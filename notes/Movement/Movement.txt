@@ -1,0 +1,7 @@
+Most distance variables on the number of tiles covered (a 64 x 64 square).
+These can be converted into pixels through the "tilesize_to_pixels" function in the "conversions" script.
+If you see a function, assume it takes distance as tiles, then does coversions as needed.
+
+Most time variables on number of seconds
+These can be converted into frames through the "seconds_to_roomspeed_frames" function in the "conversions" script.
+If you see a function, assume it takes time as seconds, then does coversions as needed.

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"detection_ranges_and_targeting",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"detection_ranges_and_targeting",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
