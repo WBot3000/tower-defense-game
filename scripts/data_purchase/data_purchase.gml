@@ -18,6 +18,7 @@ function PurchaseData(_unit, _price, _button_sprite = object_get_sprite(_unit)) 
 	button_sprite = _button_sprite;
 }
 
-PURCHASE_SAMPLE_GUNNER = new PurchaseData(sample_gunner, 100);
-PURCHASE_SAMPLE_BRAWLER = new PurchaseData(sample_brawler, 100);
-PURCHASE_SAMPLE_MORTAR = new PurchaseData(sample_mortar, 200);
+//These don't work right now, probably have to specify global or something like that
+//PURCHASE_SAMPLE_GUNNER = new PurchaseData(sample_gunner, 100);
+//PURCHASE_SAMPLE_BRAWLER = new PurchaseData(sample_brawler, 100);
+//PURCHASE_SAMPLE_MORTAR = new PurchaseData(sample_mortar, 200);

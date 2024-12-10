@@ -33,6 +33,10 @@ if(game_state == GAME_STATE.PAUSED) {
 	}
 	else {
 	    draw_surface(pause_screen_surface, 0, 0);
+		//Need to draw components of the GUI, since the pause_screen_surface only draws instances
+		if(purchase_menu_state != PURCHASE_MENU_STATE.CLOSED) { //TODO: Need to disable button highlighting
+			purchase_menu.draw(false);
+		}
 	    draw_set_alpha(0.5);
 	    draw_rectangle_colour(0, 0, _view_w, _view_h, c_black, c_black, c_black, c_black, false);
 	    draw_set_alpha(1);

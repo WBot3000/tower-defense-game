@@ -106,6 +106,7 @@
     {"id":{"name":"menus","path":"scripts/menus/menus.yy",},},
     {"id":{"name":"persistent_hitbox_effects","path":"scripts/persistent_hitbox_effects/persistent_hitbox_effects.yy",},},
     {"id":{"name":"utility","path":"scripts/utility/utility.yy",},},
+    {"id":{"name":"shader_grayscale","path":"shaders/shader_grayscale/shader_grayscale.yy",},},
     {"id":{"name":"bg_sample_level_1","path":"sprites/bg_sample_level_1/bg_sample_level_1.yy",},},
     {"id":{"name":"spr_border_tile","path":"sprites/spr_border_tile/spr_border_tile.yy",},},
     {"id":{"name":"spr_defended_wall_tile","path":"sprites/spr_defended_wall_tile/spr_defended_wall_tile.yy",},},

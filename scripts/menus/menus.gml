@@ -79,12 +79,13 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) constructor {
 	
 	
 	//_menu_x_offset and _menu_y_offset are the origins of the menu
-	static draw = function(_menu_x_offset, _menu_y_offset) {
+	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
+	static draw = function(_menu_x_offset, _menu_y_offset, _button_highlight_enabled = true) {
 		var _draw_x_pos = x_pos + _menu_x_offset;
 		var _draw_y_pos = y_pos + _menu_y_offset;
 		
 		var _spr = spr_unit_purchase_button_default
-		if(is_highlighted(_menu_x_offset, _menu_y_offset)) {
+		if(_button_highlight_enabled && is_highlighted(_menu_x_offset, _menu_y_offset)) {
 			_spr = spr_unit_purchase_button_highlighted
 		}
 		draw_sprite(_spr, 0, _draw_x_pos, _draw_y_pos);
@@ -118,8 +119,8 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	var _menu_width = _view_w - x_pos_open;
 	var _button_width = sprite_get_width(spr_unit_purchase_button_default);
 
-	var _button_x = 0;//(window_get_width() - menu_width) + x_gap;
-	var _button_y = 0;//object_get_sprite(unit_purchase_button).width;
+	var _button_x = 0;
+	var _button_y = 0;
 	var _x_gap = (_menu_width - PURCHASE_MENU_BPR*_button_width) / (PURCHASE_MENU_BPR + 1); //Gap in between buttons (also used as x_margins)
 	//Create buttons
 	for(var i = 0; i < array_length(_purchase_data_list); ++i) {
@@ -162,12 +163,13 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	}
 	
 	
-	static draw = function() {
+	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
+	static draw = function(_button_highlight_enabled = true) {
 		var _view_w = camera_get_view_width(view_camera[0]);
 		
 		draw_rectangle_color(x_pos_current, 0, _view_w, y_pos, c_silver, c_silver, c_silver, c_silver, false);
 		for(var i = 0; i < array_length(buttons); ++i) {
-			buttons[i].draw(x_pos_current, 0);
+			buttons[i].draw(x_pos_current, 0, _button_highlight_enabled);
 		}
 	}
 	
@@ -180,12 +182,5 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		}
 		return undefined;
 	}
-	
-	
-	//TODO: Specify screen percentage size instead of absolute position. Then, the absolute position can be calculated using this percentage and the total screen size
-	/*
-	static refresh_size() {
-		y_pos
-	}*/
 	
 }
