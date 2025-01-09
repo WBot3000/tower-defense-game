@@ -35,5 +35,5 @@
     "path":"sprites/spr_void_tile/spr_void_tile.yy",
   },
   "spriteMaskId":null,
-  "visible":true,
+  "visible":false,
 }

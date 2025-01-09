@@ -15,3 +15,11 @@ function map_value(_value, _current_lower_bound, _current_upper_bound, _desired_
 function number_is_between(_num, _boundary1, _boundary2) {
 	return (_boundary1 <= _num && _num <= _boundary2) || (_boundary2 <= _num && _num <= _boundary1)
 }
+
+//Used for determining if a unit can be placed on a certain tile
+//TODO: Will probably move to a different file eventually
+//TODO: Will need to account for player money once it's no longer a global variable
+function can_purchase_unit(tile, purchase_data) {
+	//Make sure tile can accept any units, and the unit is on the tile's approved list if it has one.
+	return tile.placeable && tile.placed_unit == noone && global.player_money >= purchase_data.price && (array_length(tile.valid_units) == 0 || array_contains(tile.valid_units, purchase_data.unit));
+}

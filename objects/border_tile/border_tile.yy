@@ -37,5 +37,5 @@
     "path":"sprites/spr_border_tile/spr_border_tile.yy",
   },
   "spriteMaskId":null,
-  "visible":true,
+  "visible":false,
 }

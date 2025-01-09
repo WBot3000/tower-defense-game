@@ -29,7 +29,7 @@ function AnimationController(_entity_obj, _current_sprite, _static_sprite = _cur
 		_num_loops: The number of times that the animations should play.
 		_end_sprite: The sprite that the object will be set to after the animation finishes.
 	*/
-	static set_animation = function(_sprite, _num_loops = 1, _end_sprite = _static_sprite) {
+	static set_animation = function(_sprite, _num_loops = 1, _end_sprite = static_sprite) {
 		//current_sprite = _sprite;
 		num_loops = _num_loops;
 		static_sprite = _end_sprite;

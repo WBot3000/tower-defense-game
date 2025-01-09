@@ -19,6 +19,7 @@ function Range(_unit) constructor {
 	
 	static draw_range = function(){};
 	static get_entities_in_range = function(){};
+	static move_range = function(){};
 }
 
 /*
@@ -47,6 +48,17 @@ function CircularRange(_unit, _origin_x, _origin_y, _radius) : Range(_unit) cons
 	*/
 	static get_entities_in_range = function(_entity_type, _storage_list, _ordered) {
 		collision_circle_list(origin_x, origin_y, radius, _entity_type, false, true, _storage_list, _ordered);
+	}
+	
+	/*
+		In the event you want to move a range. Can also be used to resize the range, though that's not required.
+		_new_origin_x: Where the origin of the CircularRange should move to on the x-axis.
+		_new_origin_y: Where the origin of the CircularRange should move to on the y-axis.
+	*/
+	static move_range = function(_new_origin_x, _new_origin_y, _new_radius = radius) {
+		origin_x = _new_origin_x;
+		origin_y = _new_origin_y;
+		radius = _new_radius;
 	}
 }
 
@@ -79,7 +91,37 @@ function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor 
 	static get_entities_in_range = function(_entity_type, _storage_list, _ordered) {
 		collision_rectangle_list(x1, y1, x2, y2, _entity_type, false, true, _storage_list, _ordered);
 	}
+	
+	/*
+		In the event you want to move a range. Can also be used to resize the range, though that's not required.
+		_new_x1: Where the x-coordinate of the RectangularRange's left is.
+		_new_y1: Where the y-coordinate of the RectangularRange's top is.
+		_new_x2: Where the x-coordinate of the RectangularRange's right is.
+		_new_y2: Where the y-coordinate of the RectangularRange's bottom is.
+	*/
+	static move_range = function(_new_x1, _new_y1, _new_x2 = x2 - x1 + _new_x1, _new_y2 = y2 - y1 + _new_y1) {
+		x1 = _new_x1;
+		y1 = _new_y1;
+		x2 = _new_x2;
+		y2 = _new_y2;
+	}
 }
+
+
+/*
+	The following ranges are used for specific types of units.
+*/
+
+/*
+	A Circular Range that's used for units/enemies that attack up close.
+	ex) Sample Brawler, Sample Enemy
+*/
+function BrawlerRange(_unit) : CircularRange(_unit) constructor {
+	origin_x = _unit.x + (_unit.sprite_width/2);
+	origin_y = _unit.y + (_unit.sprite_width/2);
+	radius = tilesize_to_pixels(1);
+}
+
 
 /*
 	Persistent hitboxes are used for when you want to do something to entities within a hitbox every so often.
@@ -97,7 +139,7 @@ function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor 
 	- Effect takes entity as an argument
 	- This effect will be called on every entity will be found, so make sure this function will work 
 	cooldown: The amount of time that should be waited before applying the effect again.
-	explosion_timer: The number of frames the hitbox has been active for.
+	hitbox_timer: The number of frames the hitbox has been active for.
 	entities_on_cooldown: A struct that contains all of the entities that shouldn't be affected by the effect on the current frame.
 	entity_trigger_times: A 2D array that contains all of the times the effect was last applied to.
 	- While it's somewhat redundant to have both this and entities_on_cooldown, the purpose is to save time by leveraging the advantages of both structs and arrays.
@@ -109,7 +151,7 @@ function PersistentHitbox(_range, _effect, _cooldown) constructor {
 	effect = _effect;
 	cooldown = _cooldown;
 	
-	explosion_timer = 0;
+	hitbox_timer = 0;
 	entities_on_cooldown = {};
 	entity_trigger_times = [];
 	
@@ -121,7 +163,7 @@ function PersistentHitbox(_range, _effect, _cooldown) constructor {
 		
 		//You can do this because the trigger times are in order from earliest started to most recently started.
 		while(array_length(entity_trigger_times) > 0) {
-			var _time_difference = milliseconds_to_seconds(explosion_timer - entity_trigger_times[0][1]);
+			var _time_difference = milliseconds_to_seconds(hitbox_timer - entity_trigger_times[0][1]);
 			if(_time_difference < cooldown) { //Cooldown hasn't expired yet, so none of the later cooldowns on the list will have expired either.
 				break;
 			}
@@ -139,12 +181,12 @@ function PersistentHitbox(_range, _effect, _cooldown) constructor {
 				effect(_added_entity_id);
 				//Add hash instead of entity id so we don't have to recalculate it later.
 				//NOTE: This would have to be changed if we ever wanted to display the cooldown list to the player, but tbh that's very unlikely
-				array_push(entity_trigger_times, [_added_entity_id_hash, explosion_timer]);
+				array_push(entity_trigger_times, [_added_entity_id_hash, hitbox_timer]);
 				struct_set_from_hash(entities_on_cooldown, _added_entity_id_hash, true);
 			}
 		}
 		
-		explosion_timer++;
+		hitbox_timer++;
 	}
 	
 }

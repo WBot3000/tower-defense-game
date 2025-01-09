@@ -4,6 +4,8 @@ name = "NAME_NOT_PROVIDED";
 
 max_health = 0;
 current_health = 0;
+health_state = UNIT_STATE.ACTIVE;
+recovery_rate = 0; //In health points per second
 
 radius = 0.0;
 

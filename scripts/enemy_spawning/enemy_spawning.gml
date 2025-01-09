@@ -112,7 +112,7 @@ function Round(_spawn_list, _timer_count, _on_round_finish_callback) constructor
 			var _enemy_type = _current_spawn_data.enemy_types[i];
 			var _path = _current_spawn_data.enemy_paths[i];
 		    spawn_enemy(_enemy_type, _path);
-			show_debug_message("Enemy spawned");
+			//show_debug_message("Enemy spawned");
 		}
 		
 		spawn_list_repeat_count++;
@@ -169,7 +169,6 @@ function RoundManager(_controller_obj, _max_round, _spawn_data) constructor {
 			with(controller_obj) { //This event will "win" the game;
 				event_user(0);
 			}
-			//return GAME_STATE.VICTORY; //Congrats!
 		}
 	};
 	

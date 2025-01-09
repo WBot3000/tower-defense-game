@@ -35,5 +35,5 @@
     "path":"sprites/spr_standard_tile/spr_standard_tile.yy",
   },
   "spriteMaskId":null,
-  "visible":true,
+  "visible":false,
 }

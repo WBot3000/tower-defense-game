@@ -5,10 +5,9 @@
 #macro MORTAR_CANNONBALL_EXPLOSION_DAMAGE 10
 
 function mortar_cannonball_explosion_effect(_enemy_to_damage){
+	deal_damage(_enemy_to_damage, MORTAR_CANNONBALL_EXPLOSION_DAMAGE);
+	/*
 	with(_enemy_to_damage) {
 		current_health -= MORTAR_CANNONBALL_EXPLOSION_DAMAGE;
-		if(current_health <= 0) {
-			instance_destroy();
-		}
-	}
+	}*/
 }

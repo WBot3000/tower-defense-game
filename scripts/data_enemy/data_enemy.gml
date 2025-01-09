@@ -1,4 +1,4 @@
-//Ignore all of this for now. Will probably come back to it later when the issue is more prevalent
+//Ignore most of this for now.
 
 /*
 This file contains data for all the different types of enemies in the game.
@@ -44,3 +44,11 @@ function SampleEnemyData(): BaseEnemyData(
 	
 }
 */
+
+/*
+	Whether an enemy should be moving or attacking
+*/
+enum ENEMY_ATTACKING_STATE {
+	NOT_ATTACKING,
+	IN_ATTACK
+}

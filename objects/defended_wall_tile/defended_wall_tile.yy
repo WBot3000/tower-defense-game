@@ -35,5 +35,5 @@
     "path":"sprites/spr_defended_wall_tile/spr_defended_wall_tile.yy",
   },
   "spriteMaskId":null,
-  "visible":true,
+  "visible":false,
 }

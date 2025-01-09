@@ -26,8 +26,8 @@ function CameraController() constructor {
 		var _view_w = camera_get_view_width(view_camera[0]);
 		var _view_h = camera_get_view_height(view_camera[0]);
 
-		//Padding will be 1/8th the size of the screen's height (so 1/4th the height including both sides). Used height instead of width, since viewport height should be smaller and I don't want the camera to move around as much.
-		var _padding = _view_h / 8;
+		//Padding will be 1/16th the size of the screen's height (so 1/8th the height including both sides). Used height instead of width, since viewport height should be smaller and I don't want the camera to move around as much.
+		var _padding = _view_h / 16;
 
 		var _new_x = _view_x;
 		var _new_y = _view_y;

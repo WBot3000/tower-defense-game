@@ -1,11 +1,7 @@
 {
   "$GMObject":"",
   "%Name":"base_tile",
-  "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":10,"eventType":6,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":11,"eventType":6,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-  ],
+  "eventList":[],
   "managed":true,
   "name":"base_tile",
   "overriddenProperties":[],
@@ -36,5 +32,5 @@
   "solid":false,
   "spriteId":null,
   "spriteMaskId":null,
-  "visible":true,
+  "visible":false,
 }

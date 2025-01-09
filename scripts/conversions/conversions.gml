@@ -23,3 +23,11 @@ function roomspeed_frames_to_seconds(_room_speed_frames) { //Inverse of seconds_
 function milliseconds_to_seconds(_milliseconds) { //Used for timers that utilize current_time instead of counters. Basically just dividing by 1000, but I felt like it should be encapsulated anyways.
 	return _milliseconds/1000;
 }
+
+function seconds_to_milliseconds(_seconds) { //Basically just multiplying by 1000, but I felt like it should be encapsulated anyways.
+	return _seconds*1000;
+}
+
+function microseconds_to_milliseconds(_seconds) { //Basically just dividing by 1000, but I felt like it should be encapsulated anyways.
+	return _seconds/1000;
+}
