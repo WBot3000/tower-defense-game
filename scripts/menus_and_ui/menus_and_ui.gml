@@ -2,7 +2,6 @@
 This file contains macros, structs, and functions for creating the various menus and UI elements in the game.
 Certain menus have different options based on different contexts. These let you control these options easily.
 
-TODO: Put all of the GUI stuff in a single object with a single refresh function
 */
 
 /*
@@ -76,8 +75,6 @@ function PauseButton(_x_pos, _y_pos) :
 		Button(_x_pos, _y_pos, spr_pause_menu_toggle) constructor {
 	x_pos = _x_pos;
 	y_pos = _y_pos;
-	
-	game_controller = get_game_controller(); //TODO: Can't reference the game controller before it's created. Need to find another way to refer to the game state.
 	
 	
 	static on_click = function() {
@@ -422,7 +419,7 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 	
 	//TODO: Create GUI component activation/deactivation system that can easily do this without spaghetti logic
 	static is_cursor_on_gui = function() {
-		if(game_state_manager.state == GAME_STATE.PAUSED) { //For the pause menu, just for disabling placement outright if the game is paused. TODO: Maybe change this to not running?
+		if(game_state_manager.state != GAME_STATE.RUNNING) { //For the pause menu, just for disabling placement outright if the game isn't running.
 			return true;
 		}
 		
@@ -461,7 +458,7 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 			pause_menu.draw();
 		}
 		else { //Draw control buttons
-			pause_button.draw(); //TODO: Need to figure out how to move thiss
+			pause_button.draw();
 			round_start_button.draw();
 		}
 

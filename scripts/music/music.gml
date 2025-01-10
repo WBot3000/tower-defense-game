@@ -19,7 +19,6 @@ TODO: Should there be something for sound effects too? Don't want to overcomplic
 	next_music: The song to play after the current song has faded out. Not necessary if the track should switch immediately.
 	
 	TODO: Currently, this assumes that all music should loop. Should add support for non-looping music.
-	TODO: Lots of things just to handle fading. Is this worth it?
 */
 function MusicManager(_initial_music) constructor {
 	current_music = _initial_music;

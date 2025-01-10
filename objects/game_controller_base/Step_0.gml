@@ -1,9 +1,5 @@
 /// @description Run the camera controller, round manager and handle menu resizing selection
 
-//Update menu size if the screen has been resized
-//TODO: Seems to be currently buffed
-//purchase_menu.update_menu_size();
-
 var _mouse_left_released = mouse_check_button_released(mb_left);
 
 var _q_pressed = keyboard_check_pressed(ord("Q"));
@@ -29,10 +25,6 @@ if(_q_pressed) {
 //Check to see if the music should be changed based on events in the game
 music_manager.on_step();
 
-//Check for defeat. TODO: Will probably move this somewhere else in the future
-//if(global.wall_health <= 0) {
-//	event_user(1);
-//}
 
 //Stuff below this section will only run if the game isn't paused
 if(game_state_manager.state != GAME_STATE.RUNNING) {
@@ -97,7 +89,6 @@ if(_mouse_left_released) {
 
 //Handle different cases for opening and closing the Unit Selection menu
 //TODO: Put these into their own functions in the menu object?
-//TODO: Currently, when resizing the window, the closing function takes longer to complete.
 switch (game_ui.purchase_menu.state) {
 	case PURCHASE_MENU_STATE.CLOSED:
 		if(_e_pressed) {
