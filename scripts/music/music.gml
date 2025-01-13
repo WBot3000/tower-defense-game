@@ -12,6 +12,7 @@ TODO: Should there be something for sound effects too? Don't want to overcomplic
 	
 	current_music: The song that's currently playing. Useful for checking what song is currently playing.
 	current_music_ref: Reference to the current music that's playing.
+	volume: The volume that the music is playing at. Ranges from 0 to 1 (0% to 100%).
 	fading_out: Used to keep track of whether the current music is fading out (as opposed to it just being muted).
 	fading_time: The number of milliseconds that it'll take to perform any fading out.
 	fading_start: Used to keep track of how long any fading has been going on for
@@ -20,23 +21,34 @@ TODO: Should there be something for sound effects too? Don't want to overcomplic
 	
 	TODO: Currently, this assumes that all music should loop. Should add support for non-looping music.
 */
-function MusicManager(_initial_music) constructor {
+function MusicManager(_initial_music, _initial_volume = 1) constructor {
 	current_music = _initial_music;
 	current_music_ref = -1;
+	volume = _initial_volume
 	if(_initial_music != undefined) {
-		current_music_ref = audio_play_sound(_initial_music, MAX_AUDIO_PRIORITY, true);
+		current_music_ref = audio_play_sound(_initial_music, MAX_AUDIO_PRIORITY, true, volume);
 	}
+	
 	fading_out = false;
 	fading_time = -1;
 	fading_start = -1;
 	next_music = undefined;
 	
-	set_music = function(_new_music) {
+	static set_music = function(_new_music) {
 		audio_stop_sound(current_music_ref);
 		current_music_ref = audio_play_sound(_new_music, MAX_AUDIO_PRIORITY, true);
 	}
 	
-	fade_out_current_music = function(_fading_time = MUSIC_FADING_TIME, _next_music = undefined) {
+	
+	static set_volume = function(_new_volume) {
+		volume = _new_volume;
+		if(current_music_ref != -1) {
+			audio_sound_gain(current_music_ref, volume, 0);
+		}
+	}
+	
+	
+	static fade_out_current_music = function(_fading_time = MUSIC_FADING_TIME, _next_music = undefined) {
 		fading_out = true;
 		fading_time = _fading_time
 		next_music = _next_music;
@@ -44,7 +56,8 @@ function MusicManager(_initial_music) constructor {
 		fading_start = get_timer();
 	}
 	
-	on_step = function() {
+	
+	static on_step = function() {
 		if(fading_out && microseconds_to_milliseconds(get_timer() - fading_start) >= fading_time) {
 			audio_stop_sound(current_music_ref);
 			fading_out = false;
@@ -52,7 +65,7 @@ function MusicManager(_initial_music) constructor {
 			fading_start = -1;
 			if(next_music != undefined) {
 				current_music = next_music;
-				current_music_ref = audio_play_sound(next_music, MAX_AUDIO_PRIORITY, true);
+				current_music_ref = audio_play_sound(next_music, MAX_AUDIO_PRIORITY, true, volume);
 				next_music = undefined;
 			}
 			else {

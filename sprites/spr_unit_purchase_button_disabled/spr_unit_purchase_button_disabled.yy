@@ -25,8 +25,8 @@
   "nineSlice":null,
   "origin":0,
   "parent":{
-    "name":"buttons",
-    "path":"folders/Sprites/ui_components/buttons.yy",
+    "name":"Unit Purchase Menu",
+    "path":"folders/Sprites/ui_components/buttons/Unit Purchase Menu.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

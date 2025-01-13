@@ -122,16 +122,93 @@ enum PAUSE_MENU_STATE {
 
 
 /*
-	Defines all of the data for the Pause Menu
-	surface: The surface that the game's sprites are drawn to upon pausing
-	menu_width_percentage: The percentage of the screen's width that the pause menu should take up.
-	menu_height_percentage: The percentage of the screen's height that the pause menu should take up.
+	Used for creating "pill bars", segmented sliders that can be used to select a range of values
+	x_pos: X-coordinate of the top left of the bar.
+	y_pos: Y-coordinate of the top left of the bar.
+	num_segments: The number of segments this pill bar should have.
+	current_segment: The modifier that the pill bar is set to. Values can be from 0 to num_segments.
 */
-function PauseMenu(_menu_width_percentage, _menu_height_percentage) constructor {
+#macro PILL_WIDTH sprite_get_width(spr_pill_button_light)
+#macro PILL_HEIGHT sprite_get_height(spr_pill_button_light)
+#macro PILL_GAP sprite_get_width(spr_pill_button_light) / 4
+
+function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segments) constructor {
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	num_segments = _num_segments;
+	current_segment = _starting_segment;
+	
+	static draw = function() {
+		var pill_x_pos = x_pos;
+		for(var i = 0; i < num_segments; ++i) {
+			if(i < current_segment) {
+				draw_sprite(spr_pill_button_light, 0, pill_x_pos, y_pos);
+			}
+			else {
+				draw_sprite(spr_pill_button_dark, 0, pill_x_pos, y_pos);
+			}
+			pill_x_pos += (PILL_WIDTH + PILL_GAP);
+		}
+	}
+	
+	//Returns the segment that the menu should be set to.
+	static on_click = function() {
+		var pill_x_pos = x_pos;
+		var camera_x = camera_get_view_x(view_camera[0]);
+		var camera_y = camera_get_view_y(view_camera[0]);
+		for (var i = 0; i < num_segments; ++i) {
+		    if((mouse_x - camera_x >= pill_x_pos) && (mouse_x - camera_x <= pill_x_pos + PILL_WIDTH)
+				&& (mouse_y - camera_y >= y_pos) && (mouse_y - camera_y <= y_pos + PILL_HEIGHT)) {
+					if(i + 1 == current_segment) { //If you click on the current rightmost segment, "un-select it"
+						current_segment = i;	
+					}
+					else {
+						current_segment = i+1;
+					}
+			}
+			pill_x_pos += (PILL_WIDTH + PILL_GAP);
+		}
+		return current_segment;
+	}
+}
+
+
+/*
+	Defines all of the data for the Pause Menu
+	_menu_width_percentage: The percentage of the screen's width that the pause menu should take up.
+	_menu_height_percentage: The percentage of the screen's height that the pause menu should take up.
+	
+	pause_background: Sprite used to show all the enemies while the game is paused.
+	x1: Left boundary
+	y1: Upper boundary
+	x2: Right boundary
+	y2: Lower boundary
+	music_manager: The manager of the game's music
+	volume_options: The pill bar that controls the volume of the game's music
+*/
+
+#macro NUM_VOLUME_PILLS 10
+function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manager) constructor {
 	pause_background = -1;
-	//surface = -1;
-	menu_width_percentage = _menu_width_percentage;
-	menu_height_percentage = _menu_height_percentage;
+	
+	var _view_w = camera_get_view_width(view_camera[0]);
+	var _view_h = camera_get_view_height(view_camera[0]);
+	
+	x1 = (_view_w/2) - (_menu_width_percentage/2 * _view_w); //From middle point, go to the left by the percentage amount
+	y1 = (_view_h/2) - (_menu_height_percentage/2 * _view_h); //From middle point, go up by the percentage amount
+	x2 = (_view_w/2) + (_menu_width_percentage/2 * _view_w); //From middle point, go to the right by the percentage amount
+	y2 = (_view_h/2) + (_menu_height_percentage/2 * _view_h); //From middle point, go down by the percentage amount
+	
+	music_manager = _music_manager;
+	/*
+		Gross math equation that basically says
+		- From the center of the pause menu [(_x1 + _x2) / 2]
+		- Move the pill bar [-]
+		- Half of it's length to the left [(NUM_VOLUME_PILLS * (PILL_WIDTH + PILL_GAP - 1)) / 2]
+	*/
+	var _volume_options_x = ((x1 + x2) / 2) - ((NUM_VOLUME_PILLS * (PILL_WIDTH + PILL_GAP - 1)) / 2);
+	volume_options = new PillBar(_volume_options_x, y1 + 96, NUM_VOLUME_PILLS, NUM_VOLUME_PILLS);
+	
 	
 	static create_pause_background = function() {
 		if(pause_background != -1) {
@@ -140,34 +217,24 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage) constructor 
 		pause_background = sprite_create_from_surface(application_surface, 0, 0, camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]), false, false, 0, 0);
 	}
 	
+	
 	static free_pause_background = function() {
-		/*surface_free(surface);
-        surface = -1;*/
 		sprite_delete(pause_background);
 		pause_background = -1;
 	}
 	
+	
 	static draw = function() {
-		var _view_w = camera_get_view_width(view_camera[0]);
-		var _view_h = camera_get_view_height(view_camera[0]);
-		
-		var _x1 = (_view_w/2) - (menu_width_percentage/2 * _view_w); //From middle point, go to the left by the percentage amount
-		var _y1 = (_view_h/2) - (menu_height_percentage/2 * _view_h); //From middle point, go up by the percentage amount
-		var _x2 = (_view_w/2) + (menu_width_percentage/2 * _view_w); //From middle point, go to the right by the percentage amount
-		var _y2 = (_view_h/2) + (menu_height_percentage/2 * _view_h); //From middle point, go down by the percentage amount
-		
 		draw_sprite(pause_background, 0, 0, 0);
-		draw_rectangle_color(_x1, _y1, _x2, _y2, c_black, c_black, c_black, c_black, false);
+		draw_rectangle_color(x1, y1, x2, y2, c_black, c_black, c_black, c_black, false);
 		draw_set_halign(fa_center);
-		draw_text_color((_x1 + _x2) / 2, _y1 + 32, "PAUSED", c_white, c_white, c_white, c_white, 1);
+		draw_text_color((x1 + x2) / 2, y1 + 32, "PAUSED", c_white, c_white, c_white, c_white, 1);
+		draw_text_color((x1 + x2) / 2, y1 + 64, "Music Volume", c_white, c_white, c_white, c_white, 1);
+		volume_options.draw();
 		draw_set_halign(fa_left);
 	}
 	
 	static clean_up = function() {
-		/*
-		if(surface_exists(surface)) {
-			surface_free(surface);
-		}*/
 		if(pause_background != -1) {
 			sprite_delete(pause_background);
 		}
@@ -418,6 +485,7 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 	
 	
 	//TODO: Create GUI component activation/deactivation system that can easily do this without spaghetti logic
+	//TODO: Maybe fetch component and return it (undefined if not on any GUI component) instead of boolean?
 	static is_cursor_on_gui = function() {
 		if(game_state_manager.state != GAME_STATE.RUNNING) { //For the pause menu, just for disabling placement outright if the game isn't running.
 			return true;
@@ -444,14 +512,6 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 		//var view_w = camera_get_view_width(view_camera[0]);
 		//var view_h = camera_get_view_height(view_camera[0]);
 
-		//Draw basic game stats
-		game_info_display.draw();
-
-		//Draw purchase menu if it should be present on screen
-		if(purchase_menu.state != PURCHASE_MENU_STATE.CLOSED) {
-			purchase_menu.draw();
-		}
-
 		//Draw pause menu or not
 		//TODO: Needs a little bit more work to implement actual pausing functionality
 		if(game_state_manager.state == GAME_STATE.PAUSED) {
@@ -460,6 +520,14 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 		else { //Draw control buttons
 			pause_button.draw();
 			round_start_button.draw();
+		}
+		
+		//Draw basic game stats (done later so that it's drawn over the background sprite)
+		game_info_display.draw();
+
+		//Draw purchase menu if it should be present on screen
+		if(purchase_menu.state != PURCHASE_MENU_STATE.CLOSED) {
+			purchase_menu.draw(game_state_manager.state == GAME_STATE.RUNNING);
 		}
 
 		draw_text(TILE_SIZE, view_h - (TILE_SIZE/2), "Music by Eric Matyas, www.soundimage.org");

@@ -25,6 +25,15 @@ if(_q_pressed) {
 //Check to see if the music should be changed based on events in the game
 music_manager.on_step();
 
+//TODO: Update this to make it more efficient. Currently sets a value every "tick" when it doesn't need to.
+//I'm just very tired right now.
+//Honestly organize this entire section in general.
+if(game_state_manager.state == GAME_STATE.PAUSED && _mouse_left_released) {
+	var _selected_pill = game_ui.pause_menu.volume_options.on_click();
+	game_ui.pause_menu.volume_options.current_segment = _selected_pill;
+	music_manager.set_volume(game_ui.pause_menu.volume_options.current_segment / game_ui.pause_menu.volume_options.num_segments);
+}
+
 
 //Stuff below this section will only run if the game isn't paused
 if(game_state_manager.state != GAME_STATE.RUNNING) {
@@ -40,6 +49,7 @@ if(_mouse_left_released) {
 	//Check for certain button presses
 	//TODO: Need to neaten up this mouse release code
 	//TODO: Replace code in button highlight checks with on click functions
+	
 	//TODO: Come up with "coordinatior classes" (ex. Pause Coordinator) to sync multiple tasks like this maybe?
 	if(game_ui.pause_button.is_highlighted()) { //Don't need to bother with unpausing because you can't use the button while the game is paused
 		instance_deactivate_all(true);
@@ -55,12 +65,14 @@ if(_mouse_left_released) {
 	}
 	
 	//See if the player has selected a unit from the Unit Purchase Menu
-	if(game_ui.purchase_menu.state != PURCHASE_MENU_STATE.CLOSED && _mouse_left_released) {
+	if(game_ui.purchase_menu.state != PURCHASE_MENU_STATE.CLOSED) {
 		var _purchase_selected = game_ui.purchase_menu.select_purchase();
 		if(_purchase_selected != undefined) {
 			purchase_selected = _purchase_selected;
 		}
 	}
+	
+
 	
 	//Can't purchase anything if nothing is selected
 	if(purchase_selected != undefined && ! game_ui.is_cursor_on_gui()) {
@@ -80,7 +92,7 @@ if(_mouse_left_released) {
 			if(can_purchase_unit(self.id, _purchase)) {
 				placed_unit = instance_create_layer(x, y, UNIT_LAYER, _purchase.unit);
 				global.player_money -= _purchase.price
-				highlight = noone; //Can get rid of the highlight on the tile once it's placed
+				//highlight = noone; //Can get rid of the highlight on the tile once it's placed
 			}
 		}
 	}

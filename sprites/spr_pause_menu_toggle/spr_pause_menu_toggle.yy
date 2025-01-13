@@ -26,8 +26,8 @@
   "nineSlice":null,
   "origin":0,
   "parent":{
-    "name":"buttons",
-    "path":"folders/Sprites/ui_components/buttons.yy",
+    "name":"ui_controller",
+    "path":"folders/Sprites/ui_components/buttons/ui_controller.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

@@ -4,9 +4,6 @@
 //game_state = GAME_STATE.RUNNING;
 game_state_manager = new GameStateManager();
 
-//Surface drawn when the game is paused
-//pause_screen_surface = -1;
-
 
 //Viewport variables used to calculate where things should go on the screen
 //view_w = camera_get_view_width(view_camera[0]);
