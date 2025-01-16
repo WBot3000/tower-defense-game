@@ -246,7 +246,7 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manag
 	Unit Purchase Menu Macros and Enums
 */
 //How many pixels the menu should move per frame
-#macro PURCHASE_MENU_MOVEMENT_SPEED 32
+#macro SLIDING_MENU_MOVEMENT_SPEED 32
 
 #macro PURCHASE_MENU_BPR 3 //BPR = Buttons Per Row
 
@@ -254,7 +254,7 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manag
 #macro PURCHASE_MENU_SCREEN_PERCENTAGE (1/3)
 
 //Enums for Unit Purchase Menu state
-enum PURCHASE_MENU_STATE {
+enum SLIDING_MENU_STATE {
 	CLOSED,
 	CLOSING, //For closing animation
 	OPENING, //For opening animation
@@ -316,11 +316,11 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 	menu_width_percentage: How much screen space the menu should take up. Needed to recalculate the size of the menu upon resizing the game window.
 	x_pos_open: Horizontal coordinate of the menu's top-left corner when the menu is open.
 	x_pos_current: Current horizontal coordinate of the menu's top-left corner (useful for scrolling).
-	y_pos: Vertical coordinate of the menu's top-left corner when the menu is open.
+	y_pos: Vertical coordinate of the menu's top-right corner when the menu is open.
 	purchase_data_list: The purchasing data array that corresponds with the buttons.
 */
 function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) constructor {
-	state = PURCHASE_MENU_STATE.CLOSED; //Whether the menu on the side is opened or closed
+	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the side is opened or closed
 	menu_width_percentage = _menu_width_percentage;
 	
 	var _view_w = camera_get_view_width(view_camera[0]);
@@ -357,7 +357,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		return mouse_x - _view_x >= x_pos_current; 
 	}
 	
-	
+	/*
 	static update_menu_size = function() {
 		var _view_w = camera_get_view_width(view_camera[0]);
 		var _new_x_pos_open = (1-menu_width_percentage) * _view_w;
@@ -385,6 +385,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 			}
 		}
 	}
+	*/
 	
 	
 	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
@@ -405,6 +406,43 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 			}
 		}
 		return undefined;
+	}
+}
+
+
+/*
+	Defines all the data for the Unit Info Card.
+	state: Whether the menu is open, opening, closing, or closed
+	menu_height_percentage: How much screen space the menu should take up. Needed to recalculate the height of the menu upon resizing the game window.
+	x_pos: Horizontal coordinate of the menu's top-right corner when the menu is open.
+	y_pos_open: Vertical coordinate of the menu's top-left corner when the menu is open.
+	y_pos_current: Current vertical coordinate of the menu's top-left corner (useful for scrolling).
+	selected_unit: Displays the data for the currently selected unit
+*/
+function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
+	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the bottom is opened or closed
+	menu_height_percentage = _menu_height_percentage;
+	
+	var _view_h = camera_get_view_height(view_camera[0]);
+	y_pos_open = (1-menu_height_percentage) * _view_h;
+	y_pos_current = _view_h; //Window should start out closed
+	x_pos = _x_pos;
+
+	
+	static is_highlighted = function() {
+		//mouse_y is based on room position, not camera position, so need to correct selection
+		//TODO: Passable view_camera index?
+		var _view_y = camera_get_view_x(view_camera[0]);
+		//Only need to do one calculation because the menu takes up the whole bottom of the screen
+		return mouse_y - _view_y >= y_pos_current; 
+	}
+	
+	
+	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
+	static draw = function(_button_highlight_enabled = true) {
+		var _view_h = camera_get_view_height(view_camera[0]);
+		
+		draw_rectangle_color(0, y_pos_current, x_pos, _view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
 	}
 }
 
@@ -481,7 +519,8 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 	//Menus
 	pause_menu = new PauseMenu((1/2), (1/2));
 	//NOTE: In the older code, the height was just window_get_height(). See how this changes things.
-	purchase_menu = new UnitPurchaseMenu((1/3), camera_get_view_width(view_camera[0]), _purchase_data);
+	purchase_menu = new UnitPurchaseMenu((2/7), camera_get_view_height(view_camera[0])*(4/5), _purchase_data);
+	unit_info_card = new UnitInfoCard((1/5), camera_get_view_width(view_camera[0]));
 	
 	
 	//TODO: Create GUI component activation/deactivation system that can easily do this without spaghetti logic
@@ -501,6 +540,10 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 		}
 		
 		if(purchase_menu.is_highlighted()) {
+			return true;
+		}
+		
+		if(unit_info_card.is_highlighted()) {
 			return true;
 		}
 		
@@ -526,8 +569,13 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 		game_info_display.draw();
 
 		//Draw purchase menu if it should be present on screen
-		if(purchase_menu.state != PURCHASE_MENU_STATE.CLOSED) {
+		if(purchase_menu.state != SLIDING_MENU_STATE.CLOSED) {
 			purchase_menu.draw(game_state_manager.state == GAME_STATE.RUNNING);
+		}
+		
+		//Draw unit info card if it should be present on screen
+		if(unit_info_card.state != SLIDING_MENU_STATE.CLOSED) {
+			unit_info_card.draw(game_state_manager.state == GAME_STATE.RUNNING);
 		}
 
 		draw_text(TILE_SIZE, view_h - (TILE_SIZE/2), "Music by Eric Matyas, www.soundimage.org");

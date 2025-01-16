@@ -47,7 +47,7 @@ round_start_button = new RoundStartButton(TILE_SIZE, camera_get_view_height(view
 //Menu-Specific
 pause_menu = new PauseMenu((1/2), (1/2));
 
-//purchase_menu.state = PURCHASE_MENU_STATE.CLOSED; //Whether the menu on the side is opened or closed
+//purchase_menu.state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the side is opened or closed
 //NOTE: Might make separate states for the different side menus
 
 purchase_menu = new UnitPurchaseMenu((1/3), window_get_height(), 

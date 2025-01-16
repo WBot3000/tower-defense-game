@@ -4,6 +4,7 @@ var _mouse_left_released = mouse_check_button_released(mb_left);
 
 var _q_pressed = keyboard_check_pressed(ord("Q"));
 var _e_pressed = keyboard_check_pressed(ord("E"));
+var _f_pressed = keyboard_check_pressed(ord("F"));
 
 //Check to see if the game should be paused or unpaused
 //NOTE: Currently just draws the pause menu. Doesn't handle any actual pausing or unpausing
@@ -40,7 +41,7 @@ if(game_state_manager.state != GAME_STATE.RUNNING) {
 	return;
 }
 
-camera_controller.move_camera(!(game_ui.purchase_menu.state != PURCHASE_MENU_STATE.CLOSED)); //Disable mouse camera movement while the menu is open (WASD still works though)
+camera_controller.move_camera(!(game_ui.purchase_menu.state != SLIDING_MENU_STATE.CLOSED)); //Disable mouse camera movement while the menu is open (WASD still works though)
 
 //"Advance" the round spawning timer
 round_manager.on_step();
@@ -65,7 +66,7 @@ if(_mouse_left_released) {
 	}
 	
 	//See if the player has selected a unit from the Unit Purchase Menu
-	if(game_ui.purchase_menu.state != PURCHASE_MENU_STATE.CLOSED) {
+	if(game_ui.purchase_menu.state != SLIDING_MENU_STATE.CLOSED) {
 		var _purchase_selected = game_ui.purchase_menu.select_purchase();
 		if(_purchase_selected != undefined) {
 			purchase_selected = _purchase_selected;
@@ -102,32 +103,68 @@ if(_mouse_left_released) {
 //Handle different cases for opening and closing the Unit Selection menu
 //TODO: Put these into their own functions in the menu object?
 switch (game_ui.purchase_menu.state) {
-	case PURCHASE_MENU_STATE.CLOSED:
+	case SLIDING_MENU_STATE.CLOSED:
 		if(_e_pressed) {
 			//purchase_menu.open();
-			game_ui.purchase_menu.state = PURCHASE_MENU_STATE.OPENING;
+			game_ui.purchase_menu.state = SLIDING_MENU_STATE.OPENING;
 		}
 	    break;
-	case PURCHASE_MENU_STATE.CLOSING:
-		game_ui.purchase_menu.x_pos_current = min(game_ui.purchase_menu.x_pos_current + PURCHASE_MENU_MOVEMENT_SPEED, camera_get_view_width(view_camera[0]))
+	case SLIDING_MENU_STATE.CLOSING:
+		game_ui.purchase_menu.x_pos_current = min(game_ui.purchase_menu.x_pos_current + SLIDING_MENU_MOVEMENT_SPEED, camera_get_view_width(view_camera[0]))
 		//Need to move pause button along with it
-		game_ui.pause_button.x_pos = min(game_ui.pause_button.x_pos + PURCHASE_MENU_MOVEMENT_SPEED, PAUSE_BUTTON_X);
+		game_ui.pause_button.x_pos = min(game_ui.pause_button.x_pos + SLIDING_MENU_MOVEMENT_SPEED, PAUSE_BUTTON_X);
 		if(game_ui.purchase_menu.x_pos_current >= camera_get_view_width(view_camera[0])) {
-			game_ui.purchase_menu.state = PURCHASE_MENU_STATE.CLOSED;
+			game_ui.purchase_menu.state = SLIDING_MENU_STATE.CLOSED;
 		}
 		break;
-	case PURCHASE_MENU_STATE.OPENING:
-		game_ui.purchase_menu.x_pos_current = max(game_ui.purchase_menu.x_pos_current - PURCHASE_MENU_MOVEMENT_SPEED, game_ui.purchase_menu.x_pos_open)
+	case SLIDING_MENU_STATE.OPENING:
+		game_ui.purchase_menu.x_pos_current = max(game_ui.purchase_menu.x_pos_current - SLIDING_MENU_MOVEMENT_SPEED, game_ui.purchase_menu.x_pos_open)
 		//Need to move pause button along with it
-		game_ui.pause_button.x_pos = max(game_ui.pause_button.x_pos - PURCHASE_MENU_MOVEMENT_SPEED, PAUSE_BUTTON_X - (camera_get_view_width(view_camera[0]) - game_ui.purchase_menu.x_pos_open));
+		game_ui.pause_button.x_pos = max(game_ui.pause_button.x_pos - SLIDING_MENU_MOVEMENT_SPEED, PAUSE_BUTTON_X - (camera_get_view_width(view_camera[0]) - game_ui.purchase_menu.x_pos_open));
 		if(game_ui.purchase_menu.x_pos_current <= game_ui.purchase_menu.x_pos_open) {
-			game_ui.purchase_menu.state = PURCHASE_MENU_STATE.OPEN;
+			game_ui.purchase_menu.state = SLIDING_MENU_STATE.OPEN;
 		}
 		break;
-	case PURCHASE_MENU_STATE.OPEN:
+	case SLIDING_MENU_STATE.OPEN:
 		if(_e_pressed) {
 			//purchase_menu.close();
-			game_ui.purchase_menu.state = PURCHASE_MENU_STATE.CLOSING;
+			game_ui.purchase_menu.state = SLIDING_MENU_STATE.CLOSING;
+		}
+		break;
+	default:
+	    break;
+}
+
+
+//Handle different cases for opening and closing the Unit Selection menu
+//TODO: Put these into their own functions in the menu object?
+switch (game_ui.unit_info_card.state) {
+	case SLIDING_MENU_STATE.CLOSED:
+		if(_f_pressed) {
+			//purchase_menu.open();
+			game_ui.unit_info_card.state = SLIDING_MENU_STATE.OPENING;
+		}
+	    break;
+	case SLIDING_MENU_STATE.CLOSING:
+		game_ui.unit_info_card.y_pos_current = min(game_ui.unit_info_card.y_pos_current + SLIDING_MENU_MOVEMENT_SPEED, camera_get_view_height(view_camera[0]))
+		//Need to move round button along with it
+		game_ui.round_start_button.y_pos = min(game_ui.round_start_button.y_pos + SLIDING_MENU_MOVEMENT_SPEED, ROUND_START_BUTTON_Y);
+		if(game_ui.unit_info_card.y_pos_current >= camera_get_view_height(view_camera[0])) {
+			game_ui.unit_info_card.state = SLIDING_MENU_STATE.CLOSED;
+		}
+		break;
+	case SLIDING_MENU_STATE.OPENING:
+		game_ui.unit_info_card.y_pos_current = max(game_ui.unit_info_card.y_pos_current - SLIDING_MENU_MOVEMENT_SPEED, game_ui.unit_info_card.y_pos_open)
+		//Need to move pause button along with it
+		game_ui.round_start_button.y_pos = max(game_ui.round_start_button.y_pos - SLIDING_MENU_MOVEMENT_SPEED, ROUND_START_BUTTON_Y - (camera_get_view_height(view_camera[0]) - game_ui.unit_info_card.y_pos_open));
+		if(game_ui.unit_info_card.y_pos_current <= game_ui.unit_info_card.y_pos_open) {
+			game_ui.unit_info_card.state = SLIDING_MENU_STATE.OPEN;
+		}
+		break;
+	case SLIDING_MENU_STATE.OPEN:
+		if(_f_pressed) {
+			//purchase_menu.close();
+			game_ui.unit_info_card.state = SLIDING_MENU_STATE.CLOSING;
 		}
 		break;
 	default:
