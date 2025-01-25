@@ -1,9 +1,13 @@
 /*
-This file contains macros, structs, and functions for creating the various menus and UI elements in the game.
-Certain menus have different options based on different contexts. These let you control these options easily.
+	menus_and_ui.gml
 
+	This file contains macros, structs, and functions for creating the various menus and UI elements in the game.
+	Certain menus have different options based on different contexts. These let you control these options easily.
+
+	TODO: Make a parent element for ALL UI elements (for highlighting over them?)
 */
 
+#region Button (Class)
 /*
 	Defines a parent class for a button.
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
@@ -14,7 +18,7 @@ Certain menus have different options based on different contexts. These let you 
 	
 	NOTE: As of right now, assumes highlighted button sprite is the same as the default button sprite
 */
-function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled = _button_sprite_default, _button_sprite_highlighted = _button_sprite_default) {
+function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled = _button_sprite_default, _button_sprite_highlighted = _button_sprite_default) constructor {
 	x_pos = _x_pos;
 	y_pos = _y_pos;
 	button_sprite_default = _button_sprite_default;
@@ -63,8 +67,10 @@ function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled 
 		draw_sprite(_spr, 0, _draw_x_pos, _draw_y_pos);
 	}
 }
+#endregion
 
 
+#region PauseButton (Class)
 /*
 	Defines a button that can be clicked to pause the game
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
@@ -76,13 +82,18 @@ function PauseButton(_x_pos, _y_pos) :
 	x_pos = _x_pos;
 	y_pos = _y_pos;
 	
+	//Used for determining whether or not to render
+	active = true;
+	
 	
 	static on_click = function() {
 		game_controller.game_state = GAME_STATE.PAUSED;
 	}
 }
+#endregion
 
 
+#region RoundStartButton (Class)
 /*
 	Defines a button that can be clicked to trigger a round.
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
@@ -94,6 +105,9 @@ function RoundStartButton(_x_pos, _y_pos, _round_manager) :
 	x_pos = _x_pos;
 	y_pos = _y_pos;
 	round_manager = _round_manager;
+	
+	//Used for determining whether or not to render
+	active = true;
 	
 	
 	static is_enabled = function() {
@@ -111,16 +125,10 @@ function RoundStartButton(_x_pos, _y_pos, _round_manager) :
 		}
 	}
 }
+#endregion
 
 
-
-//Enums for paused menu open state
-enum PAUSE_MENU_STATE {
-	PAUSE_OPEN,
-	PAUSE_CLOSED
-}
-
-
+#region PillBar (Class)
 /*
 	Used for creating "pill bars", segmented sliders that can be used to select a range of values
 	x_pos: X-coordinate of the top left of the bar.
@@ -151,6 +159,7 @@ function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segment
 		}
 	}
 	
+	
 	//Returns the segment that the menu should be set to.
 	static on_click = function() {
 		var pill_x_pos = x_pos;
@@ -171,8 +180,10 @@ function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segment
 		return current_segment;
 	}
 }
+#endregion
 
 
+#region PauseMenu (Class)
 /*
 	Defines all of the data for the Pause Menu
 	_menu_width_percentage: The percentage of the screen's width that the pause menu should take up.
@@ -186,6 +197,12 @@ function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segment
 	music_manager: The manager of the game's music
 	volume_options: The pill bar that controls the volume of the game's music
 */
+
+//Enums for paused menu open state
+enum PAUSE_MENU_STATE {
+	PAUSE_OPEN,
+	PAUSE_CLOSED
+}
 
 #macro NUM_VOLUME_PILLS 10
 function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manager) constructor {
@@ -209,6 +226,9 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manag
 	var _volume_options_x = ((x1 + x2) / 2) - ((NUM_VOLUME_PILLS * (PILL_WIDTH + PILL_GAP - 1)) / 2);
 	volume_options = new PillBar(_volume_options_x, y1 + 96, NUM_VOLUME_PILLS, NUM_VOLUME_PILLS);
 	
+	//Used for determining whether or not to render
+	active = true;
+	
 	
 	static create_pause_background = function() {
 		if(pause_background != -1) {
@@ -224,8 +244,11 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manag
 	}
 	
 	
-	static draw = function() {
+	static draw_paused_bg = function() {
 		draw_sprite(pause_background, 0, 0, 0);
+	}
+	
+	static draw_menu = function() {
 		draw_rectangle_color(x1, y1, x2, y2, c_black, c_black, c_black, c_black, false);
 		draw_set_halign(fa_center);
 		draw_text_color((x1 + x2) / 2, y1 + 32, "PAUSED", c_white, c_white, c_white, c_white, 1);
@@ -234,14 +257,17 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manag
 		draw_set_halign(fa_left);
 	}
 	
+	
 	static clean_up = function() {
 		if(pause_background != -1) {
 			sprite_delete(pause_background);
 		}
 	}
 }
+#endregion
 
 
+#region Sliding Menu Variables (Etc.)
 /*
 	Unit Purchase Menu Macros and Enums
 */
@@ -251,6 +277,7 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manag
 #macro PURCHASE_MENU_BPR 3 //BPR = Buttons Per Row
 
 //How much of the screen should the unit purchase menu take up while it is open
+//NOTE: I don't think this is used right now
 #macro PURCHASE_MENU_SCREEN_PERCENTAGE (1/3)
 
 //Enums for Unit Purchase Menu state
@@ -260,8 +287,10 @@ enum SLIDING_MENU_STATE {
 	OPENING, //For opening animation
 	OPEN
 }
+#endregion
 
 
+#region UnitPurchaseButton (Class)
 /*
 	Defines a clickable button for the Unit Selection Menu.
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
@@ -308,8 +337,10 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 		draw_set_halign(fa_left);
 	}
 }
+#endregion
 
 
+#region UnitPurchaseMenu (Class)
 /*
 	Defines all the data for the Unit Purchase Menu.
 	state: Whether the menu is open, opening, closing, or closed
@@ -357,36 +388,6 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		return mouse_x - _view_x >= x_pos_current; 
 	}
 	
-	/*
-	static update_menu_size = function() {
-		var _view_w = camera_get_view_width(view_camera[0]);
-		var _new_x_pos_open = (1-menu_width_percentage) * _view_w;
-		if(x_pos_open != _new_x_pos_open) { //Only do all these updates only if there's actually been a resize
-			x_pos_open = _new_x_pos_open
-			//If you can calculate the proportional difference between the old open value and the new one, then you can use that proportion to update the current x-position
-			x_pos_current = (_new_x_pos_open / x_pos_open) * x_pos_current;
-	
-			var _menu_width = _view_w - x_pos_open;
-			var _button_width = sprite_get_width(spr_unit_purchase_button_default);
-
-			var _button_x = 0;
-			var _button_y = 0;
-			var _x_gap = (_menu_width - PURCHASE_MENU_BPR*_button_width) / (PURCHASE_MENU_BPR + 1); //Gap in between buttons (also used as x_margins)
-			//Create buttons
-			for(var i = 0; i < array_length(buttons); ++i) {
-				if(i % PURCHASE_MENU_BPR == 0) { //Start of a new row
-					_button_x = _x_gap;
-					_button_y += _button_width;
-				}
-				buttons[i].x_pos = _button_x;
-				buttons[i].y_pos = _button_y;
-				//array_push(buttons, new UnitPurchaseButton(_button_x, _button_y, _purchase_data_list[i]));
-				_button_x += (_button_width + _x_gap);
-			}
-		}
-	}
-	*/
-	
 	
 	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
 	static draw = function(_button_highlight_enabled = true) {
@@ -407,9 +408,12 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		}
 		return undefined;
 	}
+	
 }
+#endregion
 
 
+#region UnitInfoCard (Class)
 /*
 	Defines all the data for the Unit Info Card.
 	state: Whether the menu is open, opening, closing, or closed
@@ -445,8 +449,10 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		draw_rectangle_color(0, y_pos_current, x_pos, _view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
 	}
 }
+#endregion
 
 
+#region GameInfoDisplay (Class)
 /*
 	Used for displaying basic game info (Round number, current money, current defense health)
 	game_state_manager: The manager that controls the game's overall state machine
@@ -485,8 +491,10 @@ function GameInfoDisplay(_game_state_manager, _round_manager) constructor {
 		draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(3/2), "Wall Health: " + string(global.wall_health), c_black, c_black, c_black, c_black, 1);
 	};
 }
+#endregion
 
 
+#region GameUI (Class)
 /*
 	Used for managing the entire UI as a unit. Allows you to enable and disable parts of the UI as needed
 */
@@ -558,7 +566,7 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 		//Draw pause menu or not
 		//TODO: Needs a little bit more work to implement actual pausing functionality
 		if(game_state_manager.state == GAME_STATE.PAUSED) {
-			pause_menu.draw();
+			pause_menu.draw_menu();
 		}
 		else { //Draw control buttons
 			pause_button.draw();
@@ -577,6 +585,10 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 		if(unit_info_card.state != SLIDING_MENU_STATE.CLOSED) {
 			unit_info_card.draw(game_state_manager.state == GAME_STATE.RUNNING);
 		}
+		
+		if(game_state_manager.state == GAME_STATE.PAUSED) {
+			pause_menu.draw_menu();
+		}
 
 		draw_text(TILE_SIZE, view_h - (TILE_SIZE/2), "Music by Eric Matyas, www.soundimage.org");
 	}
@@ -586,3 +598,4 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 		pause_menu.clean_up();
 	}
 }
+#endregion

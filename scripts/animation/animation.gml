@@ -1,6 +1,10 @@
 /*
-This file contains the Animation Controller, used for managing the animations for different units
+	animation.gml
+	This file contains the Animation Controller, used for managing the animations for different entities.
 */
+
+
+#region AnimationController (Class)
 #macro LOOP_FOREVER -1
 
 /*
@@ -71,3 +75,4 @@ function AnimationController(_entity_obj, _current_sprite, _static_sprite = _cur
 	}
 	*/
 }
+#endregion

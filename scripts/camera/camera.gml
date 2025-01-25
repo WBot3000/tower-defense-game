@@ -1,8 +1,11 @@
 /*
-This file contains the Camera Controller, responsible for moving the viewport.
-The viewport can be moved either with the mouse keys, or 
+	camera.gml
+	This file contains the Camera Controller, responsible for moving the viewport.
+	The viewport can be moved either with the mouse keys, or 
 */
 
+
+#region CameraController (Class)
 //How many pixels the camera should move each frame
 #macro CAM_SCROLL_SPEED 4
 
@@ -54,3 +57,4 @@ function CameraController() constructor {
 	}
 	
 }
+#endregion

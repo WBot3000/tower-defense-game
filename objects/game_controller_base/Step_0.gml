@@ -1,10 +1,15 @@
 /// @description Run the camera controller, round manager and handle menu resizing selection
 
+/*
+	Gather all of the user's inputs
+*/
+#region
 var _mouse_left_released = mouse_check_button_released(mb_left);
 
 var _q_pressed = keyboard_check_pressed(ord("Q"));
 var _e_pressed = keyboard_check_pressed(ord("E"));
 var _f_pressed = keyboard_check_pressed(ord("F"));
+#endregion
 
 //Check to see if the game should be paused or unpaused
 //NOTE: Currently just draws the pause menu. Doesn't handle any actual pausing or unpausing
@@ -101,7 +106,11 @@ if(_mouse_left_released) {
 
 
 //Handle different cases for opening and closing the Unit Selection menu
-//TODO: Put these into their own functions in the menu object?
+/*
+	TODO: Put these into their own functions in the menu object?
+	The issue with that is moving the buttons WITH the menu is kind of annoying.
+	Do I need to create a "Mover" object responsible for moving all of the objects within it?
+*/
 switch (game_ui.purchase_menu.state) {
 	case SLIDING_MENU_STATE.CLOSED:
 		if(_e_pressed) {

@@ -1,3 +1,10 @@
+/*
+	drawing.gml
+	This file contains functions for drawing things to the screen that don't logically fit in any other file or class.
+*/
+
+
+#region draw_health_bar (Function)
 //Draw health bars for units and enemies
 //NOTE: Since health bar's origin is center-bottom, the x coordinate is where you want to draw the CENTER of the healthbar, while the y is where you want to draw the bottom
 function draw_health_bar(x, y, _current_health, _max_health, recovering_from_ko = false){
@@ -29,3 +36,4 @@ function draw_health_bar(x, y, _current_health, _max_health, recovering_from_ko 
 		}
 	}
 }
+#endregion

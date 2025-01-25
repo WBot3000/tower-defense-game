@@ -1,10 +1,11 @@
 /*
+	enemy_spawning.gml
 	This file contains structs and functions relating to spawning enemies. It also contains the code for managing "rounds" of enemies.
-	The main advantage of the round manager is that it allows multiple series of enemies to be called upon at varying times.
+	The main advantage of the Round Manager is that it allows multiple series of enemies to be called upon at varying times.
 */
 
-#macro ENEMY_SPAWN_END -1 //Makes spawn data a bit prettier. Doesn't have much of an actual function as of right now.
 
+#region LevelPath (Class)
 /*
 	Contains all of the data for a "path" with a spawner and a default movement path
 	spawn_x: The x-coordinate of where enemies should spawn from
@@ -20,7 +21,11 @@ function LevelPath(_spawn_x, _spawn_y, _default_path) constructor {
 		return "Spawn Coordinates: (" + string(spawn_x) + ", " + string(spawn_y) + ")\nDefault Path: " + string(default_path)
 	}
 }
+#endregion
 
+
+#region EnemySpawningData (Class)
+#macro ENEMY_SPAWN_END -1 //Makes spawn data a bit prettier. Doesn't have much of an actual function as of right now.
 /*
 	The "base" unit of an enemy spawn list. An Enemy Spawn List consists of all of the enemies that will be spawned on one path in one round.
 	enemy_types: The list of enemies that should be spawned
@@ -39,7 +44,10 @@ function EnemySpawningData(_enemy_types, _enemy_paths, _time_until_next_spawn, _
 	//Might as well do conversions here. Might change this in the future
 	repeat_delay = seconds_to_roomspeed_frames(_repeat_delay)
 }
+#endregion
 
+
+#region Round (Class)
 /*
 	Contains all of the code for actually spawning enemies. Every time a round starts, one of these is created.
 	spawn_list: A list of EnemySpawningData that contains all of the enemies that'll be spawned within the round.
@@ -129,7 +137,10 @@ function Round(_spawn_list, _timer_count, _on_round_finish_callback) constructor
 	};
 	
 }
+#endregion
 
+
+#region RoundManager (Class)
 /*
 	The master controller of all rounds.
 	This controller lets the game run multiple rounds at the same time.
@@ -178,3 +189,4 @@ function RoundManager(_controller_obj, _max_round, _spawn_data) constructor {
 		}
 	};
 }
+#endregion

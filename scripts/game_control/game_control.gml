@@ -1,8 +1,11 @@
 /*
-This file contains the GameManager struct, which contains data and functions related to running the game
-Will probably contain several separate managers
+	game_control.gml
+	This file contains the GameManager struct, which contains data and functions related to running the game
+	TODO: Might end up containing several separate managers
 */
 
+
+#region GameStateManager (Class)
 /*
 	Enums for different game states
 	RUNNING: Game is running, enemies should move
@@ -48,19 +51,25 @@ function GameStateManager(initial_state = GAME_STATE.RUNNING) constructor {
 		}
 	}
 }
+#endregion
 
 
 
 /*
 	The below functions all are used for transfering data between components
 	Fetches a game controller in the event an instance needs to refer to a property of game_state.
+	
+	TODO: Still not 100% sure if we want to do this, or if we want to just pass managers as needed.
 */
+#region get_game_controller (Function)
 function get_game_controller() {
 	var _game_controller = instance_find(game_controller_base, 1);
 	return _game_controller
 }
+#endregion
 
 
+#region get_round_manager (Function)
 function get_round_manager() {
 	var _game_controller = get_game_controller();
 	if(_game_controller == noone) {
@@ -68,8 +77,10 @@ function get_round_manager() {
 	}
 	return _game_controller.round_manager;
 }
+#endregion
 
 
+#region get_camera_controller (Function)
 function get_camera_controller() {
 	var _game_controller = get_game_controller();
 	if(_game_controller == noone) {
@@ -77,4 +88,4 @@ function get_camera_controller() {
 	}
 	return _game_controller.camera_controller;
 }
-
+#endregion

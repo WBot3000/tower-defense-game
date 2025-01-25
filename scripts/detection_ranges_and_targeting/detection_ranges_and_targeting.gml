@@ -1,4 +1,5 @@
 /*
+	detection_ranges_and_targeting.gml
 	This file contains structs and functions relating to how units target enemies, including
 	- Detection ranges, used for things like:
 		-Unit attack range
@@ -6,10 +7,13 @@
 	- Unit targeting functions
 */
 
+
 /*
 	Ranges
 */
 
+
+#region Range (Class)
 /*
 	Base "range" from which all other ranges can derive from. Largely used as an interface.
 	unit: the id of the unit object that uses this range
@@ -21,7 +25,10 @@ function Range(_unit) constructor {
 	static get_entities_in_range = function(){};
 	static move_range = function(){};
 }
+#endregion
 
+
+#region CircularRange (Class)
 /*
 	For units with a circular viewing range (think most towers from Bloons Tower Defense 6)
 	origin_x: x-coordinate of the circle's origin
@@ -61,7 +68,10 @@ function CircularRange(_unit, _origin_x, _origin_y, _radius) : Range(_unit) cons
 		radius = _new_radius;
 	}
 }
+#endregion
 
+
+#region RectangularRange (Class)
 /*
 	For units with a rectangular viewing range (mostly for specialty towers, not very common)
 	x1: x-coordinate of the rectangle's top-left
@@ -106,12 +116,15 @@ function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor 
 		y2 = _new_y2;
 	}
 }
+#endregion
 
 
 /*
-	The following ranges are used for specific types of units.
+	The following ranges are used for specific types of entities.
 */
 
+
+#region BrawlerRange (Class)
 /*
 	A Circular Range that's used for units/enemies that attack up close.
 	ex) Sample Brawler, Sample Enemy
@@ -121,8 +134,10 @@ function BrawlerRange(_unit) : CircularRange(_unit) constructor {
 	origin_y = _unit.y + (_unit.sprite_width/2);
 	radius = tilesize_to_pixels(1);
 }
+#endregion
 
 
+#region PersistentHitbox (Class)
 /*
 	Persistent hitboxes are used for when you want to do something to entities within a hitbox every so often.
 	Originated from a need to damage enemies within an explosion hitbox
@@ -190,13 +205,14 @@ function PersistentHitbox(_range, _effect, _cooldown) constructor {
 	}
 	
 }
-
+#endregion
 
 
 /*
 	Unit Targeting
 */
 
+#region Targeting Types (Enums)
 /*
 	What kind of targeting a unit is using
 	CLOSEST_TO_UNIT: Attack the enemy that's physically closest to the unit. Equivalent to BTD6's "Close"
@@ -208,8 +224,10 @@ enum TARGETING_TYPE {
 	CLOSEST_TO_WALL,	//First
 	FURTHEST_FROM_WALL	//Last
 }
+#endregion
 
 
+#region target_close (Function)
 /*
 	Given an enemy list, selects the enemy closest to the unit. Can pass if the list has already been ordered to prevent the linear search.
 */
@@ -232,8 +250,10 @@ function target_close(_unit, _enemy_list, _list_is_ordered = false) {
 	}
 	return _closest_enemy;
 }
+#endregion
 
 
+#region target_first (Function)
 /*
 	Given an enemy list, selects the enemy closest to the wall.
 	Currently only takes into account enemies that have paths.
@@ -260,8 +280,10 @@ function target_first(_unit, _enemy_list) {
 	}
 	return _most_ahead_enemy;
 }
+#endregion
 
 
+#region target_last (Function)
 /*
 	Given an enemy list, selects the enemy furthest from the wall.
 	Currently only takes into account enemies that have paths.
@@ -288,3 +310,4 @@ function target_last(_unit, _enemy_list) {
 	}
 	return _most_behind_enemy;
 }
+#endregion

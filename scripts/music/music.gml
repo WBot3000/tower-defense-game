@@ -1,9 +1,13 @@
 /*
-This file contains the code for the MusicManager, responsible for playing the appropriate music for the appropriate situation, alongside appropriate effects to music.
-ex) Fading out a song before playing another one.
+	music.gml
+	This file contains the code for the MusicManager, responsible for playing the appropriate music for the appropriate situation, alongside appropriate effects to music.
+		ex) Fading out a song before playing another one.
 
-TODO: Should there be something for sound effects too? Don't want to overcomplicate sound effects.
+	TODO: Should there be something for sound effects too? Don't want to overcomplicate sound effects.
 */
+
+
+#region MusicManager (Class)
 #macro QUICK_MUSIC_FADING_TIME 0.5 //Number of seconds it takes for music to fade in and out (quickly).
 #macro MUSIC_FADING_TIME 1 //Number of seconds it takes for music to fade in and out.
 #macro MAX_AUDIO_PRIORITY 9999 //Used to give highest priority to music.
@@ -74,3 +78,4 @@ function MusicManager(_initial_music, _initial_volume = 1) constructor {
 		}
 	}
 }
+#endregion
