@@ -68,6 +68,12 @@ if(_mouse_left_released) {
 		round_manager.start_round();
 	}
 	
+	var _clicked_on_unit = instance_position(mouse_x, mouse_y, base_unit)
+	if(_clicked_on_unit != noone) {
+		//selected_unit = _clicked_on_unit;
+		game_ui.unit_info_card.selected_unit = _clicked_on_unit;
+	}
+	
 	//See if the player has selected a unit from the Unit Purchase Menu
 	if(game_ui.purchase_menu.state != SLIDING_MENU_STATE.CLOSED) {
 		var _purchase_selected = game_ui.purchase_menu.select_purchase();

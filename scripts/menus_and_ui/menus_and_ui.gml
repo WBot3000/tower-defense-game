@@ -504,15 +504,14 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	(All other argument variables correspond with non-underscored data variables)
 	
 	Data Variables:
-	state: Whether the menu is open, opening, closing, or closed
+	state: Whether the menu is open, opening, closing, or closed.
+	selected_unit: The field unit most recently clicked on or purchased.
 	x_pos: Horizontal coordinate of the menu's top-right corner when the menu is open.
 	y_pos_open: Vertical coordinate of the menu's top-left corner when the menu is open.
-	y_pos_current: Current vertical coordinate of the menu's top-left corner (useful for scrolling).
-	selected_unit: Displays the data for the currently selected unit
 */
 function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the bottom is opened or closed
-	//menu_height_percentage = _menu_height_percentage;
+	selected_unit = undefined;
 	
 	var _view_h = camera_get_view_height(view_camera[0]);
 	y_pos_open = (1-_menu_height_percentage) * _view_h;
@@ -548,6 +547,9 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		var _view_h = camera_get_view_height(view_camera[0]);
 		
 		draw_rectangle_color(0, y_pos_current, x_pos, _view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
+		if(selected_unit != undefined) {
+			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE, y_pos_current + TILE_SIZE/4);
+		}
 	}
 }
 #endregion

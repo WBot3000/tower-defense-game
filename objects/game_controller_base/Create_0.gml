@@ -59,6 +59,9 @@ purchase_menu = new UnitPurchaseMenu((1/3), window_get_height(),
 //Which unit the user has selected (make this more sophisticated)
 purchase_selected = undefined;
 
+//Which unit on the field is currently selected
+field_unit_selected = undefined;
+
 
 /*
 	Game Functions
