@@ -1,5 +1,5 @@
 /// @description Draw tile highlights and grayscale unit on tiles without enemies
-if(game_ui.is_cursor_on_gui()) { //Draw nothing if you're hovering over a GUI component
+if(game_ui.gui_element_highlighted() != undefined) { //Draw nothing if you're hovering over a GUI component
 	exit;
 }
 

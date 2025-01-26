@@ -5,18 +5,28 @@
 	Certain menus have different options based on different contexts. These let you control these options easily.
 
 	TODO: Make a parent element for ALL UI elements (for highlighting over them?)
+		OR make an Activatable object that handles all instances that can be activated and de-activated? That might be better...
 */
 
 #region Button (Class)
 /*
 	Defines a parent class for a button.
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
 	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
 	button_sprite_default: The default sprite of the button.
 	button_sprite_disabled: The sprite of the button while it can't be clicked.
 	button_sprite_highlighted: The highlighted sprite of the button.
 	
-	NOTE: As of right now, assumes highlighted button sprite is the same as the default button sprite
+	Control Variables:
+	active: Whether or not the button should appear on screen and can be clicked on
+	
+	NOTE 1: "Enabled" refers to whether or not the button can be clicked to perform an action. "Active" refers to whether or not the button is rendered at all.s
+	NOTE 2: As of right now, assumes highlighted button sprite is the same as the default button sprite
 */
 function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled = _button_sprite_default, _button_sprite_highlighted = _button_sprite_default) constructor {
 	x_pos = _x_pos;
@@ -25,12 +35,24 @@ function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled 
 	button_sprite_disabled = _button_sprite_disabled;
 	button_sprite_highlighted = _button_sprite_highlighted;
 	
+	active = false;
+	
 	
 	//Determines whether or not a button should be clickable or not.
 	//Basically always overridden, mainly just here for completion's sake;
 	//NOTE: Shouldn't accept any parameters.
 	static is_enabled = function() {
 		return true;
+	}
+	
+	//Basically just a wrapper for activating the button
+	static activate = function() {
+		active = true;
+	}
+	
+	//Basically just a wrapper for deactivating the button
+	static deactivate = function() {
+		active = false;
 	}
 	
 	
@@ -73,6 +95,11 @@ function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled 
 #region PauseButton (Class)
 /*
 	Defines a button that can be clicked to pause the game
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
 	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
 	game_controller: Game controller that manages the game that will be paused
@@ -82,12 +109,12 @@ function PauseButton(_x_pos, _y_pos) :
 	x_pos = _x_pos;
 	y_pos = _y_pos;
 	
-	//Used for determining whether or not to render
-	active = true;
-	
 	
 	static on_click = function() {
+		//TODO: Where the fuck does this game controller come from?
+		//Is it because it's called in a variable with the game controller?
 		game_controller.game_state = GAME_STATE.PAUSED;
+		game_ui.set_gui_paused(); //Ew, circular dependency...
 	}
 }
 #endregion
@@ -96,6 +123,11 @@ function PauseButton(_x_pos, _y_pos) :
 #region RoundStartButton (Class)
 /*
 	Defines a button that can be clicked to trigger a round.
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
 	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
 	round_manager: The round manager triggered by the pressing of this button.
@@ -105,9 +137,7 @@ function RoundStartButton(_x_pos, _y_pos, _round_manager) :
 	x_pos = _x_pos;
 	y_pos = _y_pos;
 	round_manager = _round_manager;
-	
-	//Used for determining whether or not to render
-	active = true;
+
 	
 	
 	static is_enabled = function() {
@@ -130,6 +160,10 @@ function RoundStartButton(_x_pos, _y_pos, _round_manager) :
 
 #region PillBar (Class)
 /*
+	Argument Variables:
+	_starting_segment: Which segment should the pill bar initially be highlighted up to when it is created. Should correspond with a "default option"
+	(All other argument variables correspond with non-underscored data variables)
+	
 	Used for creating "pill bars", segmented sliders that can be used to select a range of values
 	x_pos: X-coordinate of the top left of the bar.
 	y_pos: Y-coordinate of the top left of the bar.
@@ -186,9 +220,13 @@ function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segment
 #region PauseMenu (Class)
 /*
 	Defines all of the data for the Pause Menu
+	
+	Argument Variables:
 	_menu_width_percentage: The percentage of the screen's width that the pause menu should take up.
 	_menu_height_percentage: The percentage of the screen's height that the pause menu should take up.
+	(All other argument variables correspond with non-underscored data variables)
 	
+	Data Variables:
 	pause_background: Sprite used to show all the enemies while the game is paused.
 	x1: Left boundary
 	y1: Upper boundary
@@ -217,6 +255,7 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manag
 	y2 = (_view_h/2) + (_menu_height_percentage/2 * _view_h); //From middle point, go down by the percentage amount
 	
 	music_manager = _music_manager;
+	
 	/*
 		Gross math equation that basically says
 		- From the center of the pause menu [(_x1 + _x2) / 2]
@@ -227,7 +266,23 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manag
 	volume_options = new PillBar(_volume_options_x, y1 + 96, NUM_VOLUME_PILLS, NUM_VOLUME_PILLS);
 	
 	//Used for determining whether or not to render
-	active = true;
+	active = false;
+	
+	
+	//Basically just a wrapper for activating the button
+	static activate = function() {
+		create_pause_background();
+		active = true;
+	}
+	
+	
+	//Basically just a wrapper for deactivating the button
+	static deactivate = function() {
+		active = false;
+		if(pause_background != -1) {
+			free_pause_background();
+		}
+	}
 	
 	
 	static create_pause_background = function() {
@@ -274,12 +329,6 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manag
 //How many pixels the menu should move per frame
 #macro SLIDING_MENU_MOVEMENT_SPEED 32
 
-#macro PURCHASE_MENU_BPR 3 //BPR = Buttons Per Row
-
-//How much of the screen should the unit purchase menu take up while it is open
-//NOTE: I don't think this is used right now
-#macro PURCHASE_MENU_SCREEN_PERCENTAGE (1/3)
-
 //Enums for Unit Purchase Menu state
 enum SLIDING_MENU_STATE {
 	CLOSED,
@@ -293,6 +342,11 @@ enum SLIDING_MENU_STATE {
 #region UnitPurchaseButton (Class)
 /*
 	Defines a clickable button for the Unit Selection Menu.
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
 	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
 	purchase_data: The purchasing data that corresponds with the button.
@@ -343,13 +397,25 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 #region UnitPurchaseMenu (Class)
 /*
 	Defines all the data for the Unit Purchase Menu.
-	state: Whether the menu is open, opening, closing, or closed
-	menu_width_percentage: How much screen space the menu should take up. Needed to recalculate the size of the menu upon resizing the game window.
+	
+	Argument Variables:
+	_menu_width_percentage: A value from 0 to 1 representing what percentage of the screen's width the menu should take up.
+	_purchase_data_list: The purchasing data array that corresponds with the buttons.
+	(All other argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	state: Whether the menu is open, opening, closing, or closed.
 	x_pos_open: Horizontal coordinate of the menu's top-left corner when the menu is open.
 	x_pos_current: Current horizontal coordinate of the menu's top-left corner (useful for scrolling).
 	y_pos: Vertical coordinate of the menu's top-right corner when the menu is open.
-	purchase_data_list: The purchasing data array that corresponds with the buttons.
+	buttons: All of the unit purchase buttons within the menu itself.
 */
+#macro PURCHASE_MENU_BPR 3 //BPR = Buttons Per Row
+
+//How much of the screen should the unit purchase menu take up while it is open
+//NOTE: I don't think this is used right now
+#macro PURCHASE_MENU_SCREEN_PERCENTAGE (1/3)
+
 function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the side is opened or closed
 	menu_width_percentage = _menu_width_percentage;
@@ -377,6 +443,21 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	
 		array_push(buttons, new UnitPurchaseButton(_button_x, _button_y, _purchase_data_list[i]));
 		_button_x += (_button_width + _x_gap);
+	}
+	
+	
+	active = false;
+	
+	
+	//Basically just a wrapper for activating the button
+	static activate = function() {
+		active = true;
+	}
+	
+	
+	//Basically just a wrapper for deactivating the button
+	static deactivate = function() {
+		active = false;
 	}
 	
 	
@@ -414,10 +495,16 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 
 
 #region UnitInfoCard (Class)
+#macro UNIT_INFO_CARD_SCREEN_PERCENTAGE (1/5)
 /*
 	Defines all the data for the Unit Info Card.
+	
+	Argument Variables:
+	_menu_height_percentage: How much screen space the menu should take up.
+	(All other argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
 	state: Whether the menu is open, opening, closing, or closed
-	menu_height_percentage: How much screen space the menu should take up. Needed to recalculate the height of the menu upon resizing the game window.
 	x_pos: Horizontal coordinate of the menu's top-right corner when the menu is open.
 	y_pos_open: Vertical coordinate of the menu's top-left corner when the menu is open.
 	y_pos_current: Current vertical coordinate of the menu's top-left corner (useful for scrolling).
@@ -425,12 +512,26 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 */
 function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the bottom is opened or closed
-	menu_height_percentage = _menu_height_percentage;
+	//menu_height_percentage = _menu_height_percentage;
 	
 	var _view_h = camera_get_view_height(view_camera[0]);
-	y_pos_open = (1-menu_height_percentage) * _view_h;
+	y_pos_open = (1-_menu_height_percentage) * _view_h;
 	y_pos_current = _view_h; //Window should start out closed
 	x_pos = _x_pos;
+	
+	active = false;
+	
+	
+	//Basically just a wrapper for activating the button
+	static activate = function() {
+		active = true;
+	}
+	
+	
+	//Basically just a wrapper for deactivating the button
+	static deactivate = function() {
+		active = false;
+	}
 
 	
 	static is_highlighted = function() {
@@ -455,6 +556,10 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 #region GameInfoDisplay (Class)
 /*
 	Used for displaying basic game info (Round number, current money, current defense health)
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
 	game_state_manager: The manager that controls the game's overall state machine
 	round_manager: The manager responsible for handling round info
 */
@@ -465,13 +570,29 @@ function GameInfoDisplay(_game_state_manager, _round_manager) constructor {
 	game_state_manager = _game_state_manager;
 	round_manager = _round_manager;
 	
-	static is_highlighted = function() {
+	active = false;
+	
+	
+	//Basically just a wrapper for activating the button
+	static activate = function() {
+		active = true;
+	}
+	
+	
+	//Basically just a wrapper for deactivating the button
+	static deactivate = function() {
+		active = false;
+	}
+	
+	
+	static is_highlighted = function() {		
 		var _view_x = camera_get_view_x(view_camera[0]);
 		var _view_y = camera_get_view_y(view_camera[0]);
 		
 		//Only need two checks because this component is in the top left corner of the screen
 		return (mouse_x - _view_x <= GAME_INFO_DISPLAY_WIDTH && mouse_y - _view_y <= GAME_INFO_DISPLAY_HEIGHT);
 	}
+	
 	
 	static draw = function() {
 		//Draw background
@@ -506,8 +627,15 @@ function GameInfoDisplay(_game_state_manager, _round_manager) constructor {
 
 /*
 	In charge of drawing UI elements to the screen
+	
+	Argument Variables:
+	_purchase_data: The purchase data needed for the purchase menu
+	(All other argument variables correspond with non-underscored data variables)
+	
 	game_state_manager: The manager that controls the game's overall state machine
 	round_manager: The manager responsible for handling round info
+	
+	TODO: Finish this comment
 */
 function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor {
 	//Manager Info
@@ -527,35 +655,64 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 	//Menus
 	pause_menu = new PauseMenu((1/2), (1/2));
 	//NOTE: In the older code, the height was just window_get_height(). See how this changes things.
-	purchase_menu = new UnitPurchaseMenu((2/7), camera_get_view_height(view_camera[0])*(4/5), _purchase_data);
-	unit_info_card = new UnitInfoCard((1/5), camera_get_view_width(view_camera[0]));
+	purchase_menu = new UnitPurchaseMenu((2/7), view_h*(1-UNIT_INFO_CARD_SCREEN_PERCENTAGE), _purchase_data);
+	unit_info_card = new UnitInfoCard(UNIT_INFO_CARD_SCREEN_PERCENTAGE, view_w);
+	
+	
 	
 	
 	//TODO: Create GUI component activation/deactivation system that can easily do this without spaghetti logic
 	//TODO: Maybe fetch component and return it (undefined if not on any GUI component) instead of boolean?
-	static is_cursor_on_gui = function() {
+	//The cool thing about this is that it lets you prioritize certain GUI elements over others.
+	static gui_element_highlighted = function() {
+		/*
 		if(game_state_manager.state != GAME_STATE.RUNNING) { //For the pause menu, just for disabling placement outright if the game isn't running.
 			return true;
+		}*/
+		
+		if(game_info_display.active && game_info_display.is_highlighted()) {
+			return game_info_display;
 		}
 		
-		if(game_info_display.is_highlighted()) {
-			return true;
+		if(pause_button.active && pause_button.is_highlighted()) {
+			return pause_button;
 		}
 		
-		
-		if(pause_button.is_highlighted() || round_start_button.is_highlighted()) { //We know these buttons are active because the game isn't paused
-			return true;
+		if(round_start_button.active && round_start_button.is_highlighted()) {
+			return round_start_button;
 		}
 		
-		if(purchase_menu.is_highlighted()) {
-			return true;
+		if(purchase_menu.active && purchase_menu.is_highlighted()) {
+			return purchase_menu;
 		}
 		
-		if(unit_info_card.is_highlighted()) {
-			return true;
+		if(unit_info_card.active && unit_info_card.is_highlighted()) {
+			return unit_info_card;
 		}
 		
-		return false; //Mouse is not over any UI elements.
+		return undefined; //Mouse is not over any UI elements.
+	}
+	
+	
+	static set_gui_running = function() {
+		game_info_display.activate();
+		pause_button.activate();
+		round_start_button.activate();
+		purchase_menu.activate();
+		unit_info_card.activate();
+		
+		pause_menu.deactivate();
+	}
+	
+	
+	static set_gui_paused = function() {
+		game_info_display.activate();
+		purchase_menu.activate();
+		unit_info_card.activate();
+		pause_menu.activate();
+		
+		pause_button.deactivate();
+		round_start_button.deactivate();
 	}
 	
 	
@@ -565,28 +722,34 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 
 		//Draw pause menu or not
 		//TODO: Needs a little bit more work to implement actual pausing functionality
-		if(game_state_manager.state == GAME_STATE.PAUSED) {
-			pause_menu.draw_menu();
-		}
-		else { //Draw control buttons
-			pause_button.draw();
-			round_start_button.draw();
+		if(/*game_state_manager.state == GAME_STATE.PAUSED*/ pause_menu.active) {
+			pause_menu.draw_paused_bg();
 		}
 		
 		//Draw basic game stats (done later so that it's drawn over the background sprite)
-		game_info_display.draw();
+		if(game_info_display.active) {
+			game_info_display.draw();
+		}
+		
+		if(pause_button.active) {
+			pause_button.draw();
+		}
+		
+		if(round_start_button.active) {
+			round_start_button.draw();
+		}
 
 		//Draw purchase menu if it should be present on screen
-		if(purchase_menu.state != SLIDING_MENU_STATE.CLOSED) {
+		if(purchase_menu.active /*&& purchase_menu.state != SLIDING_MENU_STATE.CLOSED*/) {
 			purchase_menu.draw(game_state_manager.state == GAME_STATE.RUNNING);
 		}
 		
 		//Draw unit info card if it should be present on screen
-		if(unit_info_card.state != SLIDING_MENU_STATE.CLOSED) {
+		if(unit_info_card.active /*&& unit_info_card.state != SLIDING_MENU_STATE.CLOSED*/) {
 			unit_info_card.draw(game_state_manager.state == GAME_STATE.RUNNING);
 		}
 		
-		if(game_state_manager.state == GAME_STATE.PAUSED) {
+		if(/*game_state_manager.state == GAME_STATE.PAUSED*/pause_menu.active) {
 			pause_menu.draw_menu();
 		}
 

@@ -13,8 +13,6 @@ range = new CircularRange(id, x + sprite_width/2, y + sprite_height/2, tilesize_
 shooting_speed = 6;
 seconds_per_shot = 4;
 
-faction = FACTIONS.SAMPLE; //TODO: Need to determine factions
-
 special = false; //Determines if you can have more than one of a unit out
 
 unit_buffs = [];

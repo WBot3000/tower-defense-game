@@ -17,13 +17,11 @@ if(_q_pressed) {
 	if(game_state_manager.state == GAME_STATE.RUNNING) {
 		instance_deactivate_all(true);
 		game_state_manager.pause_game();
-		game_ui.pause_menu.create_pause_background();
+		game_ui.set_gui_paused();
 	}
 	else if(game_state_manager.state == GAME_STATE.PAUSED) { //TODO: Find a way to roll this all into one component
-		/*surface_free(game_ui.pause_menu.surface);
-        game_ui.pause_menu.surface = -1;*/
-		game_ui.pause_menu.free_pause_background();
 		game_state_manager.resume_game();
+		game_ui.set_gui_running();
 		instance_activate_all(); //Responsible for re-activating all of the paused instances
 	}
 }
@@ -60,7 +58,7 @@ if(_mouse_left_released) {
 	if(game_ui.pause_button.is_highlighted()) { //Don't need to bother with unpausing because you can't use the button while the game is paused
 		instance_deactivate_all(true);
 		game_state_manager.pause_game();
-		game_ui.pause_menu.create_pause_background();
+		game_ui.set_gui_paused();
 	}
 	
 	if(game_ui.round_start_button.is_highlighted()) {
@@ -80,8 +78,8 @@ if(_mouse_left_released) {
 	
 
 	
-	//Can't purchase anything if nothing is selected
-	if(purchase_selected != undefined && ! game_ui.is_cursor_on_gui()) {
+	//Can't purchase anything if nothing is selected (or if you're on the GUI)
+	if(purchase_selected != undefined && game_ui.gui_element_highlighted() == undefined) {
 		var _tile_at_mouse = instance_position(mouse_x, mouse_y, placeable_tile);
 		if(_tile_at_mouse == noone) {
 			exit;

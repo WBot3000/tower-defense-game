@@ -9,8 +9,6 @@ recovery_rate = 0; //In health points per second
 
 radius = 0.0;
 
-//faction = noone //TODO: Need to determine factions
-
 special = false; //Determines if you can have more than one of a unit out
 
 unit_buffs = [];

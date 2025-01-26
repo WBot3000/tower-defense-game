@@ -39,6 +39,7 @@ purchase_data = [new PurchaseData(sample_gunner, 100), new PurchaseData(sample_b
 //GUI Data
 #region
 game_ui = new GameUI(game_state_manager, round_manager, purchase_data);
+game_ui.set_gui_running(); //Initialize GUI to running mode
 /*
 //Buttons
 pause_button = new PauseButton(camera_get_view_width(view_camera[0]) - TILE_SIZE, TILE_SIZE);

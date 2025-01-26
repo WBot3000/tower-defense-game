@@ -13,8 +13,6 @@ range = new BrawlerRange(id); //CircularRange(id, x + sprite_width/2, y + sprite
 punch_damage = 5
 seconds_per_punch = 0.5
 
-faction = FACTIONS.SAMPLE; //TODO: Need to determine factions
-
 special = false; //Determines if you can have more than one of a unit out
 
 unit_buffs = [];
