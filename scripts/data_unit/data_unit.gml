@@ -51,14 +51,14 @@ function UnitUpgrade(_unit, _max_level, _starting_level = 0, _description = "No 
 }
 #endregion
 
-
-#region SampleUnitAttackSpeedUpgrade
+#region Sample Gunner Upgrades
+#region SampleGunnerAttackSpeedUpgrade
 /*
-	Attack speed upgrade for Sample Unit
+	Attack speed upgrade for Sample Gunner
 	
 	TODO: Write variables for this
 */
-function SampleUnitAttackSpeedUpgrade(_unit) : 
+function SampleGunnerAttackSpeedUpgrade(_unit) : 
 	UnitUpgrade(_unit, 5, 0, "Decrease attack speed by 0.3 seconds with each upgrade.", spr_increase_attack_speed_icon) constructor {
 		
 	cost_fn = function(upgrade_level) {
@@ -75,13 +75,13 @@ function SampleUnitAttackSpeedUpgrade(_unit) :
 #endregion
 
 
-#region SampleUnitDamageUpgrade
+#region SampleGunnerDamageUpgrade
 /*
-	Damage upgrade for Sample Unit
+	Damage upgrade for Sample Gunner
 	
 	TODO: Write variables for this
 */
-function SampleUnitDamageUpgrade(_unit) : 
+function SampleGunnerDamageUpgrade(_unit) : 
 	UnitUpgrade(_unit, 5, 0, "Increase damage by 10 with each upgrade.", spr_increase_damage_icon) constructor {
 		
 	cost_fn = function(upgrade_level) {
@@ -98,13 +98,13 @@ function SampleUnitDamageUpgrade(_unit) :
 #endregion
 
 
-#region SampleUnitRangeUpgrade
+#region SampleGunnerRangeUpgrade
 /*
-	Range for Sample Unit
+	Range for Sample Gunner
 	
 	TODO: Write variables for this
 */
-function SampleUnitRangeUpgrade(_unit) : 
+function SampleGunnerRangeUpgrade(_unit) : 
 	UnitUpgrade(_unit, 5, 0, "Increase radius by half a tile with each upgrade.", spr_increase_range_icon) constructor {
 		
 	cost_fn = function(upgrade_level) {
@@ -118,4 +118,5 @@ function SampleUnitRangeUpgrade(_unit) :
 		current_cost = cost_fn(current_level+1);
 	}
 }
+#endregion
 #endregion

@@ -2,4 +2,4 @@ TODO: Check explosion hitbox to see if it's correct
 
 TODO: Fix mortar cannonballs not exploding if they explode offscreen
 
-TODO: Create the unit info menu.
+TODO: Need to find a good way to easily distinguish different selected units of the same type.

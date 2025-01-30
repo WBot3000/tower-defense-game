@@ -536,15 +536,19 @@ function UnitUpgradeStatButton(_x_pos, _y_pos, _upgrade_data) :
 		
 		
 		draw_set_halign(fa_right);
+		draw_set_valign(fa_right);
 		if(upgrade_data.current_level >= upgrade_data.max_level) {
-			draw_text_color(_draw_x_pos + TILE_SIZE - 1, _draw_y_pos + TILE_SIZE*(5/8), "MAX", 
+			draw_text_color(_draw_x_pos + sprite_get_width(button_sprite_default)*0.9,
+				_draw_y_pos + sprite_get_height(upgrade_data.upgrade_spr) - 4, "MAX", 
 				c_white, c_white, c_white, c_white, 1);
 		}
 		else {
-			draw_text_color(_draw_x_pos + TILE_SIZE - 1, _draw_y_pos + TILE_SIZE*(5/8), upgrade_data.current_cost, 
+			draw_text_color(_draw_x_pos + sprite_get_width(button_sprite_default)*0.9, 
+				_draw_y_pos + sprite_get_height(upgrade_data.upgrade_spr) - 4, upgrade_data.current_cost, 
 				c_white, c_white, c_white, c_white, 1);
 		}
 		draw_set_halign(fa_left);
+		draw_set_valign(fa_left);
 	}
 	
 	static is_enabled = function() {
@@ -579,7 +583,7 @@ function UnitInfoCardUpgrade(_x_pos, _y_pos, _upgrade_data) constructor {
 	upgrade_data = _upgrade_data;
 	
 	purchase_button = new UnitUpgradeStatButton(
-		x_pos + TILE_SIZE + sprite_get_width(spr_upgrade_level),
+		x_pos + TILE_SIZE, //TILE_SIZE used because that should be the same size as all of the upgrade data images
 		y_pos, upgrade_data)
 	
 	//TODO: See if this is necessary
@@ -594,12 +598,12 @@ function UnitInfoCardUpgrade(_x_pos, _y_pos, _upgrade_data) constructor {
 		var _draw_y_pos = y_pos + _y_offset;
 		
 		draw_sprite(upgrade_data.upgrade_spr, 0, _draw_x_pos, _draw_y_pos);
-		draw_sprite(spr_upgrade_level, 0, _draw_x_pos + sprite_get_width(upgrade_data.upgrade_spr), _draw_y_pos);
-		draw_set_halign(fa_center);
-		draw_set_valign(fa_center);
+		//draw_sprite(spr_upgrade_level, 0, _draw_x_pos + sprite_get_width(upgrade_data.upgrade_spr), _draw_y_pos);
+		draw_set_halign(fa_right);
+		draw_set_valign(fa_right);
 		//Draws the number centered
-		draw_text_color(_draw_x_pos + sprite_get_width(upgrade_data.upgrade_spr) + sprite_get_width(spr_upgrade_level)/2,
-			_draw_y_pos + sprite_get_height(spr_upgrade_level)/2,
+		draw_text_color(_draw_x_pos + sprite_get_width(upgrade_data.upgrade_spr)*0.9,
+			_draw_y_pos + sprite_get_height(upgrade_data.upgrade_spr) - 4,
 			upgrade_data.current_level,
 			c_white, c_white, c_white, c_white, 1);
 		draw_set_halign(fa_left);
@@ -641,8 +645,8 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	
 	//Unit Stat Info
 	unit_upgrade_1 = new UnitInfoCardUpgrade(TILE_SIZE*2, TILE_SIZE/4, undefined);
-	unit_upgrade_2 = new UnitInfoCardUpgrade(TILE_SIZE*5.5, TILE_SIZE/4, undefined);
-	unit_upgrade_3 = new UnitInfoCardUpgrade(TILE_SIZE*9, TILE_SIZE/4, undefined);
+	unit_upgrade_2 = new UnitInfoCardUpgrade(TILE_SIZE*5, TILE_SIZE/4, undefined);
+	unit_upgrade_3 = new UnitInfoCardUpgrade(TILE_SIZE*8, TILE_SIZE/4, undefined);
 	//unit_upgrade_4 = new UnitInfoCardUpgrade(TILE_SIZE*11, y_pos_current + TILE_SIZE/4, /*TODO*/);
 	
 	

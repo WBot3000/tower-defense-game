@@ -20,9 +20,9 @@ special = false; //Determines if you can have more than one of a unit out
 unit_buffs = [];
 
 //Upgradable Stats
-upgrade_1 = new SampleUnitAttackSpeedUpgrade(self.id);
-upgrade_2 = new SampleUnitDamageUpgrade(self.id);
-upgrade_3 = new SampleUnitRangeUpgrade(self.id);
+upgrade_1 = new SampleGunnerAttackSpeedUpgrade(self.id);
+upgrade_2 = new SampleGunnerDamageUpgrade(self.id);
+upgrade_3 = new SampleGunnerRangeUpgrade(self.id);
 
 
 //Variables to keep track of and control things

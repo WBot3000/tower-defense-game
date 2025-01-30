@@ -72,13 +72,20 @@ if(_mouse_left_released) {
 	
 	var _clicked_on_unit = instance_position(mouse_x, mouse_y, base_unit)
 	if(_clicked_on_unit != noone) {
-		//selected_unit = _clicked_on_unit;
+		//selected_unit = _clicked_on_unit; //The selected unit is part of the menu's state
 		game_ui.unit_info_card.on_selected_unit_change(_clicked_on_unit);
+		//Open the unit info card if it's not open already.
+		if(game_ui.unit_info_card.state != SLIDING_MENU_STATE.OPENING && game_ui.unit_info_card.state != SLIDING_MENU_STATE.OPEN) {
+			game_ui.unit_info_card.state = SLIDING_MENU_STATE.OPENING;
+		}
 	}
 	
+	//Check to see if an upgrade is being purchased
 	if(game_ui.unit_info_card.state != SLIDING_MENU_STATE.CLOSED && game_ui.unit_info_card.is_highlighted()) {
 		game_ui.unit_info_card.select_upgrade_purchase();
 	}
+	
+	
 	
 	//See if the player has selected a unit from the Unit Purchase Menu
 	if(game_ui.purchase_menu.state != SLIDING_MENU_STATE.CLOSED) {
