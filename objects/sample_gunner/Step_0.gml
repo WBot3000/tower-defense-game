@@ -53,7 +53,8 @@ if(shot_timer >= _frames_per_shot && ds_list_size(enemies_in_range) > 0) { //Mor
 	var _bullet = instance_create_layer(x + sprite_width/2, y + sprite_height/2, PROJECTILE_LAYER, sample_gunner_bullet,
 		{
 			x_speed: _vector_x * other.shooting_speed,
-			y_speed: _vector_y * other.shooting_speed
+			y_speed: _vector_y * other.shooting_speed,
+			bullet_damage: other.bullet_damage
 		});
 	shot_timer = 0;
 }

@@ -19,14 +19,13 @@
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
 	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
 	button_sprite_default: The default sprite of the button.
-	button_sprite_disabled: The sprite of the button while it can't be clicked.
-	button_sprite_highlighted: The highlighted sprite of the button.
+	button_sprite_disabled: The sprite of the button while it can't be clicked. Should be the same dimensions as the default sprite.
+	button_sprite_highlighted: The highlighted sprite of the button. Should be the same dimensions as the default sprite.
 	
 	Control Variables:
 	active: Whether or not the button should appear on screen and can be clicked on
 	
-	NOTE 1: "Enabled" refers to whether or not the button can be clicked to perform an action. "Active" refers to whether or not the button is rendered at all.s
-	NOTE 2: As of right now, assumes highlighted button sprite is the same as the default button sprite
+	NOTE 1: "Enabled" refers to whether or not the button can be clicked to perform an action. "Active" refers to whether or not the button is rendered at all.
 */
 function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled = _button_sprite_default, _button_sprite_highlighted = _button_sprite_default) constructor {
 	x_pos = _x_pos;
@@ -88,6 +87,8 @@ function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled 
 		}
 		draw_sprite(_spr, 0, _draw_x_pos, _draw_y_pos);
 	}
+	
+	static on_click = function(){};
 }
 #endregion
 
@@ -113,6 +114,7 @@ function PauseButton(_x_pos, _y_pos) :
 	static on_click = function() {
 		//TODO: Where the fuck does this game controller come from?
 		//Is it because it's called in a variable with the game controller?
+		//No, it's just because this isn't actually called
 		game_controller.game_state = GAME_STATE.PAUSED;
 		game_ui.set_gui_paused(); //Ew, circular dependency...
 	}
@@ -465,8 +467,9 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		//mouse_x is based on room position, not camera position, so need to correct selection
 		//TODO: Passable view_camera index?
 		var _view_x = camera_get_view_x(view_camera[0]);
-		//Only need to do one calculation because the menu takes up the whole right side of the screen
-		return mouse_x - _view_x >= x_pos_current; 
+		var _view_y = camera_get_view_y(view_camera[0]);
+
+		return mouse_x - _view_x >= x_pos_current && y_pos >= mouse_y - _view_y; 
 	}
 	
 	
@@ -490,6 +493,122 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		return undefined;
 	}
 	
+}
+#endregion
+
+
+#region UnitUpgradeStatButton
+/*
+	The button that should be clicked to purchase an upgrade
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
+	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
+	upgrade_data: Unit's upgrade data that should be displayed
+	
+	NOTE: All of these variables should be passed from the UnitInfoCardUpgrade
+*/
+function UnitUpgradeStatButton(_x_pos, _y_pos, _upgrade_data) :
+	Button(_x_pos, _y_pos, spr_upgrade_purchase_default, spr_upgrade_purchase_disabled) constructor {
+
+	upgrade_data = _upgrade_data;
+	
+	
+	static draw = function(_x_offset, _y_offset) {
+		//TODO: Figure out how to get the inheritance actually working properly
+		var _draw_x_pos = x_pos + _x_offset;
+		var _draw_y_pos = y_pos + _y_offset;
+		
+		var _spr;
+		if(!is_enabled()) {
+			_spr = button_sprite_disabled;
+		}
+		else if(/*_button_highlight_enabled &&*/ is_highlighted(_x_offset, _y_offset)) {
+			_spr = button_sprite_highlighted;
+		}
+		else {
+			_spr = button_sprite_default;
+		}
+		draw_sprite(_spr, 0, _draw_x_pos, _draw_y_pos);
+		
+		
+		draw_set_halign(fa_right);
+		if(upgrade_data.current_level >= upgrade_data.max_level) {
+			draw_text_color(_draw_x_pos + TILE_SIZE - 1, _draw_y_pos + TILE_SIZE*(5/8), "MAX", 
+				c_white, c_white, c_white, c_white, 1);
+		}
+		else {
+			draw_text_color(_draw_x_pos + TILE_SIZE - 1, _draw_y_pos + TILE_SIZE*(5/8), upgrade_data.current_cost, 
+				c_white, c_white, c_white, c_white, 1);
+		}
+		draw_set_halign(fa_left);
+	}
+	
+	static is_enabled = function() {
+		return upgrade_data != undefined && global.player_money >= upgrade_data.current_cost && upgrade_data.current_level < upgrade_data.max_level;
+	}
+	
+	static on_click = function() {
+		global.player_money -= upgrade_data.current_cost;
+		upgrade_data.on_upgrade();
+	}
+	
+}
+#endregion
+
+
+#region UnitInfoCardUpgrade (Class)
+/*
+	Defines the area where the unit stats and upgrades are.
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
+	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
+	upgrade_data: Unit's upgrade data that should be displayed
+	purchase_upgrade_button: The button clicked on to purchase the upgrade
+*/
+function UnitInfoCardUpgrade(_x_pos, _y_pos, _upgrade_data) constructor {
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	upgrade_data = _upgrade_data;
+	
+	purchase_button = new UnitUpgradeStatButton(
+		x_pos + TILE_SIZE + sprite_get_width(spr_upgrade_level),
+		y_pos, upgrade_data)
+	
+	//TODO: See if this is necessary
+	static on_selected_unit_change = function(_new_upgrade_data) {
+		upgrade_data = _new_upgrade_data;
+		purchase_button.upgrade_data = upgrade_data;
+	}
+	
+	
+	static draw = function(_x_offset, _y_offset) {
+		var _draw_x_pos = x_pos + _x_offset;
+		var _draw_y_pos = y_pos + _y_offset;
+		
+		draw_sprite(upgrade_data.upgrade_spr, 0, _draw_x_pos, _draw_y_pos);
+		draw_sprite(spr_upgrade_level, 0, _draw_x_pos + sprite_get_width(upgrade_data.upgrade_spr), _draw_y_pos);
+		draw_set_halign(fa_center);
+		draw_set_valign(fa_center);
+		//Draws the number centered
+		draw_text_color(_draw_x_pos + sprite_get_width(upgrade_data.upgrade_spr) + sprite_get_width(spr_upgrade_level)/2,
+			_draw_y_pos + sprite_get_height(spr_upgrade_level)/2,
+			upgrade_data.current_level,
+			c_white, c_white, c_white, c_white, 1);
+		draw_set_halign(fa_left);
+		draw_set_valign(fa_left);
+		//Draws the purchase button
+		purchase_button.draw(_x_offset, _y_offset);
+		
+		//draw_text(mouse_x, mouse_y, "I love cats!");
+	}
 }
 #endregion
 
@@ -520,6 +639,12 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	
 	active = false;
 	
+	//Unit Stat Info
+	unit_upgrade_1 = new UnitInfoCardUpgrade(TILE_SIZE*2, TILE_SIZE/4, undefined);
+	unit_upgrade_2 = new UnitInfoCardUpgrade(TILE_SIZE*5.5, TILE_SIZE/4, undefined);
+	unit_upgrade_3 = new UnitInfoCardUpgrade(TILE_SIZE*9, TILE_SIZE/4, undefined);
+	//unit_upgrade_4 = new UnitInfoCardUpgrade(TILE_SIZE*11, y_pos_current + TILE_SIZE/4, /*TODO*/);
+	
 	
 	//Basically just a wrapper for activating the button
 	static activate = function() {
@@ -531,12 +656,21 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	static deactivate = function() {
 		active = false;
 	}
+	
+	
+	//Called when the selected unit is changed
+	static on_selected_unit_change = function(_new_selected_unit) {
+		selected_unit = _new_selected_unit;
+		unit_upgrade_1.on_selected_unit_change(selected_unit.upgrade_1);
+		unit_upgrade_2.on_selected_unit_change(selected_unit.upgrade_2);
+		unit_upgrade_3.on_selected_unit_change(selected_unit.upgrade_3);	
+	}
 
 	
 	static is_highlighted = function() {
 		//mouse_y is based on room position, not camera position, so need to correct selection
 		//TODO: Passable view_camera index?
-		var _view_y = camera_get_view_x(view_camera[0]);
+		var _view_y = camera_get_view_y(view_camera[0]);
 		//Only need to do one calculation because the menu takes up the whole bottom of the screen
 		return mouse_y - _view_y >= y_pos_current; 
 	}
@@ -548,7 +682,34 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		
 		draw_rectangle_color(0, y_pos_current, x_pos, _view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
 		if(selected_unit != undefined) {
-			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE, y_pos_current + TILE_SIZE/4);
+			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE*0.5, y_pos_current + TILE_SIZE/4);
+			if(unit_upgrade_1.upgrade_data != undefined) {
+				unit_upgrade_1.draw(0, y_pos_current);
+			}
+			if(unit_upgrade_2.upgrade_data != undefined) {
+				unit_upgrade_2.draw(0, y_pos_current);
+			}
+			if(unit_upgrade_3.upgrade_data != undefined) {
+				unit_upgrade_3.draw(0, y_pos_current);
+			}
+		}
+	}
+	
+	//TODO: This works differently from the unit purchase menu
+	// In that menu, the selection returns a unit type, this one actually performs the purchase
+	// Determine which method is better and do it.
+	static select_upgrade_purchase = function() {
+		if(unit_upgrade_1.purchase_button.is_enabled() &&
+			unit_upgrade_1.purchase_button.is_highlighted(0, y_pos_current)) {
+			unit_upgrade_1.purchase_button.on_click();
+		}
+		else if(unit_upgrade_2.purchase_button.is_enabled() &&
+			unit_upgrade_2.purchase_button.is_highlighted(0, y_pos_current)) {
+			unit_upgrade_2.purchase_button.on_click();
+		}
+		else if(unit_upgrade_3.purchase_button.is_enabled() &&
+			unit_upgrade_3.purchase_button.is_highlighted(0, y_pos_current)) {
+			unit_upgrade_3.purchase_button.on_click();
 		}
 	}
 }

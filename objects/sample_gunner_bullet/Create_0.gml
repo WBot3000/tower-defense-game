@@ -10,6 +10,6 @@ if(!y_speed) {
 }
 */
 
-bullet_damage = 10;
+//bullet_damage = 10;
 
 enemies_in_range = ds_list_create();

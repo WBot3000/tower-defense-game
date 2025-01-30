@@ -49,10 +49,12 @@ camera_controller.move_camera(!(game_ui.purchase_menu.state != SLIDING_MENU_STAT
 //"Advance" the round spawning timer
 round_manager.on_step();
 
+//TODO: Refactor this. Can just get the UI element the cursor is on, and then check appropriately. Can cut down on extraneous checks
 if(_mouse_left_released) {
 	//Check for certain button presses
 	//TODO: Need to neaten up this mouse release code
 	//TODO: Replace code in button highlight checks with on click functions
+	//var gui_elem = game_ui.gui_element_highlighted();
 	
 	//TODO: Come up with "coordinatior classes" (ex. Pause Coordinator) to sync multiple tasks like this maybe?
 	if(game_ui.pause_button.is_highlighted()) { //Don't need to bother with unpausing because you can't use the button while the game is paused
@@ -71,7 +73,11 @@ if(_mouse_left_released) {
 	var _clicked_on_unit = instance_position(mouse_x, mouse_y, base_unit)
 	if(_clicked_on_unit != noone) {
 		//selected_unit = _clicked_on_unit;
-		game_ui.unit_info_card.selected_unit = _clicked_on_unit;
+		game_ui.unit_info_card.on_selected_unit_change(_clicked_on_unit);
+	}
+	
+	if(game_ui.unit_info_card.state != SLIDING_MENU_STATE.CLOSED && game_ui.unit_info_card.is_highlighted()) {
+		game_ui.unit_info_card.select_upgrade_purchase();
 	}
 	
 	//See if the player has selected a unit from the Unit Purchase Menu

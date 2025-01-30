@@ -13,9 +13,17 @@ range = new CircularRange(id, x + sprite_width/2, y + sprite_height/2, tilesize_
 shooting_speed = 8;
 seconds_per_shot = 2;
 
+bullet_damage = 10;
+
 special = false; //Determines if you can have more than one of a unit out
 
 unit_buffs = [];
+
+//Upgradable Stats
+upgrade_1 = new SampleUnitAttackSpeedUpgrade(self.id);
+upgrade_2 = new SampleUnitDamageUpgrade(self.id);
+upgrade_3 = new SampleUnitRangeUpgrade(self.id);
+
 
 //Variables to keep track of and control things
 enemies_in_range = ds_list_create();
