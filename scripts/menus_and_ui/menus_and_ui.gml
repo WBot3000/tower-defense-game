@@ -484,6 +484,43 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	}
 	
 	
+	//This function moves the menu based on its current state. Also accepts a menu toggle boolean
+	//Shoud be called in a Step event.
+	//Returns the number of pixels the menu has moved, so that any other UI elements can be moved along with it.
+	static move_menu = function(_menu_toggle_pressed) {
+		var _x_pos_old = x_pos_current;
+		switch (state) {
+			case SLIDING_MENU_STATE.CLOSED:
+				if(_menu_toggle_pressed) {
+					state = SLIDING_MENU_STATE.OPENING;
+				}
+			    break;
+			case SLIDING_MENU_STATE.CLOSING:
+				x_pos_current = min(x_pos_current + SLIDING_MENU_MOVEMENT_SPEED, camera_get_view_width(view_camera[0]));
+				if(x_pos_current >= camera_get_view_width(view_camera[0])) {
+					state = SLIDING_MENU_STATE.CLOSED;
+				}
+				break;
+			case SLIDING_MENU_STATE.OPENING:
+				x_pos_current = max(x_pos_current - SLIDING_MENU_MOVEMENT_SPEED, x_pos_open);
+				if(x_pos_current <= x_pos_open) {
+					state = SLIDING_MENU_STATE.OPEN;
+				}
+				break;
+			case SLIDING_MENU_STATE.OPEN:
+				if(_menu_toggle_pressed) {
+					state = SLIDING_MENU_STATE.CLOSING;
+				}
+				break;
+			default:
+			    break;
+		}
+		
+		//Will be 0 if menu hasn't moved, positive if the menu is closing, and negative if the menu is opening
+		return x_pos_current - _x_pos_old;
+	}
+	
+	
 	static select_purchase = function() {
 		for(var i = 0; i < array_length(buttons); ++i) {
 			if(buttons[i].is_highlighted(x_pos_current, 0)) {
@@ -610,9 +647,8 @@ function UnitInfoCardUpgrade(_x_pos, _y_pos, _upgrade_data) constructor {
 		draw_set_valign(fa_left);
 		//Draws the purchase button
 		purchase_button.draw(_x_offset, _y_offset);
-		
-		//draw_text(mouse_x, mouse_y, "I love cats!");
 	}
+	
 }
 #endregion
 
@@ -665,9 +701,26 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	//Called when the selected unit is changed
 	static on_selected_unit_change = function(_new_selected_unit) {
 		selected_unit = _new_selected_unit;
-		unit_upgrade_1.on_selected_unit_change(selected_unit.upgrade_1);
-		unit_upgrade_2.on_selected_unit_change(selected_unit.upgrade_2);
-		unit_upgrade_3.on_selected_unit_change(selected_unit.upgrade_3);	
+		if(variable_instance_exists(selected_unit, "upgrade_1")) {
+			unit_upgrade_1.on_selected_unit_change(selected_unit.upgrade_1);
+		}
+		else {
+			unit_upgrade_1.on_selected_unit_change(undefined);
+		}
+		
+		if(variable_instance_exists(selected_unit, "upgrade_2")) {
+			unit_upgrade_2.on_selected_unit_change(selected_unit.upgrade_2);
+		}
+		else {
+			unit_upgrade_2.on_selected_unit_change(undefined);
+		}
+		
+		if(variable_instance_exists(selected_unit, "upgrade_3")) {
+			unit_upgrade_3.on_selected_unit_change(selected_unit.upgrade_3);
+		}
+		else {
+			unit_upgrade_3.on_selected_unit_change(undefined);
+		}
 	}
 
 	
@@ -698,6 +751,44 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 			}
 		}
 	}
+	
+	
+	//This function moves the menu based on its current state. Also accepts a menu toggle boolean
+	//Shoud be called in a Step event.
+	//Returns the number of pixels the menu has moved, so that any other UI elements can be moved along with it.
+	static move_menu = function(_menu_toggle_pressed) {
+		var _y_pos_old = y_pos_current;
+		switch (state) {
+			case SLIDING_MENU_STATE.CLOSED:
+				if(_menu_toggle_pressed) {
+					state = SLIDING_MENU_STATE.OPENING;
+				}
+			    break;
+			case SLIDING_MENU_STATE.CLOSING:
+				y_pos_current = min(y_pos_current + SLIDING_MENU_MOVEMENT_SPEED, camera_get_view_height(view_camera[0]))
+				if(y_pos_current >= camera_get_view_height(view_camera[0])) {
+					state = SLIDING_MENU_STATE.CLOSED;
+				}
+				break;
+			case SLIDING_MENU_STATE.OPENING:
+				y_pos_current = max(y_pos_current - SLIDING_MENU_MOVEMENT_SPEED, y_pos_open)
+				if(y_pos_current <= y_pos_open) {
+					state = SLIDING_MENU_STATE.OPEN;
+				}
+				break;
+			case SLIDING_MENU_STATE.OPEN:
+				if(_menu_toggle_pressed) {
+					state = SLIDING_MENU_STATE.CLOSING;
+				}
+				break;
+			default:
+			    break;
+		}
+		
+		//Will be 0 if menu hasn't moved, positive if the menu is closing, and negative if the menu is opening
+		return y_pos_current - _y_pos_old;
+	}
+	
 	
 	//TODO: This works differently from the unit purchase menu
 	// In that menu, the selection returns a unit type, this one actually performs the purchase

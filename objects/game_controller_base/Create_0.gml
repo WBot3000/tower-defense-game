@@ -40,27 +40,10 @@ purchase_data = [new PurchaseData(sample_gunner, 100), new PurchaseData(sample_b
 #region
 game_ui = new GameUI(game_state_manager, round_manager, purchase_data);
 game_ui.set_gui_running(); //Initialize GUI to running mode
-/*
-//Buttons
-pause_button = new PauseButton(camera_get_view_width(view_camera[0]) - TILE_SIZE, TILE_SIZE);
-round_start_button = new RoundStartButton(TILE_SIZE, camera_get_view_height(view_camera[0]) - (TILE_SIZE*1.5), round_manager);
-
-//Menu-Specific
-pause_menu = new PauseMenu((1/2), (1/2));
-
-//purchase_menu.state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the side is opened or closed
-//NOTE: Might make separate states for the different side menus
-
-purchase_menu = new UnitPurchaseMenu((1/3), window_get_height(), 
-	[new PurchaseData(sample_gunner, 100), new PurchaseData(sample_brawler, 100), new PurchaseData(sample_mortar, 200)]);
-*/
 #endregion
 
 //Which unit the user has selected (make this more sophisticated)
 purchase_selected = undefined;
-
-//Which unit on the field is currently selected
-field_unit_selected = undefined;
 
 
 /*
