@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"game_control",
+  "%Name":"enemy_spawning_and_rounds",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"game_control",
+  "name":"enemy_spawning_and_rounds",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",

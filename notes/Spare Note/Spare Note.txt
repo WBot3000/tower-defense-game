@@ -1,5 +1,5 @@
-TODO: Check explosion hitbox to see if it's correct
+TODO: Check explosion hitbox to see if it's correct.
 
-TODO: Fix mortar cannonballs not exploding if they explode offscreen
+TODO: Fix mortar cannonballs not exploding if they explode offscreen.
 
-TODO: Need to find a good way to easily distinguish different selected units of the same type.
+TODO: Put all data on upgrade into a single data class, so creating upgrade and deleting original is easier.

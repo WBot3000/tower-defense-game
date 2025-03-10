@@ -10,18 +10,21 @@
 /*
 	The Animation Controller. Handles the logic of animating objects.
 	entity_obj: The object that contains and whose sprite will be modified by this controller.
-	//current_sprite: The sprite (animation) that is currently playing
+	current_sprite: The sprite (animation) that is currently playing. Needed for mapping
 	static_sprite: The sprite that the entity object will use when an animation isn't playing.
 	//animation_queue: Contains all of the animations that the controller will play;
 	num_loops: The number of times the current animation should loop. LOOP_FOREVER to loop unless stopped.
 	loop_counter: Used to keep track of the number of times the animation has played
 	
 	TODO: Implement animation queue so different animations can be "queued" up and played sequentially
+	
+	TODO: When updating a unit, need a way to convert from the sprites of the unupgraded version to the sprites of the upgraded version.
+		- Basically need to "map" sprites to each other
 */
 
 function AnimationController(_entity_obj, _current_sprite, _static_sprite = _current_sprite) constructor {
 	entity_obj = _entity_obj;
-	//current_sprite = _current_sprite;
+	current_sprite = _current_sprite;
 	static_sprite = _static_sprite;
 	//animation_queue = [];
 	num_loops = LOOP_FOREVER;
@@ -76,3 +79,12 @@ function AnimationController(_entity_obj, _current_sprite, _static_sprite = _cur
 	*/
 }
 #endregion
+
+
+/*
+#region Sprite Maps
+global SPRITE_MAPS = {
+	
+}
+#endregion
+*/

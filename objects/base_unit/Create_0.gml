@@ -9,8 +9,6 @@ recovery_rate = 0; //In health points per second
 
 radius = 0.0;
 
-special = false; //Determines if you can have more than one of a unit out
-
 unit_buffs = [];
 
 //Variables to keep track of things

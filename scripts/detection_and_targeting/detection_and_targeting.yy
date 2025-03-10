@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"detection_ranges_and_targeting",
+  "%Name":"detection_and_targeting",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"detection_ranges_and_targeting",
+  "name":"detection_and_targeting",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",

@@ -87,6 +87,9 @@ function Round(_spawn_list, _timer_count, _on_round_finish_callback) constructor
 		Returns true if the last enemy was destroyed
 		
 		TODO: Consider making this static, taking in the round pointer, and passing the round the enemy belongs to to the enemy itself. Might be a micro-optimization though.
+		
+		TODO: Instead of passing a callback to each enemy, give each enemy a "round tag" that corresponds to which round it was spawned in.
+		- Then, when the enemy is destroyed, fetch the game manager, use that to fetch the round manager, and call this as a static function
 	*/
 	enemy_destroy_callback = function(_enemy_id) {
 		var _enemy_index = array_get_index(currently_spawned_enemies, _enemy_id);
@@ -169,6 +172,7 @@ function RoundManager(_controller_obj, _max_round, _spawn_data) constructor {
 	};
 	
 	//This is suprisingly similar to the enemy destroy callback. I guess that makes sense. Both involve clearing out an instance that's no longer needed, and then checking a condition to see if a thing is completed.
+	//TODO: Make this static in a similar way to the enemy defeated callback.
 	on_round_finish_callback = function(_round_ptr) {
 		var _round_index = array_get_index(rounds_currently_running, _round_ptr);
 		if(_round_index == -1) {

@@ -15,14 +15,17 @@ seconds_per_shot = 2;
 
 bullet_damage = 10;
 
-special = false; //Determines if you can have more than one of a unit out
-
 unit_buffs = [];
 
-//Upgradable Stats
-upgrade_1 = new SampleGunnerAttackSpeedUpgrade(self.id);
-upgrade_2 = new SampleGunnerDamageUpgrade(self.id);
-upgrade_3 = new SampleGunnerRangeUpgrade(self.id);
+//Stat Upgrades
+stat_upgrade_1 = new SampleGunnerAttackSpeedUpgrade(self.id);
+stat_upgrade_2 = new SampleGunnerDamageUpgrade(self.id);
+stat_upgrade_3 = new SampleGunnerRangeUpgrade(self.id);
+
+//Unit Upgrades
+unit_upgrade_1 = new UpgradeToSampleGunnerUpgrade1(); //TODO: If this is just reference data, don't need to create a new one for each individual unit, just create once
+unit_upgrade_2 = new UpgradeToSampleGunnerUpgrade1();
+unit_upgrade_3 = new UpgradeToSampleGunnerUpgrade1();
 
 
 //Variables to keep track of and control things

@@ -12,7 +12,7 @@ enum UNIT_STATE {
 }
 
 
-#region UnitUpgrade
+#region StatUpgrade
 /*
 	Contains code that keep tracks of a unit's "level" in a certain stat.
 	Increasing the level of the upgrade will increase that stat by a certain amount.
@@ -27,14 +27,14 @@ enum UNIT_STATE {
 	current_level: The current level at which the upgrade is at.
 	max_level: The maximum level that the upgrade can be.
 	description: A short description of what upgrading this stat does.
-	current_cost: The current cost of purchasing the next level.
-	cost_fn: A function that can be used to calculate the cost of purchasing upgrade level n.
+	current_price: The current cost of purchasing the next level.
+	price_fn: A function that can be used to calculate the cost of purchasing upgrade level n.
 		- Should take in a level parameter.
 		- Useful for not hardcoding in any costs.
 	on_upgrade: A function that determines what happens upon the upgrade's purchase. Responsible for increasing any relevant stats and updating the cost.
 	upgrade_spr: The sprite used in the Unit Info Card
 */
-function UnitUpgrade(_unit, _max_level, _starting_level = 0, _description = "No description provided", _upgrade_spr = spr_increase_attack_speed_icon) constructor {
+function StatUpgrade(_unit, _max_level, _starting_level = 0, _description = "No description provided", _upgrade_spr = spr_increase_attack_speed_icon) constructor {
 	unit = _unit;
 	
 	current_level = _starting_level;
@@ -42,8 +42,8 @@ function UnitUpgrade(_unit, _max_level, _starting_level = 0, _description = "No 
 	
 	description = _description;
 	
-	cost_fn = function(){};
-	current_cost = 0;
+	price_fn = function(){};
+	current_price = 0;
 	
 	on_upgrade = function(){};
 	
@@ -51,7 +51,36 @@ function UnitUpgrade(_unit, _max_level, _starting_level = 0, _description = "No 
 }
 #endregion
 
-#region Sample Gunner Upgrades
+
+#region UnitUpgrade
+/*
+	Contains code for upgrading one unit into a stronger version of itself. Contains the pre-requisites and cost of the upgrade.
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	upgrade_to: The unit that should be upgraded into upon getting the upgrade.
+	price: How much the upgrade costs to purchase.
+	level_req_1: The level the unit's first upgradable stat needs to be in order to get purchased
+	level_req_2: The level the unit's second upgradable stat needs to be in order to get purchased
+	level_req_3: The level the unit's third upgradable stat needs to be in order to get purchased
+	
+*/
+function UnitUpgrade(_upgrade_to, _price, _level_req_1 = 0, _level_req_2 = 0, _level_req_3 = 0) constructor {
+	upgrade_to = _upgrade_to;
+	price = _price;
+	
+	level_req_1 = _level_req_1;
+	level_req_2 = _level_req_2;
+	level_req_3 = _level_req_3;
+}
+#endregion
+
+
+#region Sample Gunner Data
+
+#region Sample Gunner Stat Upgrades
 #region SampleGunnerAttackSpeedUpgrade
 /*
 	Attack speed upgrade for Sample Gunner
@@ -59,17 +88,17 @@ function UnitUpgrade(_unit, _max_level, _starting_level = 0, _description = "No 
 	TODO: Write variables for this
 */
 function SampleGunnerAttackSpeedUpgrade(_unit) : 
-	UnitUpgrade(_unit, 5, 0, "Decrease attack speed by 0.3 seconds with each upgrade.", spr_increase_attack_speed_icon) constructor {
+	StatUpgrade(_unit, 5, 0, "Decrease attack speed by 0.3 seconds with each upgrade.", spr_increase_attack_speed_icon) constructor {
 		
-	cost_fn = function(upgrade_level) {
+	price_fn = function(upgrade_level) {
 		return 10*upgrade_level;
 	}
-	current_cost = cost_fn(1);
+	current_price = price_fn(1);
 	
 	on_upgrade = function() {
 		unit.seconds_per_shot -= 0.3;
 		current_level++;
-		current_cost = cost_fn(current_level+1);
+		current_price = price_fn(current_level+1);
 	}
 }
 #endregion
@@ -82,17 +111,17 @@ function SampleGunnerAttackSpeedUpgrade(_unit) :
 	TODO: Write variables for this
 */
 function SampleGunnerDamageUpgrade(_unit) : 
-	UnitUpgrade(_unit, 5, 0, "Increase damage by 10 with each upgrade.", spr_increase_damage_icon) constructor {
+	StatUpgrade(_unit, 5, 0, "Increase damage by 10 with each upgrade.", spr_increase_damage_icon) constructor {
 		
-	cost_fn = function(upgrade_level) {
+	price_fn = function(upgrade_level) {
 		return 10*upgrade_level;
 	}
-	current_cost = cost_fn(1);
+	current_price = price_fn(1);
 	
 	on_upgrade = function() {
 		unit.bullet_damage += 10;
 		current_level++;
-		current_cost = cost_fn(current_level+1);
+		current_price = price_fn(current_level+1);
 	}
 }
 #endregion
@@ -105,18 +134,30 @@ function SampleGunnerDamageUpgrade(_unit) :
 	TODO: Write variables for this
 */
 function SampleGunnerRangeUpgrade(_unit) : 
-	UnitUpgrade(_unit, 5, 0, "Increase radius by half a tile with each upgrade.", spr_increase_range_icon) constructor {
+	StatUpgrade(_unit, 5, 0, "Increase radius by half a tile with each upgrade.", spr_increase_range_icon) constructor {
 		
-	cost_fn = function(upgrade_level) {
+	price_fn = function(upgrade_level) {
 		return 10*upgrade_level;
 	}
-	current_cost = cost_fn(1);
+	current_price = price_fn(1);
 	
 	on_upgrade = function() {
 		unit.range.radius += TILE_SIZE/2;
 		current_level++;
-		current_cost = cost_fn(current_level+1);
+		current_price = price_fn(current_level+1);
 	}
 }
 #endregion
+#endregion
+
+
+#region Sample Gunner Unit Upgrades
+/*
+	Upgrade from Sample Gunner to Sample Gunner Upgrade 1
+*/
+function UpgradeToSampleGunnerUpgrade1() :
+	UnitUpgrade(sample_gunner_upgrade_1, 100, 2, 0, 3) constructor {
+}
+#endregion
+
 #endregion

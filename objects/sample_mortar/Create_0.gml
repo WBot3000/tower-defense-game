@@ -13,8 +13,6 @@ range = new CircularRange(id, x + sprite_width/2, y + sprite_height/2, tilesize_
 shooting_speed = 6;
 seconds_per_shot = 4;
 
-special = false; //Determines if you can have more than one of a unit out
-
 unit_buffs = [];
 
 //Variables to keep track of and control things

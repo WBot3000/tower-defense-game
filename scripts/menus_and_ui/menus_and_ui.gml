@@ -115,8 +115,8 @@ function PauseButton(_x_pos, _y_pos) :
 		//TODO: Where the fuck does this game controller come from?
 		//Is it because it's called in a variable with the game controller?
 		//No, it's just because this isn't actually called
-		game_controller.game_state = GAME_STATE.PAUSED;
-		game_ui.set_gui_paused(); //Ew, circular dependency...
+		//game_controller.game_state = GAME_STATE.PAUSED;
+		//game_ui.set_gui_paused(); //Ew, circular dependency...
 	}
 }
 #endregion
@@ -132,28 +132,35 @@ function PauseButton(_x_pos, _y_pos) :
 	Data Variables:
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
 	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
-	round_manager: The round manager triggered by the pressing of this button.
+	controller_obj: Game controller object that manages game state.
 */
-function RoundStartButton(_x_pos, _y_pos, _round_manager) :
+function RoundStartButton(_x_pos, _y_pos, _controller_obj) :
 		Button(_x_pos, _y_pos, spr_round_start_button_enabled, spr_round_start_button_disabled, spr_round_start_button_enabled) constructor {
 	x_pos = _x_pos;
 	y_pos = _y_pos;
-	round_manager = _round_manager;
+	controller_obj = _controller_obj;
 
 	
 	
 	static is_enabled = function() {
+		var _round_manager = get_round_manager(controller_obj); //TODO: Implement a cache system for this and other instances like this so we don't have to fetch the manager EVERY time this function is called.
+		if(_round_manager == undefined ) {
+			return false;
+		}
 		//If we're on the final round, you shouldn't be able to trigger more rounds.
-		if(round_manager.current_round >= round_manager.max_round) {
+		if(_round_manager.current_round >= _round_manager.max_round) {
 			return false;
 		}
 		return true;
 	}
 	
 	
+	//Also not used
 	static on_click = function() {
 		if(is_enabled()) {
-			round_manager.start_round();
+			//Round manager MUST exist if is_enabled returns true, so we don't have to check again in here.
+			var _round_manager = get_round_manager(controller_obj);
+			_round_manager.start_round();
 		}
 	}
 }
@@ -245,7 +252,7 @@ enum PAUSE_MENU_STATE {
 }
 
 #macro NUM_VOLUME_PILLS 10
-function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manager) constructor {
+function PauseMenu(_menu_width_percentage, _menu_height_percentage/*, _music_manager*/) constructor {
 	pause_background = -1;
 	
 	var _view_w = camera_get_view_width(view_camera[0]);
@@ -256,7 +263,7 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage, _music_manag
 	x2 = (_view_w/2) + (_menu_width_percentage/2 * _view_w); //From middle point, go to the right by the percentage amount
 	y2 = (_view_h/2) + (_menu_height_percentage/2 * _view_h); //From middle point, go down by the percentage amount
 	
-	music_manager = _music_manager;
+	//music_manager = _music_manager;
 	
 	/*
 		Gross math equation that basically says
@@ -341,6 +348,8 @@ enum SLIDING_MENU_STATE {
 #endregion
 
 
+#region Unit Purchase Menu Classes
+
 #region UnitPurchaseButton (Class)
 /*
 	Defines a clickable button for the Unit Selection Menu.
@@ -416,7 +425,7 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 
 //How much of the screen should the unit purchase menu take up while it is open
 //NOTE: I don't think this is used right now
-#macro PURCHASE_MENU_SCREEN_PERCENTAGE (1/3)
+#macro PURCHASE_MENU_SCREEN_PERCENTAGE (2/7)
 
 function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the side is opened or closed
@@ -533,8 +542,12 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 }
 #endregion
 
+#endregion
 
-#region UnitUpgradeStatButton
+
+#region Unit Info Card Classes
+
+#region StatUpgradeButton (Class)
 /*
 	The button that should be clicked to purchase an upgrade
 	
@@ -544,14 +557,14 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	Data Variables:
 	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
 	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
-	upgrade_data: Unit's upgrade data that should be displayed
+	stat_upgrade_data: Unit's upgrade data that should be displayed
 	
-	NOTE: All of these variables should be passed from the UnitInfoCardUpgrade
+	NOTE: All of these variables should be passed from the UnitInfoCardStatUpgrade
 */
-function UnitUpgradeStatButton(_x_pos, _y_pos, _upgrade_data) :
+function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data) :
 	Button(_x_pos, _y_pos, spr_upgrade_purchase_default, spr_upgrade_purchase_disabled) constructor {
 
-	upgrade_data = _upgrade_data;
+	stat_upgrade_data = _stat_upgrade_data;
 	
 	
 	static draw = function(_x_offset, _y_offset) {
@@ -574,14 +587,14 @@ function UnitUpgradeStatButton(_x_pos, _y_pos, _upgrade_data) :
 		
 		draw_set_halign(fa_right);
 		draw_set_valign(fa_right);
-		if(upgrade_data.current_level >= upgrade_data.max_level) {
+		if(stat_upgrade_data.current_level >= stat_upgrade_data.max_level) {
 			draw_text_color(_draw_x_pos + sprite_get_width(button_sprite_default)*0.9,
-				_draw_y_pos + sprite_get_height(upgrade_data.upgrade_spr) - 4, "MAX", 
+				_draw_y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4, "MAX", 
 				c_white, c_white, c_white, c_white, 1);
 		}
 		else {
 			draw_text_color(_draw_x_pos + sprite_get_width(button_sprite_default)*0.9, 
-				_draw_y_pos + sprite_get_height(upgrade_data.upgrade_spr) - 4, upgrade_data.current_cost, 
+				_draw_y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4, stat_upgrade_data.current_price, 
 				c_white, c_white, c_white, c_white, 1);
 		}
 		draw_set_halign(fa_left);
@@ -589,19 +602,21 @@ function UnitUpgradeStatButton(_x_pos, _y_pos, _upgrade_data) :
 	}
 	
 	static is_enabled = function() {
-		return upgrade_data != undefined && global.player_money >= upgrade_data.current_cost && upgrade_data.current_level < upgrade_data.max_level;
+		return (stat_upgrade_data != undefined 
+			&& global.player_money >= stat_upgrade_data.current_price 
+			&& stat_upgrade_data.current_level < stat_upgrade_data.max_level);
 	}
 	
 	static on_click = function() {
-		global.player_money -= upgrade_data.current_cost;
-		upgrade_data.on_upgrade();
+		global.player_money -= stat_upgrade_data.current_price;
+		stat_upgrade_data.on_upgrade();
 	}
 	
 }
 #endregion
 
 
-#region UnitInfoCardUpgrade (Class)
+#region UnitInfoCardStatUpgrade (Class)
 /*
 	Defines the area where the unit stats and upgrades are.
 	
@@ -611,22 +626,22 @@ function UnitUpgradeStatButton(_x_pos, _y_pos, _upgrade_data) :
 	Data Variables:
 	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
 	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
-	upgrade_data: Unit's upgrade data that should be displayed
+	stat_upgrade_data: Unit's upgrade data that should be displayed
 	purchase_upgrade_button: The button clicked on to purchase the upgrade
 */
-function UnitInfoCardUpgrade(_x_pos, _y_pos, _upgrade_data) constructor {
+function UnitInfoCardStatUpgrade(_x_pos, _y_pos, _stat_upgrade_data) constructor {
 	x_pos = _x_pos;
 	y_pos = _y_pos;
-	upgrade_data = _upgrade_data;
+	stat_upgrade_data = _stat_upgrade_data;
 	
-	purchase_button = new UnitUpgradeStatButton(
+	purchase_button = new StatUpgradeButton(
 		x_pos + TILE_SIZE, //TILE_SIZE used because that should be the same size as all of the upgrade data images
-		y_pos, upgrade_data)
+		y_pos, stat_upgrade_data)
 	
-	//TODO: See if this is necessary
+
 	static on_selected_unit_change = function(_new_upgrade_data) {
-		upgrade_data = _new_upgrade_data;
-		purchase_button.upgrade_data = upgrade_data;
+		stat_upgrade_data = _new_upgrade_data;
+		purchase_button.stat_upgrade_data = stat_upgrade_data;
 	}
 	
 	
@@ -634,14 +649,14 @@ function UnitInfoCardUpgrade(_x_pos, _y_pos, _upgrade_data) constructor {
 		var _draw_x_pos = x_pos + _x_offset;
 		var _draw_y_pos = y_pos + _y_offset;
 		
-		draw_sprite(upgrade_data.upgrade_spr, 0, _draw_x_pos, _draw_y_pos);
+		draw_sprite(stat_upgrade_data.upgrade_spr, 0, _draw_x_pos, _draw_y_pos);
 		//draw_sprite(spr_upgrade_level, 0, _draw_x_pos + sprite_get_width(upgrade_data.upgrade_spr), _draw_y_pos);
 		draw_set_halign(fa_right);
 		draw_set_valign(fa_right);
 		//Draws the number centered
-		draw_text_color(_draw_x_pos + sprite_get_width(upgrade_data.upgrade_spr)*0.9,
-			_draw_y_pos + sprite_get_height(upgrade_data.upgrade_spr) - 4,
-			upgrade_data.current_level,
+		draw_text_color(_draw_x_pos + sprite_get_width(stat_upgrade_data.upgrade_spr)*0.9,
+			_draw_y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4,
+			stat_upgrade_data.current_level,
 			c_white, c_white, c_white, c_white, 1);
 		draw_set_halign(fa_left);
 		draw_set_valign(fa_left);
@@ -649,6 +664,70 @@ function UnitInfoCardUpgrade(_x_pos, _y_pos, _upgrade_data) constructor {
 		purchase_button.draw(_x_offset, _y_offset);
 	}
 	
+}
+#endregion
+
+
+#region UnitUpgradeButton (Class)
+/*
+	Button clicked to upgrade a unit into a different one.
+*/
+function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data, _selected_unit) : 
+		Button(_x_pos, _y_pos, spr_unit_purchase_button_default, spr_unit_purchase_button_disabled, spr_unit_purchase_button_highlighted) constructor {
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	unit_upgrade_data = _unit_upgrade_data;
+	selected_unit = _selected_unit;
+	
+	
+	static is_enabled = function() {
+		return (global.player_money >= unit_upgrade_data.price &&
+			selected_unit.stat_upgrade_1.current_level >= unit_upgrade_data.level_req_1 &&
+			selected_unit.stat_upgrade_2.current_level >= unit_upgrade_data.level_req_2 &&
+			selected_unit.stat_upgrade_3.current_level >= unit_upgrade_data.level_req_3)
+	}
+	
+	
+	static on_selected_unit_change = function(_new_upgrade_data, _new_selected_unit) {
+		unit_upgrade_data = _new_upgrade_data;
+		selected_unit = _new_selected_unit;
+	}
+	
+
+	//static draw_parent = method(self, draw); //TODO: For some reason, the bind method was causing all of the button backgrounds to appear in the first section. Need to figure out why.
+	
+	//_x_offset and _y_offset are the origins of the menu
+	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
+	static draw = function(_x_offset, _y_offset, _button_highlight_enabled = true) {
+		var _draw_x_pos = x_pos + _x_offset;
+		var _draw_y_pos = y_pos + _y_offset;
+		
+		var _spr;
+		if(!is_enabled()) {
+			_spr = button_sprite_disabled;
+		}
+		else if(_button_highlight_enabled && is_highlighted(_x_offset, _y_offset)) {
+			_spr = button_sprite_highlighted;
+		}
+		else {
+			_spr = button_sprite_default;
+		}
+		draw_sprite(_spr, 0, _draw_x_pos, _draw_y_pos);
+		draw_sprite(object_get_sprite(unit_upgrade_data.upgrade_to), 0, _draw_x_pos + 8, _draw_y_pos + 4);
+		draw_set_halign(fa_right);
+		draw_text(_draw_x_pos + sprite_get_width(button_sprite_default) - 8, _draw_y_pos + 72, string(unit_upgrade_data.price));
+		draw_set_halign(fa_left);
+	}
+	
+	static on_click = function() { //TODO: Need to finish
+		global.player_money -= unit_upgrade_data.price;
+		/*
+		var _unit_tile = instance_position(selected_unit.x, selected_unit.y, base_tile);
+		var _new_unit = instance_create_layer(selected_unit.x, selected_unit.y)*/
+		with(selected_unit) {	
+			instance_change(other.unit_upgrade_data.upgrade_to, false);
+		}
+	}
 }
 #endregion
 
@@ -679,11 +758,16 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	
 	active = false;
 	
-	//Unit Stat Info
-	unit_upgrade_1 = new UnitInfoCardUpgrade(TILE_SIZE*2, TILE_SIZE/4, undefined);
-	unit_upgrade_2 = new UnitInfoCardUpgrade(TILE_SIZE*5, TILE_SIZE/4, undefined);
-	unit_upgrade_3 = new UnitInfoCardUpgrade(TILE_SIZE*8, TILE_SIZE/4, undefined);
-	//unit_upgrade_4 = new UnitInfoCardUpgrade(TILE_SIZE*11, y_pos_current + TILE_SIZE/4, /*TODO*/);
+	//Stat Upgrade Info
+	stat_upgrade_1 = new UnitInfoCardStatUpgrade(TILE_SIZE*2, TILE_SIZE/4, undefined);
+	stat_upgrade_2 = new UnitInfoCardStatUpgrade(TILE_SIZE*5, TILE_SIZE/4, undefined);
+	stat_upgrade_3 = new UnitInfoCardStatUpgrade(TILE_SIZE*8, TILE_SIZE/4, undefined);
+	stat_upgrade_4 = new UnitInfoCardStatUpgrade(TILE_SIZE*11, TILE_SIZE/4, undefined);
+	
+	//Unit Upgrade Info
+	unit_upgrade_1 = new UnitUpgradeButton(TILE_SIZE*10.5, TILE_SIZE/8, undefined);
+	unit_upgrade_2 = new UnitUpgradeButton(TILE_SIZE*12, TILE_SIZE/8, undefined);
+	unit_upgrade_3 = new UnitUpgradeButton(TILE_SIZE*13.5, TILE_SIZE/8, undefined);
 	
 	
 	//Basically just a wrapper for activating the button
@@ -701,25 +785,53 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	//Called when the selected unit is changed
 	static on_selected_unit_change = function(_new_selected_unit) {
 		selected_unit = _new_selected_unit;
-		if(variable_instance_exists(selected_unit, "upgrade_1")) {
-			unit_upgrade_1.on_selected_unit_change(selected_unit.upgrade_1);
+		if(variable_instance_exists(selected_unit, "stat_upgrade_1")) {
+			stat_upgrade_1.on_selected_unit_change(selected_unit.stat_upgrade_1);
 		}
 		else {
-			unit_upgrade_1.on_selected_unit_change(undefined);
+			stat_upgrade_1.on_selected_unit_change(undefined);
 		}
 		
-		if(variable_instance_exists(selected_unit, "upgrade_2")) {
-			unit_upgrade_2.on_selected_unit_change(selected_unit.upgrade_2);
+		if(variable_instance_exists(selected_unit, "stat_upgrade_2")) {
+			stat_upgrade_2.on_selected_unit_change(selected_unit.stat_upgrade_2);
 		}
 		else {
-			unit_upgrade_2.on_selected_unit_change(undefined);
+			stat_upgrade_2.on_selected_unit_change(undefined);
 		}
 		
-		if(variable_instance_exists(selected_unit, "upgrade_3")) {
-			unit_upgrade_3.on_selected_unit_change(selected_unit.upgrade_3);
+		if(variable_instance_exists(selected_unit, "stat_upgrade_3")) {
+			stat_upgrade_3.on_selected_unit_change(selected_unit.stat_upgrade_3);
 		}
 		else {
-			unit_upgrade_3.on_selected_unit_change(undefined);
+			stat_upgrade_3.on_selected_unit_change(undefined);
+		}
+		
+		if(variable_instance_exists(selected_unit, "stat_upgrade_4")) {
+			stat_upgrade_4.on_selected_unit_change(selected_unit.stat_upgrade_4);
+		}
+		else {
+			stat_upgrade_4.on_selected_unit_change(undefined);
+		}
+		
+		if(variable_instance_exists(selected_unit, "unit_upgrade_1")) {
+			unit_upgrade_1.on_selected_unit_change(selected_unit.unit_upgrade_1, selected_unit);
+		}
+		else {
+			unit_upgrade_1.on_selected_unit_change(undefined, undefined);
+		}
+		
+		if(variable_instance_exists(selected_unit, "unit_upgrade_2")) {
+			unit_upgrade_2.on_selected_unit_change(selected_unit.unit_upgrade_2, selected_unit);
+		}
+		else {
+			unit_upgrade_2.on_selected_unit_change(undefined, undefined);
+		}
+		
+		if(variable_instance_exists(selected_unit, "unit_upgrade_3")) {
+			unit_upgrade_3.on_selected_unit_change(selected_unit.unit_upgrade_3, selected_unit);
+		}
+		else {
+			unit_upgrade_3.on_selected_unit_change(undefined, undefined);
 		}
 	}
 
@@ -740,13 +852,26 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		draw_rectangle_color(0, y_pos_current, x_pos, _view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
 		if(selected_unit != undefined) {
 			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE*0.5, y_pos_current + TILE_SIZE/4);
-			if(unit_upgrade_1.upgrade_data != undefined) {
+			if(stat_upgrade_1.stat_upgrade_data != undefined) {
+				stat_upgrade_1.draw(0, y_pos_current);
+			}
+			if(stat_upgrade_2.stat_upgrade_data != undefined) {
+				stat_upgrade_2.draw(0, y_pos_current);
+			}
+			if(stat_upgrade_3.stat_upgrade_data != undefined) {
+				stat_upgrade_3.draw(0, y_pos_current);
+			}
+			if(stat_upgrade_4.stat_upgrade_data != undefined) {
+				stat_upgrade_4.draw(0, y_pos_current);
+			}
+			
+			if(unit_upgrade_1.unit_upgrade_data != undefined) {
 				unit_upgrade_1.draw(0, y_pos_current);
 			}
-			if(unit_upgrade_2.upgrade_data != undefined) {
+			if(unit_upgrade_2.unit_upgrade_data != undefined) {
 				unit_upgrade_2.draw(0, y_pos_current);
 			}
-			if(unit_upgrade_3.upgrade_data != undefined) {
+			if(unit_upgrade_3.unit_upgrade_data != undefined) {
 				unit_upgrade_3.draw(0, y_pos_current);
 			}
 		}
@@ -793,21 +918,52 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	//TODO: This works differently from the unit purchase menu
 	// In that menu, the selection returns a unit type, this one actually performs the purchase
 	// Determine which method is better and do it.
-	static select_upgrade_purchase = function() {
-		if(unit_upgrade_1.purchase_button.is_enabled() &&
-			unit_upgrade_1.purchase_button.is_highlighted(0, y_pos_current)) {
-			unit_upgrade_1.purchase_button.on_click();
+	//TODO: Make this code nicer. To many else ifs
+	static select_purchase = function() {
+		if(stat_upgrade_1.purchase_button.is_enabled() &&
+			stat_upgrade_1.purchase_button.is_highlighted(0, y_pos_current)) {
+			stat_upgrade_1.purchase_button.on_click();
 		}
-		else if(unit_upgrade_2.purchase_button.is_enabled() &&
-			unit_upgrade_2.purchase_button.is_highlighted(0, y_pos_current)) {
-			unit_upgrade_2.purchase_button.on_click();
+		else if(stat_upgrade_2.purchase_button.is_enabled() &&
+			stat_upgrade_2.purchase_button.is_highlighted(0, y_pos_current)) {
+			stat_upgrade_2.purchase_button.on_click();
 		}
-		else if(unit_upgrade_3.purchase_button.is_enabled() &&
-			unit_upgrade_3.purchase_button.is_highlighted(0, y_pos_current)) {
-			unit_upgrade_3.purchase_button.on_click();
+		else if(stat_upgrade_3.purchase_button.is_enabled() &&
+			stat_upgrade_3.purchase_button.is_highlighted(0, y_pos_current)) {
+			stat_upgrade_3.purchase_button.on_click();
+		}
+		else if(stat_upgrade_4.purchase_button.is_enabled() &&
+			stat_upgrade_4.purchase_button.is_highlighted(0, y_pos_current)) {
+			stat_upgrade_4.purchase_button.on_click();
+		}
+		else if(unit_upgrade_1.is_enabled() &&
+			unit_upgrade_1.is_highlighted(0, y_pos_current)) {
+			unit_upgrade_1.on_click();
+			/*
+			unit_upgrade_1.on_selected_unit_change(
+				variable_instance_exists(selected_unit, "unit_upgrade_1") ? selected_unit.unit_upgrade_1 : undefined, 
+				selected_unit);*/
+		}
+		else if(unit_upgrade_2.is_enabled() &&
+			unit_upgrade_2.is_highlighted(0, y_pos_current)) {
+			unit_upgrade_2.on_click();
+			/*
+			unit_upgrade_2.on_selected_unit_change(
+				variable_instance_exists(selected_unit, "unit_upgrade_2") ? selected_unit.unit_upgrade_1 : undefined, 
+				selected_unit);*/
+		}
+		else if(unit_upgrade_3.is_enabled() &&
+			unit_upgrade_3.is_highlighted(0, y_pos_current)) {
+			unit_upgrade_3.on_click();
+			/*
+			unit_upgrade_3.on_selected_unit_change(
+				variable_instance_exists(selected_unit, "unit_upgrade_3") ? selected_unit.unit_upgrade_1 : undefined, 
+				selected_unit);*/
 		}
 	}
 }
+#endregion
+
 #endregion
 
 
@@ -818,15 +974,13 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	(All argument variables correspond with non-underscored data variables)
 	
 	Data Variables:
-	game_state_manager: The manager that controls the game's overall state machine
-	round_manager: The manager responsible for handling round info
+	controller_obj: Game controller object that manages game state.
 */
 #macro GAME_INFO_DISPLAY_WIDTH TILE_SIZE*4
 #macro GAME_INFO_DISPLAY_HEIGHT TILE_SIZE*2
 
-function GameInfoDisplay(_game_state_manager, _round_manager) constructor {
-	game_state_manager = _game_state_manager;
-	round_manager = _round_manager;
+function GameInfoDisplay(_controller_obj) constructor {
+	controller_obj = _controller_obj;
 	
 	active = false;
 	
@@ -853,18 +1007,26 @@ function GameInfoDisplay(_game_state_manager, _round_manager) constructor {
 	
 	
 	static draw = function() {
+		//Get necessary information from managers
+		//TODO: Same cache stuff as mentioned 
+		var _game_state_manager = get_game_state_manager(controller_obj);
+		var _round_manager = get_round_manager(controller_obj);
+		
 		//Draw background
 		draw_rectangle_color(0, 0, GAME_INFO_DISPLAY_WIDTH, GAME_INFO_DISPLAY_HEIGHT, c_silver, c_silver, c_silver, c_silver, false);
 		
 		//Draw basic game stats
-		if(game_state_manager.state== GAME_STATE.VICTORY) {
+		if(_game_state_manager != undefined && _game_state_manager.state== GAME_STATE.VICTORY) {
 			draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(1/2), "Victory!", c_black, c_black, c_black, c_black, 1);
 		}
-		else if(game_state_manager.state == GAME_STATE.DEFEAT) {
+		else if(_game_state_manager != undefined && _game_state_manager.state == GAME_STATE.DEFEAT) {
 			draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(1/2), "Defeat...", c_black, c_black, c_black, c_black, 1);
 		}
-		else {
-			draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(1/2), "Round: " + string(round_manager.current_round), c_black, c_black, c_black, c_black, 1);
+		else if(_round_manager != undefined) {
+			draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(1/2), "Round: " + string(_round_manager.current_round), c_black, c_black, c_black, c_black, 1);
+		}
+		else { //Fallback in the event we have no manager data. Should never actually show up in real play.
+			draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(1/2), "Round: ???", c_black, c_black, c_black, c_black, 1);
 		}
 		draw_text_color(TILE_SIZE*(1/2), TILE_SIZE, "Money: " + string(global.player_money), c_black, c_black, c_black, c_black, 1);
 		draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(3/2), "Wall Health: " + string(global.wall_health), c_black, c_black, c_black, c_black, 1);
@@ -890,43 +1052,35 @@ function GameInfoDisplay(_game_state_manager, _round_manager) constructor {
 	_purchase_data: The purchase data needed for the purchase menu
 	(All other argument variables correspond with non-underscored data variables)
 	
-	game_state_manager: The manager that controls the game's overall state machine
-	round_manager: The manager responsible for handling round info
+	controller_obj: The controller object this manager is created for.
 	
 	TODO: Finish this comment
 */
-function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor {
+function GameUI(_controller_obj, _purchase_data) constructor {
 	//Manager Info
-	game_state_manager = _game_state_manager;
+	controller_obj = _controller_obj;
 	
 	//Viewport info
 	view_w =  camera_get_view_width(view_camera[0]);
 	view_h = camera_get_view_height(view_camera[0]);
 	
 	//Pure Display Elements (no interactivity)
-	game_info_display = new GameInfoDisplay(_game_state_manager, _round_manager);
+	game_info_display = new GameInfoDisplay(_controller_obj);
 	
 	//Buttons
 	pause_button = new PauseButton(PAUSE_BUTTON_X, PAUSE_BUTTON_Y);
-	round_start_button = new RoundStartButton(ROUND_START_BUTTON_X, ROUND_START_BUTTON_Y, _round_manager); //Maybe find a way to get Round Manager without passing
+	round_start_button = new RoundStartButton(ROUND_START_BUTTON_X, ROUND_START_BUTTON_Y, _controller_obj);
 	
 	//Menus
 	pause_menu = new PauseMenu((1/2), (1/2));
 	//NOTE: In the older code, the height was just window_get_height(). See how this changes things.
-	purchase_menu = new UnitPurchaseMenu((2/7), view_h*(1-UNIT_INFO_CARD_SCREEN_PERCENTAGE), _purchase_data);
+	purchase_menu = new UnitPurchaseMenu(PURCHASE_MENU_SCREEN_PERCENTAGE, 
+		view_h*(1-UNIT_INFO_CARD_SCREEN_PERCENTAGE), _purchase_data);
 	unit_info_card = new UnitInfoCard(UNIT_INFO_CARD_SCREEN_PERCENTAGE, view_w);
 	
 	
-	
-	
-	//TODO: Create GUI component activation/deactivation system that can easily do this without spaghetti logic
-	//TODO: Maybe fetch component and return it (undefined if not on any GUI component) instead of boolean?
 	//The cool thing about this is that it lets you prioritize certain GUI elements over others.
 	static gui_element_highlighted = function() {
-		/*
-		if(game_state_manager.state != GAME_STATE.RUNNING) { //For the pause menu, just for disabling placement outright if the game isn't running.
-			return true;
-		}*/
 		
 		if(game_info_display.active && game_info_display.is_highlighted()) {
 			return game_info_display;
@@ -977,10 +1131,11 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 	static draw = function() {
 		//var view_w = camera_get_view_width(view_camera[0]);
 		//var view_h = camera_get_view_height(view_camera[0]);
+		var _game_state_manager = get_game_state_manager(controller_obj);
 
 		//Draw pause menu or not
 		//TODO: Needs a little bit more work to implement actual pausing functionality
-		if(/*game_state_manager.state == GAME_STATE.PAUSED*/ pause_menu.active) {
+		if(pause_menu.active) {
 			pause_menu.draw_paused_bg();
 		}
 		
@@ -998,16 +1153,16 @@ function GameUI(_game_state_manager, _round_manager, _purchase_data) constructor
 		}
 
 		//Draw purchase menu if it should be present on screen
-		if(purchase_menu.active /*&& purchase_menu.state != SLIDING_MENU_STATE.CLOSED*/) {
-			purchase_menu.draw(game_state_manager.state == GAME_STATE.RUNNING);
+		if(purchase_menu.active) {
+			purchase_menu.draw(_game_state_manager.state == GAME_STATE.RUNNING);
 		}
 		
 		//Draw unit info card if it should be present on screen
-		if(unit_info_card.active /*&& unit_info_card.state != SLIDING_MENU_STATE.CLOSED*/) {
-			unit_info_card.draw(game_state_manager.state == GAME_STATE.RUNNING);
+		if(unit_info_card.active) {
+			unit_info_card.draw(_game_state_manager.state == GAME_STATE.RUNNING);
 		}
 		
-		if(/*game_state_manager.state == GAME_STATE.PAUSED*/pause_menu.active) {
+		if(pause_menu.active) {
 			pause_menu.draw_menu();
 		}
 

@@ -15,14 +15,18 @@ var _f_pressed = keyboard_check_pressed(ord("F"));
 //NOTE: Currently just draws the pause menu. Doesn't handle any actual pausing or unpausing
 if(_q_pressed) {
 	if(game_state_manager.state == GAME_STATE.RUNNING) {
+		/*
 		instance_deactivate_all(true);
 		game_state_manager.pause_game();
-		game_ui.set_gui_paused();
+		game_ui.set_gui_paused();*/
+		game_state_manager.pause_game();
 	}
 	else if(game_state_manager.state == GAME_STATE.PAUSED) { //TODO: Find a way to roll this all into one component
+		/*
 		game_state_manager.resume_game();
 		game_ui.set_gui_running();
-		instance_activate_all(); //Responsible for re-activating all of the paused instances
+		instance_activate_all(); //Responsible for re-activating all of the paused instances*/
+		game_state_manager.resume_game();
 	}
 }
 
@@ -58,9 +62,11 @@ if(_mouse_left_released) {
 	
 	//TODO: Come up with "coordinatior classes" (ex. Pause Coordinator) to sync multiple tasks like this maybe?
 	if(game_ui.pause_button.is_highlighted()) { //Don't need to bother with unpausing because you can't use the button while the game is paused
+		/*
 		instance_deactivate_all(true);
 		game_state_manager.pause_game();
-		game_ui.set_gui_paused();
+		game_ui.set_gui_paused();*/
+		game_state_manager.pause_game();
 	}
 	
 	if(game_ui.round_start_button.is_highlighted()) {
@@ -82,7 +88,7 @@ if(_mouse_left_released) {
 	
 	//Check to see if an upgrade is being purchased
 	if(game_ui.unit_info_card.state != SLIDING_MENU_STATE.CLOSED && game_ui.unit_info_card.is_highlighted()) {
-		game_ui.unit_info_card.select_upgrade_purchase();
+		game_ui.unit_info_card.select_purchase();
 	}
 	
 	

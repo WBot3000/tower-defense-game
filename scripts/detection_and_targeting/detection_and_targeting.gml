@@ -1,5 +1,5 @@
 /*
-	detection_ranges_and_targeting.gml
+	detection_and_targeting.gml
 	This file contains structs and functions relating to how units target enemies, including
 	- Detection ranges, used for things like:
 		-Unit attack range
@@ -11,7 +11,7 @@
 /*
 	Ranges
 */
-
+#region Ranges
 
 #region Range (Class)
 /*
@@ -41,7 +41,7 @@ function CircularRange(_unit, _origin_x, _origin_y, _radius) : Range(_unit) cons
 	radius = _radius;
 	
 	static draw_range = function() {
-		draw_set_alpha(0.25)
+		draw_set_alpha(0.125)
 		draw_circle_color(origin_x, origin_y, radius, c_white, c_white, false);
 		draw_set_alpha(1)
 	}
@@ -86,7 +86,7 @@ function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor 
 	y2 = _y2;
 	
 	static draw_range = function() {
-		draw_set_alpha(0.25)
+		draw_set_alpha(0.125)
 		draw_rectangle_color(x1, y1, x2, y2, c_white, c_white, c_white, c_white, false);
 		draw_set_alpha(1)
 	}
@@ -134,6 +134,8 @@ function BrawlerRange(_unit) : CircularRange(_unit) constructor {
 	origin_y = _unit.y + (_unit.sprite_width/2);
 	radius = tilesize_to_pixels(1);
 }
+#endregion
+
 #endregion
 
 
@@ -211,8 +213,8 @@ function PersistentHitbox(_range, _effect, _cooldown) constructor {
 /*
 	Unit Targeting
 */
+#region Unit Targeting
 
-#region Targeting Types (Enums)
 /*
 	What kind of targeting a unit is using
 	CLOSEST_TO_UNIT: Attack the enemy that's physically closest to the unit. Equivalent to BTD6's "Close"
@@ -224,7 +226,6 @@ enum TARGETING_TYPE {
 	CLOSEST_TO_WALL,	//First
 	FURTHEST_FROM_WALL	//Last
 }
-#endregion
 
 
 #region target_close (Function)
@@ -310,4 +311,6 @@ function target_last(_unit, _enemy_list) {
 	}
 	return _most_behind_enemy;
 }
+#endregion
+
 #endregion

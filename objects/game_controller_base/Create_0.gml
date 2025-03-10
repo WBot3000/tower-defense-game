@@ -1,8 +1,8 @@
 /// @description Create game state, round data, money data, and wall data
 
 //Set current game state. Defaults to RUNNING
-//game_state = GAME_STATE.RUNNING;
-game_state_manager = new GameStateManager();
+//This bject is passed in as reference for coordination purposes
+game_state_manager = new GameStateManager(self.id);
 
 
 //Viewport variables used to calculate where things should go on the screen
@@ -38,7 +38,7 @@ purchase_data = [new PurchaseData(sample_gunner, 100), new PurchaseData(sample_b
 
 //GUI Data
 #region
-game_ui = new GameUI(game_state_manager, round_manager, purchase_data);
+game_ui = new GameUI(/*game_state_manager, round_manager,*/self.id, purchase_data);
 game_ui.set_gui_running(); //Initialize GUI to running mode
 #endregion
 

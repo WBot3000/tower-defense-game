@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"enemy_spawning",
+  "%Name":"game_state_control",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"enemy_spawning",
+  "name":"game_state_control",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",
