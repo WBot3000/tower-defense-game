@@ -1,5 +1,6 @@
 /*
-	game_control.gml
+	game_state_control.gml
+	
 	This file contains the GameManager struct, which contains data and functions related to running the game.
 	It also contains functions for fetching individual managers from a game controller object. This lets you reference managers inside other managers without having to do a bunch of nested parameter passing.
 	TODO: Might end up containing several separate managers

@@ -1,5 +1,6 @@
 /*
 	data_purchase.gml
+	
 	This file contains structs containing purchasing data for all of your units.
 
 	TODO: Currently function as globals, maybe alter this? Not sure

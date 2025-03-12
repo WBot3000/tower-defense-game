@@ -33,6 +33,8 @@ enemies_in_range = ds_list_create();
 
 shot_timer = 90; //When the unit is placed, takes less time to take a shot.
 
+sell_price = 100 * SELL_PRICE_REDUCTION;
+
 animation_controller = new AnimationController(self.id, spr_sample_gunner);
 
 

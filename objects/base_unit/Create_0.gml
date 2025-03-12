@@ -11,6 +11,8 @@ radius = 0.0;
 
 unit_buffs = [];
 
+sell_price = 0;
+
 //Variables to keep track of things
 enemies_in_range = ds_list_create();
 

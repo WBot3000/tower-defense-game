@@ -1,5 +1,6 @@
 /*
 	detection_and_targeting.gml
+	
 	This file contains structs and functions relating to how units target enemies, including
 	- Detection ranges, used for things like:
 		-Unit attack range

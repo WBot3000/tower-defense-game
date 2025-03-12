@@ -1,5 +1,6 @@
 /*
-	enemy_spawning.gml
+	enemy_spawning_and_rounds.gml
+	
 	This file contains structs and functions relating to spawning enemies. It also contains the code for managing "rounds" of enemies.
 	The main advantage of the Round Manager is that it allows multiple series of enemies to be called upon at varying times.
 */

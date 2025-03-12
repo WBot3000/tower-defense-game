@@ -1,5 +1,6 @@
 /*
 	persistent_hitbox_effects.gml
+	
 	This file contains functions for various types of persistent hitbox effects.
 	All of these take the id of the entity they will affect.
 */

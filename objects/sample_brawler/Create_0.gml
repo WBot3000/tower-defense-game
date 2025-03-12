@@ -21,5 +21,7 @@ enemies_in_range = ds_list_create();
 punch_timer = 15;
 curr_direction = DIRECTION.DOWN;
 
+sell_price = 100 * SELL_PRICE_REDUCTION;
+
 animation_controller = new AnimationController(self.id, spr_sample_brawler_down);
 

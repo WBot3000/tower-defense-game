@@ -1,5 +1,6 @@
 /*
 	conversions.gml
+	
 	This file contains various unit conversion functions.
 	Primarily used so that variables can be set using more "human" units (ex. number of tiles and seconds) compared to the units GameMaker uses (ex. pixels and frames) 
 	If a conversion changes, you can just change the function instead of changing everywhere where the conversion is needed.

@@ -116,7 +116,7 @@ function PauseButton(_x_pos, _y_pos) :
 		//Is it because it's called in a variable with the game controller?
 		//No, it's just because this isn't actually called
 		//game_controller.game_state = GAME_STATE.PAUSED;
-		//game_ui.set_gui_paused(); //Ew, circular dependency...
+		//game_ui.set_gui_paused();
 	}
 }
 #endregion
@@ -749,7 +749,7 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data, _selected_unit) :
 */
 function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the bottom is opened or closed
-	selected_unit = undefined;
+	selected_unit = noone;
 	
 	var _view_h = camera_get_view_height(view_camera[0]);
 	y_pos_open = (1-_menu_height_percentage) * _view_h;
@@ -850,7 +850,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		var _view_h = camera_get_view_height(view_camera[0]);
 		
 		draw_rectangle_color(0, y_pos_current, x_pos, _view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
-		if(selected_unit != undefined) {
+		if(selected_unit != noone) {
 			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE*0.5, y_pos_current + TILE_SIZE/4);
 			if(stat_upgrade_1.stat_upgrade_data != undefined) {
 				stat_upgrade_1.draw(0, y_pos_current);

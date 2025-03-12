@@ -1,5 +1,6 @@
 /*
 	music.gml
+	
 	This file contains the code for the MusicManager, responsible for playing the appropriate music for the appropriate situation, alongside appropriate effects to music.
 		ex) Fading out a song before playing another one.
 

@@ -1,5 +1,6 @@
 /*
 	enums_and_macros.gml
+	
 	This file contains macros and enums that don't fit in any other particular script file.
 	Mainly used for those that appear everywhere.
 */
@@ -32,17 +33,4 @@ enum DIRECTION {
 	RIGHT
 }
 
-
-/*
-	Enums for different kinds of buffs.
-	Buffs consists of one of these types and a multiplier
-		- 1 < x multiplier indicates a buff
-		- 0 < x < 1 multiplier indicates a debuff
-*/
-enum BUFF_TYPE {
-	RANGE, //Alters size of range
-	MOVEMENT_SPEED, //Alters movement speed of unit/enemy
-	SHOOTING_SPEED, //Alters shooting speed of unit/enemy
-	DEFENSE, //Alters unit/enemy defense
-	HEALTH_REGEN, //Alters unit/enemy health regen speed
-}
+#macro SELL_PRICE_REDUCTION 0.8 //How much a unit sells for in comparison to how much it cost.

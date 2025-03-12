@@ -1,10 +1,8 @@
 /// @description Run the camera controller, round manager and handle menu resizing selection
 
-/*
-	Gather all of the user's inputs
-*/
-#region
+#region Gathering User Inputs
 var _mouse_left_released = mouse_check_button_released(mb_left);
+var _mouse_right_released = mouse_check_button_released(mb_right);
 
 var _q_pressed = keyboard_check_pressed(ord("Q"));
 var _e_pressed = keyboard_check_pressed(ord("E"));
@@ -124,6 +122,20 @@ if(_mouse_left_released) {
 				//highlight = noone; //Can get rid of the highlight on the tile once it's placed
 			}
 		}
+	}
+}
+
+//Just for selling units now
+//TODO: This doesn't handle selling a unit that's selected yet. Need to change the data in the unit info card as well.
+if(_mouse_right_released) {
+	var _unit_to_sell = instance_position(mouse_x, mouse_y, base_unit);
+	if(_unit_to_sell != noone) {
+		var _tile_at_mouse = instance_position(_unit_to_sell.x, _unit_to_sell.y, placeable_tile);
+		_tile_at_mouse.placed_unit = noone;
+		
+		global.player_money += (_unit_to_sell.sell_price ?? 0);
+		game_ui.unit_info_card.on_selected_unit_change(noone); //Don't want this menu referencing a unit that doesn't exist anymore
+		instance_destroy(_unit_to_sell);
 	}
 }
 

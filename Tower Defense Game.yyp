@@ -98,6 +98,7 @@
     {"id":{"name":"pth_spawn1_SampleLevel1","path":"paths/pth_spawn1_SampleLevel1/pth_spawn1_SampleLevel1.yy",},},
     {"id":{"name":"SampleLevel1","path":"rooms/SampleLevel1/SampleLevel1.yy",},},
     {"id":{"name":"animation","path":"scripts/animation/animation.yy",},},
+    {"id":{"name":"buffs","path":"scripts/buffs/buffs.yy",},},
     {"id":{"name":"camera","path":"scripts/camera/camera.yy",},},
     {"id":{"name":"conversions","path":"scripts/conversions/conversions.yy",},},
     {"id":{"name":"damage","path":"scripts/damage/damage.yy",},},

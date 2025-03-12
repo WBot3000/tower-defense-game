@@ -1,5 +1,6 @@
 /*
 	utility.gml
+	
 	This file contains additional functions that help out with specific computations and such.
 	If a function doesn't "fit" in another script, then it's probably here.
 */

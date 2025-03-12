@@ -1,5 +1,6 @@
 /*
 	damage.gml
+	
 	This file contains the damage function, used for dealing damage to enemies and units.
 
 	Currently just a wrapper around setting and max functions

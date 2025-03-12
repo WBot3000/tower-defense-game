@@ -1,10 +1,12 @@
 //Ignore most of this for now.
 
 /*
-This file contains data for all the different types of enemies in the game.
-Sometimes, we might need to refer to some stats that an enemy has before initializing any instances of that enemy (ex. looking at an enemy descriptions)
-This data can be used to refer to enemies in these instances.
-This data is also used when the corresponding enemy is created
+	data_enemy.gml
+	
+	This file contains data for all the different types of enemies in the game.
+	Sometimes, we might need to refer to some stats that an enemy has before initializing any instances of that enemy (ex. looking at an enemy descriptions)
+	This data can be used to refer to enemies in these instances.
+	This data is also used when the corresponding enemy is created
 */
 
 /*

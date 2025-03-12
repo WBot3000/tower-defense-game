@@ -1,5 +1,6 @@
 /*
 	camera.gml
+	
 	This file contains the Camera Controller, responsible for moving the viewport.
 	The viewport can be moved either with the mouse keys, or 
 */

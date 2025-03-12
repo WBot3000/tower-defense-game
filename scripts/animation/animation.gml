@@ -1,5 +1,6 @@
 /*
 	animation.gml
+	
 	This file contains the Animation Controller, used for managing the animations for different entities.
 */
 
