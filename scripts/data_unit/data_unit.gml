@@ -37,7 +37,7 @@ enum UNIT_STATE {
 		- Useful for not hardcoding in any costs.
 	upgrade_spr: The sprite used in the Unit Info Card
 */
-function StatUpgrade(_unit, _max_level, _starting_level = 0, _upgrade_stats_fn = function(){}, _price_fn = function(upgrade_lvl) {return 0;},
+function StatUpgrade(_unit, _max_level, _starting_level = 0,
 	_description = "No description provided", _upgrade_spr = spr_increase_attack_speed_icon) constructor {
 	unit = _unit;
 	
@@ -49,10 +49,10 @@ function StatUpgrade(_unit, _max_level, _starting_level = 0, _upgrade_stats_fn =
 		// increasing the level of the upgrade
 		// adjusting the next upgrade's price
 		// adjusting the unit's sell value
-	upgrade_stats_fn = function() {}
+	static upgrade_stats_fn = function() {};
 	
 	//Call when an upgrade is purchased.
-	on_upgrade = function() {
+	static on_upgrade = function() {
 		upgrade_stats_fn();
 		unit.sell_price = (unit.sell_price ?? 0) + (current_price * SELL_PRICE_REDUCTION)
 		current_level++;
@@ -61,7 +61,7 @@ function StatUpgrade(_unit, _max_level, _starting_level = 0, _upgrade_stats_fn =
 	
 	description = _description;
 	
-	price_fn = _price_fn;
+	static price_fn = function(upgrade_level) { return 0; };
 	current_price = price_fn(_starting_level+1);
 	
 	upgrade_spr = _upgrade_spr;
@@ -106,8 +106,6 @@ function UnitUpgrade(_upgrade_to, _price, _level_req_1 = 0, _level_req_2 = 0, _l
 */
 function SampleGunnerAttackSpeedUpgrade(_unit) : 
 	StatUpgrade(_unit, 5, 0, 
-		function() {_unit.seconds_per_shot -= 0.3}, //upgrade_stats_fn
-		function(upgrade_level) {return 10*upgrade_level}, //price_fn
 		"Decrease attack speed by 0.3 seconds with each upgrade.", spr_increase_attack_speed_icon) constructor {
 	/*
 	price_fn = function(upgrade_level) {
@@ -120,6 +118,15 @@ function SampleGunnerAttackSpeedUpgrade(_unit) :
 		current_level++;
 		current_price = price_fn(current_level+1);
 	}*/
+	static upgrade_stats_fn = function() {
+		unit.seconds_per_shot -= 0.3
+	}
+	
+	static price_fn = function(upgrade_level) {
+		return upgrade_level * 10;
+	}
+	//Need to reset the starting price if we update the price function, as the intialized starting price was called with the base price function (which always returns 0)
+	current_price = price_fn(current_level+1);
 }
 #endregion
 
@@ -131,21 +138,17 @@ function SampleGunnerAttackSpeedUpgrade(_unit) :
 	TODO: Write variables for this
 */
 function SampleGunnerDamageUpgrade(_unit) : 
-	StatUpgrade(_unit, 5, 0, 
-		function() {_unit.bullet_damage += 10}, //upgrade_stats_fn
-		function(upgrade_level) {return 10*upgrade_level}, //price_fn
+	StatUpgrade(_unit, 5, 0,
 		"Increase damage by 10 with each upgrade.", spr_increase_damage_icon) constructor {
-	/*
-	price_fn = function(upgrade_level) {
-		return 10*upgrade_level;
-	}
-	current_price = price_fn(1);
-	
-	on_upgrade = function() {
+
+	static upgrade_stats_fn = function() {
 		unit.bullet_damage += 10;
-		current_level++;
-		current_price = price_fn(current_level+1);
-	}*/
+	}
+	
+	static price_fn = function(upgrade_level) {
+		return upgrade_level * 10;
+	}
+	current_price = price_fn(current_level+1);
 }
 #endregion
 
@@ -157,21 +160,17 @@ function SampleGunnerDamageUpgrade(_unit) :
 	TODO: Write variables for this
 */
 function SampleGunnerRangeUpgrade(_unit) : 
-	StatUpgrade(_unit, 5, 0, 
-		function() {_unit.range.radius += TILE_SIZE/2}, //upgrade_stats_fn
-		function(upgrade_level) {return 10*upgrade_level}, //price_fn
+	StatUpgrade(_unit, 5, 0,
 		"Increase radius by half a tile with each upgrade.", spr_increase_range_icon) constructor {
-	/*
-	price_fn = function(upgrade_level) {
-		return 10*upgrade_level;
-	}
-	current_price = price_fn(1);
-	
-	on_upgrade = function() {
+
+	static upgrade_stats_fn = function() {
 		unit.range.radius += TILE_SIZE/2;
-		current_level++;
-		current_price = price_fn(current_level+1);
-	}*/
+	}
+	
+	static price_fn = function(upgrade_level) {
+		return upgrade_level * 10;
+	}
+	current_price = price_fn(current_level+1);
 }
 #endregion
 #endregion
