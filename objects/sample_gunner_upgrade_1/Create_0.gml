@@ -55,11 +55,13 @@ if(!variable_instance_exists(self.id, "stat_upgrade_3")) {
 	stat_upgrade_3 = new SampleGunnerRangeUpgrade(self.id);
 }
 //TODO: Add Stat Upgrade 4
+stat_upgrade_4 = undefined;
 
 //Shouldn't have any unit upgrades after the initial
-delete unit_upgrade_1;
-delete unit_upgrade_2;
-delete unit_upgrade_3;
+//TODO: Delete or set to undefined?
+unit_upgrade_1 = undefined;
+unit_upgrade_2 = undefined;
+unit_upgrade_3 = undefined;
 
 
 if(!variable_instance_exists(self.id, "enemies_in_range")) { 

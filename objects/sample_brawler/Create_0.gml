@@ -15,6 +15,17 @@ seconds_per_punch = 0.5
 
 unit_buffs = [];
 
+//Stat Upgrades
+stat_upgrade_1 = undefined;
+stat_upgrade_2 = undefined;
+stat_upgrade_3 = undefined;
+stat_upgrade_4 = undefined;
+
+//Unit Upgrades
+unit_upgrade_1 = undefined;
+unit_upgrade_2 = undefined;
+unit_upgrade_3 = undefined;
+
 //Variables to keep track of and control things
 enemies_in_range = ds_list_create();
 

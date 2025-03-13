@@ -11,6 +11,17 @@ radius = 0.0;
 
 unit_buffs = [];
 
+//Stat Upgrades
+stat_upgrade_1 = undefined;
+stat_upgrade_2 = undefined;
+stat_upgrade_3 = undefined;
+stat_upgrade_4 = undefined;
+
+//Unit Upgrades
+unit_upgrade_1 = undefined;
+unit_upgrade_2 = undefined;
+unit_upgrade_3 = undefined;
+
 sell_price = 0;
 
 //Variables to keep track of things

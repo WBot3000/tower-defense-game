@@ -38,7 +38,7 @@ purchase_data = [new PurchaseData(sample_gunner, 100), new PurchaseData(sample_b
 
 //GUI Data
 #region
-game_ui = new GameUI(/*game_state_manager, round_manager,*/self.id, purchase_data);
+game_ui = new GameUI(self.id, purchase_data);
 game_ui.set_gui_running(); //Initialize GUI to running mode
 #endregion
 

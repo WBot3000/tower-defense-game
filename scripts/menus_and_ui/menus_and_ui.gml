@@ -4,8 +4,7 @@
 	This file contains macros, structs, and functions for creating the various menus and UI elements in the game.
 	Certain menus have different options based on different contexts. These let you control these options easily.
 
-	TODO: Make a parent element for ALL UI elements (for highlighting over them?)
-		OR make an Activatable object that handles all instances that can be activated and de-activated? That might be better...
+	TODO: Maybe make an Activatable object that handles all instances that can be activated and de-activated?
 */
 
 #region Button (Class)
@@ -561,7 +560,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	
 	NOTE: All of these variables should be passed from the UnitInfoCardStatUpgrade
 */
-function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data) :
+function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 	Button(_x_pos, _y_pos, spr_upgrade_purchase_default, spr_upgrade_purchase_disabled) constructor {
 
 	stat_upgrade_data = _stat_upgrade_data;
@@ -571,6 +570,11 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data) :
 		//TODO: Figure out how to get the inheritance actually working properly
 		var _draw_x_pos = x_pos + _x_offset;
 		var _draw_y_pos = y_pos + _y_offset;
+		
+		if(stat_upgrade_data == undefined) {
+			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos, _draw_y_pos);
+			return; //No number for a stat that doesn't exist
+		}
 		
 		var _spr;
 		if(!is_enabled()) {
@@ -608,15 +612,17 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data) :
 	}
 	
 	static on_click = function() {
-		global.player_money -= stat_upgrade_data.current_price;
-		stat_upgrade_data.on_upgrade();
+		if(stat_upgrade_data != undefined) {
+			global.player_money -= stat_upgrade_data.current_price;
+			stat_upgrade_data.on_upgrade();
+		}
 	}
 	
 }
 #endregion
 
 
-#region UnitInfoCardStatUpgrade (Class)
+#region UnitInfoCardStatUpgrade [OLD] (Class)
 /*
 	Defines the area where the unit stats and upgrades are.
 	
@@ -668,6 +674,170 @@ function UnitInfoCardStatUpgrade(_x_pos, _y_pos, _stat_upgrade_data) constructor
 #endregion
 
 
+#region UnitStatSquare (Class)
+/*
+	Used to display all of the stats that a unit has, as well as what levels they currently are.
+	
+	Argument Variables:
+	
+	Data Variables:
+	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
+	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
+	unit: The unit whose stats are being displayed
+*/
+function UnitStatSquare(_x_pos, _y_pos, _unit) constructor {
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	unit = _unit;
+	
+	static draw = function(_x_offset, _y_offset) {
+		if(unit == noone) {
+			return;
+		}
+		
+		var _draw_x_pos = x_pos + _x_offset;
+		var _draw_y_pos = y_pos + _y_offset;
+		
+		//Top-left: Stat 1
+		if(unit.stat_upgrade_1 != undefined) {
+			draw_sprite(unit.stat_upgrade_1.upgrade_spr, 0, _draw_x_pos, _draw_y_pos);
+			draw_set_halign(fa_right);
+			draw_set_valign(fa_right);
+			//Draws the number centered
+			draw_text_color(_draw_x_pos + sprite_get_width(unit.stat_upgrade_1.upgrade_spr)*0.9,
+				_draw_y_pos + sprite_get_height(unit.stat_upgrade_1.upgrade_spr) - 4,
+				unit.stat_upgrade_1.current_level,
+				c_white, c_white, c_white, c_white, 1);
+			draw_set_halign(fa_left);
+			draw_set_valign(fa_left);
+		}
+		else {
+			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos, _draw_y_pos);
+		}
+		
+		//Top-right: Stat 2
+		//NOTE: Currently assumes icons are tile-sized, which might not always hold true
+		if(unit.stat_upgrade_2 != undefined) {
+			draw_sprite(unit.stat_upgrade_2.upgrade_spr, 0, _draw_x_pos + TILE_SIZE, _draw_y_pos);
+			draw_set_halign(fa_right);
+			draw_set_valign(fa_right);
+			//Draws the number centered
+			draw_text_color(_draw_x_pos + TILE_SIZE + sprite_get_width(unit.stat_upgrade_2.upgrade_spr)*0.9,
+				_draw_y_pos + sprite_get_height(unit.stat_upgrade_2.upgrade_spr) - 4,
+				unit.stat_upgrade_2.current_level,
+				c_white, c_white, c_white, c_white, 1);
+			draw_set_halign(fa_left);
+			draw_set_valign(fa_left);
+		}
+		else {
+			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos + TILE_SIZE, _draw_y_pos);
+		}
+		
+		//Bottom-left: Stat 3
+		//NOTE: Currently assumes icons are tile-sized, which might not always hold true
+		if(unit.stat_upgrade_3 != undefined) {
+			draw_sprite(unit.stat_upgrade_3.upgrade_spr, 0, _draw_x_pos, _draw_y_pos + TILE_SIZE);
+			draw_set_halign(fa_right);
+			draw_set_valign(fa_right);
+			//Draws the number centered
+			draw_text_color(_draw_x_pos + sprite_get_width(unit.stat_upgrade_3.upgrade_spr)*0.9,
+				_draw_y_pos + TILE_SIZE + sprite_get_height(unit.stat_upgrade_3.upgrade_spr) - 4,
+				unit.stat_upgrade_3.current_level,
+				c_white, c_white, c_white, c_white, 1);
+			draw_set_halign(fa_left);
+			draw_set_valign(fa_left);
+		}
+		else {
+			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos, _draw_y_pos + TILE_SIZE);
+		}
+		
+		//Bottom-right: Stat 2
+		//NOTE: Currently assumes icons are tile-sized, which might not always hold true
+		if(unit.stat_upgrade_4 != undefined) {
+			draw_sprite(unit.stat_upgrade_4.upgrade_spr, 0, _draw_x_pos + TILE_SIZE, _draw_y_pos + TILE_SIZE);
+			draw_set_halign(fa_right);
+			draw_set_valign(fa_right);
+			//Draws the number centered
+			draw_text_color(_draw_x_pos + TILE_SIZE + sprite_get_width(unit.stat_upgrade_4.upgrade_spr)*0.9,
+				_draw_y_pos + TILE_SIZE + sprite_get_height(unit.stat_upgrade_4.upgrade_spr) - 4,
+				unit.stat_upgrade_4.current_level,
+				c_white, c_white, c_white, c_white, 1);
+			draw_set_halign(fa_left);
+			draw_set_valign(fa_left);
+		}
+		else {
+			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos + TILE_SIZE, _draw_y_pos + TILE_SIZE);
+		}
+	}
+	
+}
+#endregion
+
+
+#region UnitStatUpgradeSquare (Class)
+/*
+	Used to display all of the stat upgrade buttons 
+	
+	Argument Variables:
+	
+	Data Variables:
+	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
+	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
+	unit: The unit whose stats are being displayed
+*/
+function UnitStatUpgradeSquare(_x_pos, _y_pos, _unit) constructor {
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	
+	stat_upgrade_button_1 = new StatUpgradeButton(x_pos, y_pos);
+	stat_upgrade_button_2 = new StatUpgradeButton(x_pos + TILE_SIZE, y_pos);
+	stat_upgrade_button_3 = new StatUpgradeButton(x_pos, y_pos + TILE_SIZE);
+	stat_upgrade_button_4 = new StatUpgradeButton(x_pos + TILE_SIZE, y_pos + TILE_SIZE);
+	
+	
+	static draw = function(_x_offset, _y_offset) {
+		stat_upgrade_button_1.draw(_x_offset, _y_offset);
+		stat_upgrade_button_2.draw(_x_offset, _y_offset);
+		stat_upgrade_button_3.draw(_x_offset, _y_offset);
+		stat_upgrade_button_4.draw(_x_offset, _y_offset);
+	}
+	
+	
+	static on_unit_changed = function(_new_unit) {
+		stat_upgrade_button_1.stat_upgrade_data = _new_unit.stat_upgrade_1;
+		stat_upgrade_button_2.stat_upgrade_data = _new_unit.stat_upgrade_2;
+		stat_upgrade_button_3.stat_upgrade_data = _new_unit.stat_upgrade_3;
+		stat_upgrade_button_4.stat_upgrade_data = _new_unit.stat_upgrade_4;
+		
+	}
+	
+	
+	static get_button_clicked = function(_x_offset, _y_offset) {
+		if(stat_upgrade_button_1.is_enabled() &&
+			stat_upgrade_button_1.is_highlighted(_x_offset, _y_offset)) {
+			return stat_upgrade_button_1;
+		}
+		else if(stat_upgrade_button_2.is_enabled() &&
+			stat_upgrade_button_2.is_highlighted(_x_offset, _y_offset)) {
+			return stat_upgrade_button_2;
+		}
+		else if(stat_upgrade_button_3.is_enabled() &&
+			stat_upgrade_button_3.is_highlighted(_x_offset, _y_offset)) {
+			return stat_upgrade_button_3;
+		}
+		else if(stat_upgrade_button_4.is_enabled() &&
+			stat_upgrade_button_4.is_highlighted(_x_offset, _y_offset)) {
+			return stat_upgrade_button_4;
+		}
+		else {
+			return undefined;
+		}
+	}
+	
+}
+#endregion
+
+
 #region UnitUpgradeButton (Class)
 /*
 	Button clicked to upgrade a unit into a different one.
@@ -681,7 +851,7 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data, _selected_unit) :
 	
 	
 	static is_enabled = function() {
-		return (global.player_money >= unit_upgrade_data.price &&
+		return (unit_upgrade_data != undefined && global.player_money >= unit_upgrade_data.price &&
 			selected_unit.stat_upgrade_1.current_level >= unit_upgrade_data.level_req_1 &&
 			selected_unit.stat_upgrade_2.current_level >= unit_upgrade_data.level_req_2 &&
 			selected_unit.stat_upgrade_3.current_level >= unit_upgrade_data.level_req_3)
@@ -702,6 +872,11 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data, _selected_unit) :
 		var _draw_x_pos = x_pos + _x_offset;
 		var _draw_y_pos = y_pos + _y_offset;
 		
+		if(unit_upgrade_data == undefined) {
+			draw_sprite(button_sprite_disabled, 0, _draw_x_pos, _draw_y_pos);
+			return; //Nothing else to draw
+		}
+		
 		var _spr;
 		if(!is_enabled()) {
 			_spr = button_sprite_disabled;
@@ -719,13 +894,12 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data, _selected_unit) :
 		draw_set_halign(fa_left);
 	}
 	
-	static on_click = function() { //TODO: Need to finish
-		global.player_money -= unit_upgrade_data.price;
-		/*
-		var _unit_tile = instance_position(selected_unit.x, selected_unit.y, base_tile);
-		var _new_unit = instance_create_layer(selected_unit.x, selected_unit.y)*/
-		with(selected_unit) {	
-			instance_change(other.unit_upgrade_data.upgrade_to, false);
+	static on_click = function() { //TODO: Need to finish??? Not actually sure.
+		if(unit_upgrade_data != undefined) {
+			global.player_money -= unit_upgrade_data.price;
+			with(selected_unit) {	
+				instance_change(other.unit_upgrade_data.upgrade_to, false);
+			}
 		}
 	}
 }
@@ -733,7 +907,7 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data, _selected_unit) :
 
 
 #region UnitInfoCard (Class)
-#macro UNIT_INFO_CARD_SCREEN_PERCENTAGE (1/5)
+#macro UNIT_INFO_CARD_SCREEN_PERCENTAGE (1/4)
 /*
 	Defines all the data for the Unit Info Card.
 	
@@ -746,6 +920,7 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data, _selected_unit) :
 	selected_unit: The field unit most recently clicked on or purchased.
 	x_pos: Horizontal coordinate of the menu's top-right corner when the menu is open.
 	y_pos_open: Vertical coordinate of the menu's top-left corner when the menu is open.
+	//TODO: Add stat icons and the like
 */
 function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the bottom is opened or closed
@@ -759,15 +934,13 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	active = false;
 	
 	//Stat Upgrade Info
-	stat_upgrade_1 = new UnitInfoCardStatUpgrade(TILE_SIZE*2, TILE_SIZE/4, undefined);
-	stat_upgrade_2 = new UnitInfoCardStatUpgrade(TILE_SIZE*5, TILE_SIZE/4, undefined);
-	stat_upgrade_3 = new UnitInfoCardStatUpgrade(TILE_SIZE*8, TILE_SIZE/4, undefined);
-	stat_upgrade_4 = new UnitInfoCardStatUpgrade(TILE_SIZE*11, TILE_SIZE/4, undefined);
+	stat_icons = new UnitStatSquare(TILE_SIZE*2, TILE_SIZE/4, undefined);
+	stat_upgrade_buttons = new UnitStatUpgradeSquare(TILE_SIZE * 5, TILE_SIZE/4, undefined);
 	
 	//Unit Upgrade Info
-	unit_upgrade_1 = new UnitUpgradeButton(TILE_SIZE*10.5, TILE_SIZE/8, undefined);
-	unit_upgrade_2 = new UnitUpgradeButton(TILE_SIZE*12, TILE_SIZE/8, undefined);
-	unit_upgrade_3 = new UnitUpgradeButton(TILE_SIZE*13.5, TILE_SIZE/8, undefined);
+	unit_upgrade_button_1 = new UnitUpgradeButton(TILE_SIZE*10.5, TILE_SIZE/8, undefined, undefined);
+	unit_upgrade_button_2 = new UnitUpgradeButton(TILE_SIZE*12, TILE_SIZE/8, undefined, undefined);
+	unit_upgrade_button_3 = new UnitUpgradeButton(TILE_SIZE*13.5, TILE_SIZE/8, undefined, undefined);
 	
 	
 	//Basically just a wrapper for activating the button
@@ -785,54 +958,12 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	//Called when the selected unit is changed
 	static on_selected_unit_change = function(_new_selected_unit) {
 		selected_unit = _new_selected_unit;
-		if(variable_instance_exists(selected_unit, "stat_upgrade_1")) {
-			stat_upgrade_1.on_selected_unit_change(selected_unit.stat_upgrade_1);
-		}
-		else {
-			stat_upgrade_1.on_selected_unit_change(undefined);
-		}
+		stat_icons.unit = selected_unit;
+		stat_upgrade_buttons.on_unit_changed(selected_unit);
 		
-		if(variable_instance_exists(selected_unit, "stat_upgrade_2")) {
-			stat_upgrade_2.on_selected_unit_change(selected_unit.stat_upgrade_2);
-		}
-		else {
-			stat_upgrade_2.on_selected_unit_change(undefined);
-		}
-		
-		if(variable_instance_exists(selected_unit, "stat_upgrade_3")) {
-			stat_upgrade_3.on_selected_unit_change(selected_unit.stat_upgrade_3);
-		}
-		else {
-			stat_upgrade_3.on_selected_unit_change(undefined);
-		}
-		
-		if(variable_instance_exists(selected_unit, "stat_upgrade_4")) {
-			stat_upgrade_4.on_selected_unit_change(selected_unit.stat_upgrade_4);
-		}
-		else {
-			stat_upgrade_4.on_selected_unit_change(undefined);
-		}
-		
-		if(variable_instance_exists(selected_unit, "unit_upgrade_1")) {
-			unit_upgrade_1.on_selected_unit_change(selected_unit.unit_upgrade_1, selected_unit);
-		}
-		else {
-			unit_upgrade_1.on_selected_unit_change(undefined, undefined);
-		}
-		
-		if(variable_instance_exists(selected_unit, "unit_upgrade_2")) {
-			unit_upgrade_2.on_selected_unit_change(selected_unit.unit_upgrade_2, selected_unit);
-		}
-		else {
-			unit_upgrade_2.on_selected_unit_change(undefined, undefined);
-		}
-		
-		if(variable_instance_exists(selected_unit, "unit_upgrade_3")) {
-			unit_upgrade_3.on_selected_unit_change(selected_unit.unit_upgrade_3, selected_unit);
-		}
-		else {
-			unit_upgrade_3.on_selected_unit_change(undefined, undefined);
-		}
+		unit_upgrade_button_1.on_selected_unit_change(selected_unit.unit_upgrade_1, selected_unit);
+		unit_upgrade_button_2.on_selected_unit_change(selected_unit.unit_upgrade_2, selected_unit);
+		unit_upgrade_button_3.on_selected_unit_change(selected_unit.unit_upgrade_3, selected_unit);
 	}
 
 	
@@ -852,28 +983,11 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		draw_rectangle_color(0, y_pos_current, x_pos, _view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
 		if(selected_unit != noone) {
 			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE*0.5, y_pos_current + TILE_SIZE/4);
-			if(stat_upgrade_1.stat_upgrade_data != undefined) {
-				stat_upgrade_1.draw(0, y_pos_current);
-			}
-			if(stat_upgrade_2.stat_upgrade_data != undefined) {
-				stat_upgrade_2.draw(0, y_pos_current);
-			}
-			if(stat_upgrade_3.stat_upgrade_data != undefined) {
-				stat_upgrade_3.draw(0, y_pos_current);
-			}
-			if(stat_upgrade_4.stat_upgrade_data != undefined) {
-				stat_upgrade_4.draw(0, y_pos_current);
-			}
-			
-			if(unit_upgrade_1.unit_upgrade_data != undefined) {
-				unit_upgrade_1.draw(0, y_pos_current);
-			}
-			if(unit_upgrade_2.unit_upgrade_data != undefined) {
-				unit_upgrade_2.draw(0, y_pos_current);
-			}
-			if(unit_upgrade_3.unit_upgrade_data != undefined) {
-				unit_upgrade_3.draw(0, y_pos_current);
-			}
+			stat_icons.draw(0, y_pos_current);
+			stat_upgrade_buttons.draw(0, y_pos_current);
+			unit_upgrade_button_1.draw(0, y_pos_current);
+			unit_upgrade_button_2.draw(0, y_pos_current);
+			unit_upgrade_button_3.draw(0, y_pos_current);
 		}
 	}
 	
@@ -920,45 +1034,25 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	// Determine which method is better and do it.
 	//TODO: Make this code nicer. To many else ifs
 	static select_purchase = function() {
-		if(stat_upgrade_1.purchase_button.is_enabled() &&
-			stat_upgrade_1.purchase_button.is_highlighted(0, y_pos_current)) {
-			stat_upgrade_1.purchase_button.on_click();
+		var _selected_purchase_button = stat_upgrade_buttons.get_button_clicked(0, y_pos_current); //Checks all the stat upgrade buttons
+		
+		if(_selected_purchase_button == undefined) {	//No dedicated struct for all the unit upgrade buttons, so these are all just checked here for now.
+			if(unit_upgrade_button_1.is_enabled() &&
+				unit_upgrade_button_1.is_highlighted(0, y_pos_current)) {
+				_selected_purchase_button = unit_upgrade_button_1;
+			}
+			else if(unit_upgrade_button_2.is_enabled() &&
+				unit_upgrade_button_2.is_highlighted(0, y_pos_current)) {
+				_selected_purchase_button = unit_upgrade_button_2;
+			}
+			else if(unit_upgrade_button_3.is_enabled() &&
+				unit_upgrade_button_3.is_highlighted(0, y_pos_current)) {
+				_selected_purchase_button = unit_upgrade_button_3;
+			}
 		}
-		else if(stat_upgrade_2.purchase_button.is_enabled() &&
-			stat_upgrade_2.purchase_button.is_highlighted(0, y_pos_current)) {
-			stat_upgrade_2.purchase_button.on_click();
-		}
-		else if(stat_upgrade_3.purchase_button.is_enabled() &&
-			stat_upgrade_3.purchase_button.is_highlighted(0, y_pos_current)) {
-			stat_upgrade_3.purchase_button.on_click();
-		}
-		else if(stat_upgrade_4.purchase_button.is_enabled() &&
-			stat_upgrade_4.purchase_button.is_highlighted(0, y_pos_current)) {
-			stat_upgrade_4.purchase_button.on_click();
-		}
-		else if(unit_upgrade_1.is_enabled() &&
-			unit_upgrade_1.is_highlighted(0, y_pos_current)) {
-			unit_upgrade_1.on_click();
-			/*
-			unit_upgrade_1.on_selected_unit_change(
-				variable_instance_exists(selected_unit, "unit_upgrade_1") ? selected_unit.unit_upgrade_1 : undefined, 
-				selected_unit);*/
-		}
-		else if(unit_upgrade_2.is_enabled() &&
-			unit_upgrade_2.is_highlighted(0, y_pos_current)) {
-			unit_upgrade_2.on_click();
-			/*
-			unit_upgrade_2.on_selected_unit_change(
-				variable_instance_exists(selected_unit, "unit_upgrade_2") ? selected_unit.unit_upgrade_1 : undefined, 
-				selected_unit);*/
-		}
-		else if(unit_upgrade_3.is_enabled() &&
-			unit_upgrade_3.is_highlighted(0, y_pos_current)) {
-			unit_upgrade_3.on_click();
-			/*
-			unit_upgrade_3.on_selected_unit_change(
-				variable_instance_exists(selected_unit, "unit_upgrade_3") ? selected_unit.unit_upgrade_1 : undefined, 
-				selected_unit);*/
+		
+		if(_selected_purchase_button != undefined) {
+			_selected_purchase_button.on_click();
 		}
 	}
 }

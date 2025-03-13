@@ -21,6 +21,7 @@ unit_buffs = [];
 stat_upgrade_1 = new SampleGunnerAttackSpeedUpgrade(self.id);
 stat_upgrade_2 = new SampleGunnerDamageUpgrade(self.id);
 stat_upgrade_3 = new SampleGunnerRangeUpgrade(self.id);
+stat_upgrade_4 = undefined;
 
 //Unit Upgrades
 unit_upgrade_1 = new UpgradeToSampleGunnerUpgrade1(); //TODO: If this is just reference data, don't need to create a new one for each individual unit, just create once
