@@ -804,10 +804,18 @@ function UnitStatUpgradeSquare(_x_pos, _y_pos, _unit) constructor {
 	
 	
 	static on_unit_changed = function(_new_unit) {
-		stat_upgrade_button_1.stat_upgrade_data = _new_unit.stat_upgrade_1;
-		stat_upgrade_button_2.stat_upgrade_data = _new_unit.stat_upgrade_2;
-		stat_upgrade_button_3.stat_upgrade_data = _new_unit.stat_upgrade_3;
-		stat_upgrade_button_4.stat_upgrade_data = _new_unit.stat_upgrade_4;
+		if(_new_unit != noone) {
+			stat_upgrade_button_1.stat_upgrade_data = _new_unit.stat_upgrade_1;
+			stat_upgrade_button_2.stat_upgrade_data = _new_unit.stat_upgrade_2;
+			stat_upgrade_button_3.stat_upgrade_data = _new_unit.stat_upgrade_3;
+			stat_upgrade_button_4.stat_upgrade_data = _new_unit.stat_upgrade_4;
+		}
+		else {
+			stat_upgrade_button_1.stat_upgrade_data = undefined;
+			stat_upgrade_button_2.stat_upgrade_data = undefined;
+			stat_upgrade_button_3.stat_upgrade_data = undefined;
+			stat_upgrade_button_4.stat_upgrade_data = undefined;
+		}
 		
 	}
 	
@@ -842,7 +850,7 @@ function UnitStatUpgradeSquare(_x_pos, _y_pos, _unit) constructor {
 /*
 	Button clicked to upgrade a unit into a different one.
 */
-function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data, _selected_unit) : 
+function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _selected_unit = noone) : 
 		Button(_x_pos, _y_pos, spr_unit_purchase_button_default, spr_unit_purchase_button_disabled, spr_unit_purchase_button_highlighted) constructor {
 	x_pos = _x_pos;
 	y_pos = _y_pos;
@@ -851,7 +859,7 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data, _selected_unit) :
 	
 	
 	static is_enabled = function() {
-		return (unit_upgrade_data != undefined && global.player_money >= unit_upgrade_data.price &&
+		return (selected_unit != noone && unit_upgrade_data != undefined && global.player_money >= unit_upgrade_data.price &&
 			selected_unit.stat_upgrade_1.current_level >= unit_upgrade_data.level_req_1 &&
 			selected_unit.stat_upgrade_2.current_level >= unit_upgrade_data.level_req_2 &&
 			selected_unit.stat_upgrade_3.current_level >= unit_upgrade_data.level_req_3)
@@ -938,9 +946,9 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	stat_upgrade_buttons = new UnitStatUpgradeSquare(TILE_SIZE * 5, TILE_SIZE/4, undefined);
 	
 	//Unit Upgrade Info
-	unit_upgrade_button_1 = new UnitUpgradeButton(TILE_SIZE*10.5, TILE_SIZE/8, undefined, undefined);
-	unit_upgrade_button_2 = new UnitUpgradeButton(TILE_SIZE*12, TILE_SIZE/8, undefined, undefined);
-	unit_upgrade_button_3 = new UnitUpgradeButton(TILE_SIZE*13.5, TILE_SIZE/8, undefined, undefined);
+	unit_upgrade_button_1 = new UnitUpgradeButton(TILE_SIZE*8, TILE_SIZE/8, undefined, noone);
+	unit_upgrade_button_2 = new UnitUpgradeButton(TILE_SIZE*9.5, TILE_SIZE/8, undefined, noone);
+	unit_upgrade_button_3 = new UnitUpgradeButton(TILE_SIZE*11, TILE_SIZE/8, undefined, noone);
 	
 	
 	//Basically just a wrapper for activating the button
@@ -961,9 +969,16 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		stat_icons.unit = selected_unit;
 		stat_upgrade_buttons.on_unit_changed(selected_unit);
 		
-		unit_upgrade_button_1.on_selected_unit_change(selected_unit.unit_upgrade_1, selected_unit);
-		unit_upgrade_button_2.on_selected_unit_change(selected_unit.unit_upgrade_2, selected_unit);
-		unit_upgrade_button_3.on_selected_unit_change(selected_unit.unit_upgrade_3, selected_unit);
+		if(_new_selected_unit != noone) {
+			unit_upgrade_button_1.on_selected_unit_change(selected_unit.unit_upgrade_1, selected_unit);
+			unit_upgrade_button_2.on_selected_unit_change(selected_unit.unit_upgrade_2, selected_unit);
+			unit_upgrade_button_3.on_selected_unit_change(selected_unit.unit_upgrade_3, selected_unit);
+		}
+		else {
+			unit_upgrade_button_1.on_selected_unit_change(undefined, noone);
+			unit_upgrade_button_2.on_selected_unit_change(undefined, noone);
+			unit_upgrade_button_3.on_selected_unit_change(undefined, noone);
+		}
 	}
 
 	
