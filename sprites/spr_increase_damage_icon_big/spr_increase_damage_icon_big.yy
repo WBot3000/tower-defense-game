@@ -1,6 +1,6 @@
 {
   "$GMSprite":"",
-  "%Name":"spr_upgrade_unit",
+  "%Name":"spr_increase_damage_icon_big",
   "bboxMode":0,
   "bbox_bottom":61,
   "bbox_left":2,
@@ -19,21 +19,22 @@
   "height":64,
   "HTile":false,
   "layers":[
+    {"$GMImageLayer":"","%Name":"7165e391-1374-4595-9fea-ea4114edd7b3","blendMode":0,"displayName":"Icon","isLocked":false,"name":"7165e391-1374-4595-9fea-ea4114edd7b3","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
     {"$GMImageLayer":"","%Name":"4384838e-6baa-45e9-af3d-d41a5da50bca","blendMode":0,"displayName":"default","isLocked":false,"name":"4384838e-6baa-45e9-af3d-d41a5da50bca","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
   ],
-  "name":"spr_upgrade_unit",
+  "name":"spr_increase_damage_icon_big",
   "nineSlice":null,
   "origin":0,
   "parent":{
-    "name":"Unit Info Card",
-    "path":"folders/Sprites/ui_components/buttons/Unit Info Card.yy",
+    "name":"Upgrade Types",
+    "path":"folders/Sprites/ui_components/buttons/Unit Info Card/Upgrade Types.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",
   "resourceVersion":"2.0",
   "sequence":{
     "$GMSequence":"",
-    "%Name":"spr_upgrade_unit",
+    "%Name":"spr_increase_damage_icon_big",
     "autoRecord":true,
     "backdropHeight":768,
     "backdropImageOpacity":0.5,
@@ -57,7 +58,7 @@
       "resourceType":"KeyframeStore<MomentsEventKeyframe>",
       "resourceVersion":"2.0",
     },
-    "name":"spr_upgrade_unit",
+    "name":"spr_increase_damage_icon_big",
     "playback":1,
     "playbackSpeed":30.0,
     "playbackSpeedType":0,
@@ -69,7 +70,7 @@
     "tracks":[
       {"$GMSpriteFramesTrack":"","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"$KeyframeStore<SpriteFrameKeyframe>":"","Keyframes":[
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"f8e70f0e-592b-44fe-8bea-3624d2d80828","path":"sprites/spr_upgrade_unit/spr_upgrade_unit.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"f8e70f0e-592b-44fe-8bea-3624d2d80828","path":"sprites/spr_increase_damage_icon_big/spr_increase_damage_icon_big.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
               },"Disabled":false,"id":"728a5fa5-4770-4d21-8d45-5db507eb05e8","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
           ],"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"2.0",},"modifiers":[],"name":"frames","resourceType":"GMSpriteFramesTrack","resourceVersion":"2.0","spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],

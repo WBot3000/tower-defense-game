@@ -546,6 +546,8 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 
 #region Unit Info Card Classes
 
+#macro STAT_BUTTON_SIZE sprite_get_width(spr_stat_icon)
+
 #region StatUpgradeButton (Class)
 /*
 	The button that should be clicked to purchase an upgrade
@@ -622,58 +624,6 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 #endregion
 
 
-#region UnitInfoCardStatUpgrade [OLD] (Class)
-/*
-	Defines the area where the unit stats and upgrades are.
-	
-	Argument Variables:
-	(All argument variables correspond with non-underscored data variables)
-	
-	Data Variables:
-	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
-	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
-	stat_upgrade_data: Unit's upgrade data that should be displayed
-	purchase_upgrade_button: The button clicked on to purchase the upgrade
-*/
-function UnitInfoCardStatUpgrade(_x_pos, _y_pos, _stat_upgrade_data) constructor {
-	x_pos = _x_pos;
-	y_pos = _y_pos;
-	stat_upgrade_data = _stat_upgrade_data;
-	
-	purchase_button = new StatUpgradeButton(
-		x_pos + TILE_SIZE, //TILE_SIZE used because that should be the same size as all of the upgrade data images
-		y_pos, stat_upgrade_data)
-	
-
-	static on_selected_unit_change = function(_new_upgrade_data) {
-		stat_upgrade_data = _new_upgrade_data;
-		purchase_button.stat_upgrade_data = stat_upgrade_data;
-	}
-	
-	
-	static draw = function(_x_offset, _y_offset) {
-		var _draw_x_pos = x_pos + _x_offset;
-		var _draw_y_pos = y_pos + _y_offset;
-		
-		draw_sprite(stat_upgrade_data.upgrade_spr, 0, _draw_x_pos, _draw_y_pos);
-		//draw_sprite(spr_upgrade_level, 0, _draw_x_pos + sprite_get_width(upgrade_data.upgrade_spr), _draw_y_pos);
-		draw_set_halign(fa_right);
-		draw_set_valign(fa_right);
-		//Draws the number centered
-		draw_text_color(_draw_x_pos + sprite_get_width(stat_upgrade_data.upgrade_spr)*0.9,
-			_draw_y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4,
-			stat_upgrade_data.current_level,
-			c_white, c_white, c_white, c_white, 1);
-		draw_set_halign(fa_left);
-		draw_set_valign(fa_left);
-		//Draws the purchase button
-		purchase_button.draw(_x_offset, _y_offset);
-	}
-	
-}
-#endregion
-
-
 #region UnitStatSquare (Class)
 /*
 	Used to display all of the stats that a unit has, as well as what levels they currently are.
@@ -685,13 +635,26 @@ function UnitInfoCardStatUpgrade(_x_pos, _y_pos, _stat_upgrade_data) constructor
 	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
 	unit: The unit whose stats are being displayed
 */
-function UnitStatSquare(_x_pos, _y_pos, _unit) constructor {
+function draw_stat_level(_x_pos, _y_pos, _stat_level) {
+	draw_set_halign(fa_right);
+	draw_set_valign(fa_right);
+	//Draws the number to the right
+	draw_text_color(_x_pos + STAT_BUTTON_SIZE*0.9,
+		_y_pos + STAT_BUTTON_SIZE - 4,
+		_stat_level,
+		c_white, c_white, c_white, c_white, 1);
+	draw_set_halign(fa_left);
+	draw_set_valign(fa_left);
+}
+
+
+function UnitStatSquare(_x_pos, _y_pos, _selected_unit = noone) constructor {
 	x_pos = _x_pos;
 	y_pos = _y_pos;
-	unit = _unit;
+	selected_unit = _selected_unit;
 	
 	static draw = function(_x_offset, _y_offset) {
-		if(unit == noone) {
+		if(selected_unit == noone) {
 			return;
 		}
 		
@@ -699,74 +662,39 @@ function UnitStatSquare(_x_pos, _y_pos, _unit) constructor {
 		var _draw_y_pos = y_pos + _y_offset;
 		
 		//Top-left: Stat 1
-		if(unit.stat_upgrade_1 != undefined) {
-			draw_sprite(unit.stat_upgrade_1.upgrade_spr, 0, _draw_x_pos, _draw_y_pos);
-			draw_set_halign(fa_right);
-			draw_set_valign(fa_right);
-			//Draws the number centered
-			draw_text_color(_draw_x_pos + sprite_get_width(unit.stat_upgrade_1.upgrade_spr)*0.9,
-				_draw_y_pos + sprite_get_height(unit.stat_upgrade_1.upgrade_spr) - 4,
-				unit.stat_upgrade_1.current_level,
-				c_white, c_white, c_white, c_white, 1);
-			draw_set_halign(fa_left);
-			draw_set_valign(fa_left);
+		if(selected_unit.stat_upgrade_1 != undefined) {
+			draw_sprite(selected_unit.stat_upgrade_1.upgrade_spr, 0, _draw_x_pos, _draw_y_pos);
+			draw_stat_level(_draw_x_pos, _draw_y_pos, selected_unit.stat_upgrade_1.current_level)
 		}
 		else {
 			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos, _draw_y_pos);
 		}
 		
 		//Top-right: Stat 2
-		//NOTE: Currently assumes icons are tile-sized, which might not always hold true
-		if(unit.stat_upgrade_2 != undefined) {
-			draw_sprite(unit.stat_upgrade_2.upgrade_spr, 0, _draw_x_pos + TILE_SIZE, _draw_y_pos);
-			draw_set_halign(fa_right);
-			draw_set_valign(fa_right);
-			//Draws the number centered
-			draw_text_color(_draw_x_pos + TILE_SIZE + sprite_get_width(unit.stat_upgrade_2.upgrade_spr)*0.9,
-				_draw_y_pos + sprite_get_height(unit.stat_upgrade_2.upgrade_spr) - 4,
-				unit.stat_upgrade_2.current_level,
-				c_white, c_white, c_white, c_white, 1);
-			draw_set_halign(fa_left);
-			draw_set_valign(fa_left);
+		if(selected_unit.stat_upgrade_2 != undefined) {
+			draw_sprite(selected_unit.stat_upgrade_2.upgrade_spr, 0, _draw_x_pos + STAT_BUTTON_SIZE, _draw_y_pos);
+			draw_stat_level(_draw_x_pos + STAT_BUTTON_SIZE, _draw_y_pos, selected_unit.stat_upgrade_2.current_level);
 		}
 		else {
-			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos + TILE_SIZE, _draw_y_pos);
+			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos + STAT_BUTTON_SIZE, _draw_y_pos);
 		}
 		
 		//Bottom-left: Stat 3
-		//NOTE: Currently assumes icons are tile-sized, which might not always hold true
-		if(unit.stat_upgrade_3 != undefined) {
-			draw_sprite(unit.stat_upgrade_3.upgrade_spr, 0, _draw_x_pos, _draw_y_pos + TILE_SIZE);
-			draw_set_halign(fa_right);
-			draw_set_valign(fa_right);
-			//Draws the number centered
-			draw_text_color(_draw_x_pos + sprite_get_width(unit.stat_upgrade_3.upgrade_spr)*0.9,
-				_draw_y_pos + TILE_SIZE + sprite_get_height(unit.stat_upgrade_3.upgrade_spr) - 4,
-				unit.stat_upgrade_3.current_level,
-				c_white, c_white, c_white, c_white, 1);
-			draw_set_halign(fa_left);
-			draw_set_valign(fa_left);
+		if(selected_unit.stat_upgrade_3 != undefined) {
+			draw_sprite(selected_unit.stat_upgrade_3.upgrade_spr, 0, _draw_x_pos, _draw_y_pos + STAT_BUTTON_SIZE);
+			draw_stat_level(_draw_x_pos, _draw_y_pos + STAT_BUTTON_SIZE, selected_unit.stat_upgrade_3.current_level);
 		}
 		else {
-			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos, _draw_y_pos + TILE_SIZE);
+			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos, _draw_y_pos + STAT_BUTTON_SIZE);
 		}
 		
-		//Bottom-right: Stat 2
-		//NOTE: Currently assumes icons are tile-sized, which might not always hold true
-		if(unit.stat_upgrade_4 != undefined) {
-			draw_sprite(unit.stat_upgrade_4.upgrade_spr, 0, _draw_x_pos + TILE_SIZE, _draw_y_pos + TILE_SIZE);
-			draw_set_halign(fa_right);
-			draw_set_valign(fa_right);
-			//Draws the number centered
-			draw_text_color(_draw_x_pos + TILE_SIZE + sprite_get_width(unit.stat_upgrade_4.upgrade_spr)*0.9,
-				_draw_y_pos + TILE_SIZE + sprite_get_height(unit.stat_upgrade_4.upgrade_spr) - 4,
-				unit.stat_upgrade_4.current_level,
-				c_white, c_white, c_white, c_white, 1);
-			draw_set_halign(fa_left);
-			draw_set_valign(fa_left);
+		//Bottom-right: Stat 4
+		if(selected_unit.stat_upgrade_4 != undefined) {
+			draw_sprite(selected_unit.stat_upgrade_4.upgrade_spr, 0, _draw_x_pos + STAT_BUTTON_SIZE, _draw_y_pos + STAT_BUTTON_SIZE);
+			draw_stat_level(_draw_x_pos + STAT_BUTTON_SIZE, _draw_y_pos + STAT_BUTTON_SIZE, selected_unit.stat_upgrade_4.current_level);
 		}
 		else {
-			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos + TILE_SIZE, _draw_y_pos + TILE_SIZE);
+			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos + STAT_BUTTON_SIZE, _draw_y_pos + STAT_BUTTON_SIZE);
 		}
 	}
 	
@@ -783,16 +711,16 @@ function UnitStatSquare(_x_pos, _y_pos, _unit) constructor {
 	Data Variables:
 	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
 	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
-	unit: The unit whose stats are being displayed
+	//unit: The unit whose stats are being displayed
 */
-function UnitStatUpgradeSquare(_x_pos, _y_pos, _unit) constructor {
+function UnitStatUpgradeSquare(_x_pos, _y_pos/*, _unit*/) constructor {
 	x_pos = _x_pos;
 	y_pos = _y_pos;
 	
 	stat_upgrade_button_1 = new StatUpgradeButton(x_pos, y_pos);
-	stat_upgrade_button_2 = new StatUpgradeButton(x_pos + TILE_SIZE, y_pos);
-	stat_upgrade_button_3 = new StatUpgradeButton(x_pos, y_pos + TILE_SIZE);
-	stat_upgrade_button_4 = new StatUpgradeButton(x_pos + TILE_SIZE, y_pos + TILE_SIZE);
+	stat_upgrade_button_2 = new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE, y_pos);
+	stat_upgrade_button_3 = new StatUpgradeButton(x_pos, y_pos + STAT_BUTTON_SIZE);
+	stat_upgrade_button_4 = new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE, y_pos + STAT_BUTTON_SIZE);
 	
 	
 	static draw = function(_x_offset, _y_offset) {
@@ -914,6 +842,51 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _sele
 #endregion
 
 
+#region SellButton (Class)
+/*
+	Button clicked to sell a unit for cash back
+	Currently takes in a reference to the parent unit info card, as that needs to get updated when a unit is sold.
+	TODO: Find a better way to do this (some sort of event listener pattern or whatever)
+*/
+function SellButton(_unit_info_card, _x_pos, _y_pos, _selected_unit = noone) :
+		Button(_x_pos, _y_pos, spr_sell_button_default, spr_sell_button_disabled, spr_sell_button_default) constructor {
+	unit_info_card = _unit_info_card;
+	selected_unit = _selected_unit;
+	
+	static is_enabled = function() {
+		return selected_unit != noone;
+	}
+	
+	//_x_offset and _y_offset are the origins of the menu
+	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
+	static draw = function(_x_offset, _y_offset, _button_highlight_enabled = true) {
+		if(selected_unit == noone) {
+			return; //Nothing to draw
+		}
+		
+		var _draw_x_pos = x_pos + _x_offset;
+		var _draw_y_pos = y_pos + _y_offset;
+		
+		draw_sprite(button_sprite_default, 0, _draw_x_pos, _draw_y_pos);
+		draw_set_halign(fa_right);
+		draw_text(_draw_x_pos + sprite_get_width(button_sprite_default) - 8, _draw_y_pos + 4, string(selected_unit.sell_price));
+		draw_set_halign(fa_left);
+	}
+	
+	static on_click = function() {
+		if(selected_unit != noone) {
+			var _tile = instance_position(selected_unit.x, selected_unit.y, placeable_tile);
+			_tile.placed_unit = noone;
+			global.player_money += selected_unit.sell_price;
+			instance_destroy(selected_unit);
+			unit_info_card.on_selected_unit_change(noone); //Don't want this menu referencing a unit that doesn't exist anymore
+		}
+	}
+}
+	
+#endregion
+
+
 #region UnitInfoCard (Class)
 #macro UNIT_INFO_CARD_SCREEN_PERCENTAGE (1/4)
 /*
@@ -942,13 +915,16 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	active = false;
 	
 	//Stat Upgrade Info
-	stat_icons = new UnitStatSquare(TILE_SIZE*2, TILE_SIZE/4, undefined);
+	stat_icons = new UnitStatSquare(TILE_SIZE*2, TILE_SIZE/4, noone);
 	stat_upgrade_buttons = new UnitStatUpgradeSquare(TILE_SIZE * 5, TILE_SIZE/4, undefined);
 	
 	//Unit Upgrade Info
 	unit_upgrade_button_1 = new UnitUpgradeButton(TILE_SIZE*8, TILE_SIZE/8, undefined, noone);
 	unit_upgrade_button_2 = new UnitUpgradeButton(TILE_SIZE*9.5, TILE_SIZE/8, undefined, noone);
 	unit_upgrade_button_3 = new UnitUpgradeButton(TILE_SIZE*11, TILE_SIZE/8, undefined, noone);
+	
+	//Sell Button
+	sell_button = new SellButton(self, TILE_SIZE*13, TILE_SIZE/4, noone);
 	
 	
 	//Basically just a wrapper for activating the button
@@ -966,8 +942,9 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	//Called when the selected unit is changed
 	static on_selected_unit_change = function(_new_selected_unit) {
 		selected_unit = _new_selected_unit;
-		stat_icons.unit = selected_unit;
+		stat_icons.selected_unit = selected_unit;
 		stat_upgrade_buttons.on_unit_changed(selected_unit);
+		sell_button.selected_unit = selected_unit
 		
 		if(_new_selected_unit != noone) {
 			unit_upgrade_button_1.on_selected_unit_change(selected_unit.unit_upgrade_1, selected_unit);
@@ -1003,6 +980,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 			unit_upgrade_button_1.draw(0, y_pos_current);
 			unit_upgrade_button_2.draw(0, y_pos_current);
 			unit_upgrade_button_3.draw(0, y_pos_current);
+			sell_button.draw(0, y_pos_current);
 		}
 	}
 	
@@ -1048,26 +1026,30 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	// In that menu, the selection returns a unit type, this one actually performs the purchase
 	// Determine which method is better and do it.
 	//TODO: Make this code nicer. To many else ifs
-	static select_purchase = function() {
-		var _selected_purchase_button = stat_upgrade_buttons.get_button_clicked(0, y_pos_current); //Checks all the stat upgrade buttons
+	static on_click = function() {
+		var _selected_button = stat_upgrade_buttons.get_button_clicked(0, y_pos_current); //Checks all the stat upgrade buttons
 		
-		if(_selected_purchase_button == undefined) {	//No dedicated struct for all the unit upgrade buttons, so these are all just checked here for now.
+		if(_selected_button == undefined) {	//No dedicated struct for all the other buttons, so these are all just checked here for now.
 			if(unit_upgrade_button_1.is_enabled() &&
 				unit_upgrade_button_1.is_highlighted(0, y_pos_current)) {
-				_selected_purchase_button = unit_upgrade_button_1;
+				_selected_button = unit_upgrade_button_1;
 			}
 			else if(unit_upgrade_button_2.is_enabled() &&
 				unit_upgrade_button_2.is_highlighted(0, y_pos_current)) {
-				_selected_purchase_button = unit_upgrade_button_2;
+				_selected_button = unit_upgrade_button_2;
 			}
 			else if(unit_upgrade_button_3.is_enabled() &&
 				unit_upgrade_button_3.is_highlighted(0, y_pos_current)) {
-				_selected_purchase_button = unit_upgrade_button_3;
+				_selected_button = unit_upgrade_button_3;
+			}
+			else if(sell_button.is_enabled() &&
+				sell_button.is_highlighted(0, y_pos_current)) {
+				_selected_button = sell_button;
 			}
 		}
 		
-		if(_selected_purchase_button != undefined) {
-			_selected_purchase_button.on_click();
+		if(_selected_button != undefined) {
+			_selected_button.on_click();
 		}
 	}
 }

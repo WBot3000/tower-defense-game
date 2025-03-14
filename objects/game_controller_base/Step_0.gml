@@ -84,9 +84,9 @@ if(_mouse_left_released) {
 		}
 	}
 	
-	//Check to see if an upgrade is being purchased
+	//Check to see if an upgrade is being purchased or if the unit is being sold
 	if(game_ui.unit_info_card.state != SLIDING_MENU_STATE.CLOSED && game_ui.unit_info_card.is_highlighted()) {
-		game_ui.unit_info_card.select_purchase();
+		game_ui.unit_info_card.on_click();
 	}
 	
 	
@@ -126,7 +126,7 @@ if(_mouse_left_released) {
 }
 
 //Just for selling units now
-//TODO: This doesn't handle selling a unit that's selected yet. Need to change the data in the unit info card as well.
+//TODO: Should probably get rid of the placed unit tile ownership stuff. Just leaves more teardown work for something that can just be done with math instead. (Applies to selling with the sell button too.)
 if(_mouse_right_released) {
 	var _unit_to_sell = instance_position(mouse_x, mouse_y, base_unit);
 	if(_unit_to_sell != noone) {
