@@ -38,3 +38,40 @@ function draw_health_bar(x, y, _current_health, _max_health, recovering_from_ko 
 	}
 }
 #endregion
+
+
+//TODO: Might move this to the menus_and_ui script, but not 100% about every single application of this, plus that file's getting huge and this component doesn't have any interactable parts.
+#region draw_highlight_info (Function)
+//TODO: For macros that rely on calculated values that shouldn't change, find a good way to get the value once, then cache it
+//TODO: Take into account these values, and then adjust strings based on them
+#macro MIN_HIGHLIGHT_WIDTH	(camera_get_view_width(view_camera[0]) / 16)
+#macro MAX_HIGLIGHT_WIDTH	(camera_get_view_width(view_camera[0]) / 8)
+#macro HIGHLIGHT_PADDING (camera_get_view_width(view_camera[0]) / 32)
+
+#macro HIGHLIGHT_HEIGHT (camera_get_view_width(view_camera[0]) / 16)
+
+function draw_highlight_info(_title = "No Title", _description = "No description given") {
+	var _title_width = string_width(_title);
+	var _description_width = string_width(_description);
+	
+	var _highlight_width = max(_title_width, _description_width) + HIGHLIGHT_PADDING; //+ is for extra padding
+	
+	draw_set_halign(fa_center);
+	
+	draw_rectangle_color(device_mouse_x_to_gui(0) - _highlight_width/2, 
+						device_mouse_y_to_gui(0) - (HIGHLIGHT_HEIGHT + 30),
+						device_mouse_x_to_gui(0) + _highlight_width/2,
+						device_mouse_y_to_gui(0) - 2,
+						c_black, c_black, c_black, c_black, false);
+						
+	draw_text_color(device_mouse_x_to_gui(0), 
+					device_mouse_y_to_gui(0) - (HIGHLIGHT_HEIGHT + 24),
+					_title, c_white, c_white, c_white, c_white, 1);
+					
+	draw_text_color(device_mouse_x_to_gui(0), 
+					device_mouse_y_to_gui(0) - (HIGHLIGHT_HEIGHT + 4),
+					_description, c_white, c_white, c_white, c_white, 1);		
+	
+	draw_set_halign(fa_left);
+}
+#endregion

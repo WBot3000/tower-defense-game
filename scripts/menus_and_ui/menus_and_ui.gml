@@ -59,12 +59,11 @@ function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled 
 		var _absolute_x_pos = x_pos + _x_offset
 		var _absolute_y_pos = y_pos + _y_offset
 		
-		//mouse_x is based on room position, not camera position, so need to correct selection
-		//TODO: Passable view_camera index?
-		var _view_x = camera_get_view_x(view_camera[0]);
-		var _view_y = camera_get_view_y(view_camera[0]);
-		return (mouse_x - _view_x >= _absolute_x_pos && mouse_x - _view_x <= _absolute_x_pos + sprite_get_width(button_sprite_default)
-			&& mouse_y - _view_y >= _absolute_y_pos && mouse_y - _view_y <= _absolute_y_pos + sprite_get_height(button_sprite_default));
+		//TODO: Passable view_camera index? And maybe rename these variables? Not sure.
+		var _view_x = device_mouse_x_to_gui(0);
+		var _view_y = device_mouse_y_to_gui(0);
+		return (_view_x >= _absolute_x_pos && _view_x <= _absolute_x_pos + sprite_get_width(button_sprite_default)
+			&& _view_y >= _absolute_y_pos && _view_y <= _absolute_y_pos + sprite_get_height(button_sprite_default));
 	}
 	
 	
@@ -204,12 +203,12 @@ function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segment
 	
 	//Returns the segment that the menu should be set to.
 	static on_click = function() {
-		var pill_x_pos = x_pos;
-		var camera_x = camera_get_view_x(view_camera[0]);
-		var camera_y = camera_get_view_y(view_camera[0]);
+		var _pill_x_pos = x_pos;
+		var _click_x = device_mouse_x_to_gui(0);
+		var _click_y = device_mouse_y_to_gui(0);
 		for (var i = 0; i < num_segments; ++i) {
-		    if((mouse_x - camera_x >= pill_x_pos) && (mouse_x - camera_x <= pill_x_pos + PILL_WIDTH)
-				&& (mouse_y - camera_y >= y_pos) && (mouse_y - camera_y <= y_pos + PILL_HEIGHT)) {
+		    if((_click_x >= _pill_x_pos) && (_click_x <= _pill_x_pos + PILL_WIDTH)
+				&& (_click_y >= y_pos) && (_click_y <= y_pos + PILL_HEIGHT)) {
 					if(i + 1 == current_segment) { //If you click on the current rightmost segment, "un-select it"
 						current_segment = i;	
 					}
@@ -217,7 +216,7 @@ function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segment
 						current_segment = i+1;
 					}
 			}
-			pill_x_pos += (PILL_WIDTH + PILL_GAP);
+			_pill_x_pos += (PILL_WIDTH + PILL_GAP);
 		}
 		return current_segment;
 	}
@@ -603,6 +602,7 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 				_draw_y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4, stat_upgrade_data.current_price, 
 				c_white, c_white, c_white, c_white, 1);
 		}
+		
 		draw_set_halign(fa_left);
 		draw_set_valign(fa_left);
 	}
@@ -869,8 +869,10 @@ function SellButton(_unit_info_card, _x_pos, _y_pos, _selected_unit = noone) :
 		
 		draw_sprite(button_sprite_default, 0, _draw_x_pos, _draw_y_pos);
 		draw_set_halign(fa_right);
-		draw_text(_draw_x_pos + sprite_get_width(button_sprite_default) - 8, _draw_y_pos + 4, string(selected_unit.sell_price));
+		draw_set_valign(fa_center);
+		draw_text(_draw_x_pos + sprite_get_width(button_sprite_default) - 8, _draw_y_pos + sprite_get_height(button_sprite_default)/2, string(selected_unit.sell_price));
 		draw_set_halign(fa_left);
+		draw_set_valign(fa_top);
 	}
 	
 	static on_click = function() {
@@ -981,6 +983,32 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 			unit_upgrade_button_2.draw(0, y_pos_current);
 			unit_upgrade_button_3.draw(0, y_pos_current);
 			sell_button.draw(0, y_pos_current);
+			
+			//Draw any necessary highlights. This is done after all of the other drawing so that they'll always be on top.
+			with(stat_upgrade_buttons) {
+				//Can use else if here, since only one should ever be highlighted at a time
+				if(stat_upgrade_button_1.stat_upgrade_data != undefined && 
+					stat_upgrade_button_1.is_highlighted(0, other.y_pos_current)) {
+					draw_highlight_info(stat_upgrade_button_1.stat_upgrade_data.title, 
+						stat_upgrade_button_1.stat_upgrade_data.description);
+				}
+				else if(stat_upgrade_button_2.stat_upgrade_data != undefined && 
+					stat_upgrade_button_2.is_highlighted(0, other.y_pos_current)) {
+					draw_highlight_info(stat_upgrade_button_2.stat_upgrade_data.title, 
+						stat_upgrade_button_2.stat_upgrade_data.description);
+				}
+				else if(stat_upgrade_button_3.stat_upgrade_data != undefined && 
+					stat_upgrade_button_3.is_highlighted(0, other.y_pos_current)) {
+					draw_highlight_info(stat_upgrade_button_3.stat_upgrade_data.title, 
+						stat_upgrade_button_3.stat_upgrade_data.description);
+				}
+				else if(stat_upgrade_button_4.stat_upgrade_data != undefined && 
+					stat_upgrade_button_4.is_highlighted(0, other.y_pos_current)) {
+					draw_highlight_info(stat_upgrade_button_4.stat_upgrade_data.title, 
+						stat_upgrade_button_4.stat_upgrade_data.description);
+				}
+				
+			}
 		}
 	}
 	

@@ -26,6 +26,7 @@ enum UNIT_STATE {
 	
 	Data Variables:
 	unit: The unit that this upgrade level belongs to.
+	title: What this stat is referred to when checking the highlighted information.
 	current_level: The current level at which the upgrade is at.
 	max_level: The maximum level that the upgrade can be.
 	upgrade_stats_fn: A function that determines what happens upon the upgrade's purchase.
@@ -37,9 +38,10 @@ enum UNIT_STATE {
 		- Useful for not hardcoding in any costs.
 	upgrade_spr: The sprite used in the Unit Info Card
 */
-function StatUpgrade(_unit, _max_level, _starting_level = 0,
+function StatUpgrade(_unit, _title = "No Name", _max_level = 5, _starting_level = 0,
 	_description = "No description provided", _upgrade_spr = spr_increase_attack_speed_icon) constructor {
 	unit = _unit;
+	title = _title;
 	
 	current_level = _starting_level;
 	max_level = _max_level;
@@ -105,7 +107,7 @@ function UnitUpgrade(_upgrade_to, _price, _level_req_1 = 0, _level_req_2 = 0, _l
 	TODO: Write variables for this
 */
 function SampleGunnerAttackSpeedUpgrade(_unit) : 
-	StatUpgrade(_unit, 5, 0, 
+	StatUpgrade(_unit, "Faster Firing", 5, 0, 
 		"Decrease attack speed by 0.3 seconds with each upgrade.", spr_increase_attack_speed_icon) constructor {
 	/*
 	price_fn = function(upgrade_level) {
@@ -138,7 +140,7 @@ function SampleGunnerAttackSpeedUpgrade(_unit) :
 	TODO: Write variables for this
 */
 function SampleGunnerDamageUpgrade(_unit) : 
-	StatUpgrade(_unit, 5, 0,
+	StatUpgrade(_unit, "Stronger Shots", 5, 0,
 		"Increase damage by 10 with each upgrade.", spr_increase_damage_icon) constructor {
 
 	static upgrade_stats_fn = function() {
@@ -160,7 +162,7 @@ function SampleGunnerDamageUpgrade(_unit) :
 	TODO: Write variables for this
 */
 function SampleGunnerRangeUpgrade(_unit) : 
-	StatUpgrade(_unit, 5, 0,
+	StatUpgrade(_unit, "Binocular Power", 5, 0,
 		"Increase radius by half a tile with each upgrade.", spr_increase_range_icon) constructor {
 
 	static upgrade_stats_fn = function() {
