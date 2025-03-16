@@ -1,6 +1,6 @@
 /// @description Initialize variables and data structures
 
-name = "Sample Gunner U1";
+unit_name = "Sample Gunner U1";
 
 //Quick work-around to check if
 if(!variable_instance_exists(self.id, "max_health")) { 

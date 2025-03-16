@@ -1,6 +1,6 @@
 /// @description Initialize data structures
 
-name = "NAME_NOT_PROVIDED";
+unit_name = "NAME_NOT_PROVIDED";
 
 max_health = 0;
 current_health = 0;

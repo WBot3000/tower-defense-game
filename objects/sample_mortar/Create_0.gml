@@ -1,6 +1,6 @@
 /// @description Initialize variables and data structures
 
-name = "Sample Mortar";
+unit_name = "Sample Mortar";
 
 max_health = 100;
 current_health = 100;

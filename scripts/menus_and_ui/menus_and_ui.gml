@@ -976,7 +976,11 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		
 		draw_rectangle_color(0, y_pos_current, x_pos, _view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
 		if(selected_unit != noone) {
-			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE*0.5, y_pos_current + TILE_SIZE/4);
+			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE/2, y_pos_current + TILE_SIZE/4);
+			draw_set_halign(fa_middle);
+			draw_text_color(TILE_SIZE, y_pos_current + 5*TILE_SIZE/4, 
+				selected_unit.unit_name, c_white, c_white, c_white, c_white, 1);
+			draw_set_halign(fa_left)
 			stat_icons.draw(0, y_pos_current);
 			stat_upgrade_buttons.draw(0, y_pos_current);
 			unit_upgrade_button_1.draw(0, y_pos_current);
