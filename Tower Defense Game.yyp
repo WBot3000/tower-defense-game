@@ -33,8 +33,8 @@
     {"$GMFolder":"","%Name":"Particle Systems","folderPath":"folders/Particle Systems.yy","name":"Particle Systems","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Paths","folderPath":"folders/Paths.yy","name":"Paths","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"enemy_spawner_paths","folderPath":"folders/Paths/enemy_spawner_paths.yy","name":"enemy_spawner_paths","resourceType":"GMFolder","resourceVersion":"2.0",},
-    {"$GMFolder":"","%Name":"SampleLevel2","folderPath":"folders/Paths/enemy_spawner_paths/SampleLevel2.yy","name":"SampleLevel2","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"SampleLevel1","folderPath":"folders/Paths/enemy_spawner_paths/SampleLevel1.yy","name":"SampleLevel1","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"SampleLevel2","folderPath":"folders/Paths/enemy_spawner_paths/SampleLevel2.yy","name":"SampleLevel2","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Rooms","folderPath":"folders/Rooms.yy","name":"Rooms","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Scripts","folderPath":"folders/Scripts.yy","name":"Scripts","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"data","folderPath":"folders/Scripts/data.yy","name":"data","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -72,6 +72,7 @@
   },
   "name":"Tower Defense Game",
   "resources":[
+    {"id":{"name":"Data Storage","path":"notes/Data Storage/Data Storage.yy",},},
     {"id":{"name":"Movement","path":"notes/Movement/Movement.yy",},},
     {"id":{"name":"Script Assets Have Changed For v2.3.0","path":"notes/Script Assets Have Changed For v2.3.0/Script Assets Have Changed For v2.3.0.yy",},},
     {"id":{"name":"Spare Note","path":"notes/Spare Note/Spare Note.yy",},},
@@ -107,6 +108,7 @@
     {"id":{"name":"conversions","path":"scripts/conversions/conversions.yy",},},
     {"id":{"name":"damage","path":"scripts/damage/damage.yy",},},
     {"id":{"name":"data_enemy","path":"scripts/data_enemy/data_enemy.yy",},},
+    {"id":{"name":"data_level","path":"scripts/data_level/data_level.yy",},},
     {"id":{"name":"data_purchase","path":"scripts/data_purchase/data_purchase.yy",},},
     {"id":{"name":"data_unit","path":"scripts/data_unit/data_unit.yy",},},
     {"id":{"name":"detection_and_targeting","path":"scripts/detection_and_targeting/detection_and_targeting.yy",},},
@@ -179,8 +181,8 @@
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
-    {"roomId":{"name":"SampleLevel2","path":"rooms/SampleLevel2/SampleLevel2.yy",},},
     {"roomId":{"name":"SampleLevel1","path":"rooms/SampleLevel1/SampleLevel1.yy",},},
+    {"roomId":{"name":"SampleLevel2","path":"rooms/SampleLevel2/SampleLevel2.yy",},},
   ],
   "templateType":"game",
   "TextureGroups":[

@@ -1152,7 +1152,7 @@ function GameInfoDisplay(_controller_obj) constructor {
 			draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(1/2), "Round: ???", c_black, c_black, c_black, c_black, 1);
 		}
 		draw_text_color(TILE_SIZE*(1/2), TILE_SIZE, "Money: " + string(global.player_money), c_black, c_black, c_black, c_black, 1);
-		draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(3/2), "Wall Health: " + string(global.wall_health), c_black, c_black, c_black, c_black, 1);
+		draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(3/2), "Defense Health: " + string(global.defense_health), c_black, c_black, c_black, c_black, 1);
 	};
 }
 #endregion

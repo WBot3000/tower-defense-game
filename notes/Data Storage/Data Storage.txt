@@ -1,0 +1,22 @@
+All large chunks of data are stored as globals with the following naming conventions:
+*Words encased in brackets [] indicate where unique values go. Words that aren't encased in these brackets are consistent.
+
+
+DATA_UNIT_[NAME]
+- Contains various metadata for unit instances
+
+DATA_ENEMY_[NAME]
+- Contains various metadata for enemy instances
+
+DATA_PURCHASE_[NAME]
+- Contains metadata for purchases you can make in the shop
+	- Usually a DATA_UNIT_[NAME] and a price
+	- Allows different shop variations on the same unit
+	
+DATA_LEVEL_PATH_[LEVELNAME]_[NUMBER]
+- Contains path data for a level
+- NUMBER starts at 1, and increases for each path in a level
+- Referenced in the spawn data present in DATA_LEVEL_MAIN_[LEVELNAME]
+
+DATA_LEVEL_MAIN_[LEVELNAME]
+- Contains level-unique metadata, such as starting defense health, starting money, and spawn data

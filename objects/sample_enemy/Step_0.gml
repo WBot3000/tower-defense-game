@@ -62,7 +62,7 @@ switch (attack_state) {
 		if(movement_path != pth_dummypath && path_position == 1) {
 			attack_timer++;
 			if(attack_timer >= seconds_to_roomspeed_frames(seconds_per_attack)) {
-				global.wall_health -= melee_damage;
+				global.defense_health -= melee_damage;
 				attack_timer = 0;
 			}
 		}

@@ -6,25 +6,6 @@
 */
 
 
-#region LevelPath (Class)
-/*
-	Contains all of the data for a "path" with a spawner and a default movement path
-	spawn_x: The x-coordinate of where enemies should spawn from
-	spawn_y: The y-coordinate of where enemies should spawn from
-	default_path: The path that enemies without a specific path defined for them will use when spawned 
-*/
-function LevelPath(_spawn_x, _spawn_y, _default_path) constructor {
-	spawn_x = _spawn_x;
-	spawn_y = _spawn_y;
-	default_path = _default_path;
-	
-	static toString = function() { //For debug purposes
-		return "Spawn Coordinates: (" + string(spawn_x) + ", " + string(spawn_y) + ")\nDefault Path: " + string(default_path)
-	}
-}
-#endregion
-
-
 #region EnemySpawningData (Class)
 #macro ENEMY_SPAWN_END -1 //Makes spawn data a bit prettier. Doesn't have much of an actual function as of right now.
 /*
@@ -154,7 +135,7 @@ function Round(_spawn_list, _timer_count, _on_round_finish_callback) constructor
 	max_round: The final round of the game
 	spawn_data: 2D array containing all of the enemies that should be spawned in this game
 */
-function RoundManager(_controller_obj, _max_round, _spawn_data) constructor {
+function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constructor {
 	controller_obj = _controller_obj;
 	current_round = 0;
 	max_round = _max_round;
