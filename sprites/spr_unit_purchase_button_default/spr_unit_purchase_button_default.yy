@@ -26,7 +26,7 @@
   "origin":0,
   "parent":{
     "name":"Unit Purchase Menu",
-    "path":"folders/Sprites/ui_components/buttons/Unit Purchase Menu.yy",
+    "path":"folders/Sprites/ui_components/Unit Purchase Menu.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

@@ -44,8 +44,8 @@
   },
   "origin":0,
   "parent":{
-    "name":"pause_menu",
-    "path":"folders/Sprites/ui_components/buttons/pause_menu.yy",
+    "name":"pillbar",
+    "path":"folders/Sprites/ui_components/buttons/pillbar.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

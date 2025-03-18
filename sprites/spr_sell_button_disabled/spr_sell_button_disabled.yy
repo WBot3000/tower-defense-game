@@ -27,7 +27,7 @@
   "origin":0,
   "parent":{
     "name":"Unit Info Card",
-    "path":"folders/Sprites/ui_components/buttons/Unit Info Card.yy",
+    "path":"folders/Sprites/ui_components/Unit Info Card.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

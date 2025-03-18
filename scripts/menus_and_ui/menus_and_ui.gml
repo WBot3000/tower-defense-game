@@ -7,6 +7,8 @@
 	TODO: Maybe make an Activatable object that handles all instances that can be activated and de-activated?
 */
 
+#region Basic UI Components
+
 #region Button (Class)
 /*
 	Defines a parent class for a button.
@@ -91,6 +93,179 @@ function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled 
 #endregion
 
 
+#region PillBar (Class)
+/*
+	Argument Variables:
+	_starting_segment: Which segment should the pill bar initially be highlighted up to when it is created. Should correspond with a "default option"
+	(All other argument variables correspond with non-underscored data variables)
+	
+	Used for creating "pill bars", segmented sliders that can be used to select a range of values
+	x_pos: X-coordinate of the top left of the bar.
+	y_pos: Y-coordinate of the top left of the bar.
+	num_segments: The number of segments this pill bar should have.
+	current_segment: The modifier that the pill bar is set to. Values can be from 0 to num_segments.
+*/
+#macro PILL_WIDTH sprite_get_width(spr_pill_button_light)
+#macro PILL_HEIGHT sprite_get_height(spr_pill_button_light)
+#macro PILL_GAP sprite_get_width(spr_pill_button_light) / 4
+
+function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segments) constructor {
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	num_segments = _num_segments;
+	current_segment = _starting_segment;
+	
+	static draw = function() {
+		var pill_x_pos = x_pos;
+		for(var i = 0; i < num_segments; ++i) {
+			if(i < current_segment) {
+				draw_sprite(spr_pill_button_light, 0, pill_x_pos, y_pos);
+			}
+			else {
+				draw_sprite(spr_pill_button_dark, 0, pill_x_pos, y_pos);
+			}
+			pill_x_pos += (PILL_WIDTH + PILL_GAP);
+		}
+	}
+	
+	
+	//Returns the segment that the menu should be set to.
+	static on_click = function() {
+		var _pill_x_pos = x_pos;
+		var _click_x = device_mouse_x_to_gui(0);
+		var _click_y = device_mouse_y_to_gui(0);
+		for (var i = 0; i < num_segments; ++i) {
+		    if((_click_x >= _pill_x_pos) && (_click_x <= _pill_x_pos + PILL_WIDTH)
+				&& (_click_y >= y_pos) && (_click_y <= y_pos + PILL_HEIGHT)) {
+					if(i + 1 == current_segment) { //If you click on the current rightmost segment, "un-select it"
+						current_segment = i;	
+					}
+					else {
+						current_segment = i+1;
+					}
+			}
+			_pill_x_pos += (PILL_WIDTH + PILL_GAP);
+		}
+		return current_segment;
+	}
+}
+#endregion
+
+#endregion
+
+
+
+#region Menu UI
+
+#region LevelSelectButton (Class)
+/*
+	Defines a button that can be clicked to take you to a level select screen
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
+	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
+*/
+function LevelSelectButton(_x_pos, _y_pos) :
+	Button(_x_pos, _y_pos, spr_play_game_button) constructor {
+		
+		static on_click = function() {
+			//TODO: Add functionality
+		}
+}
+#endregion
+
+
+#region QuitGameButton (Class)
+/*
+	Defines a button that can be clicked to exit the game
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
+	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
+*/
+function QuitGameButton(_x_pos, _y_pos) :
+	Button(_x_pos, _y_pos, spr_quit_game_button) constructor {
+		
+		static on_click = function() {
+			game_end();
+		}
+}
+#endregion
+
+
+#region StartMenuUI (Class)
+/*
+	Used for managing the entire UI as a unit. Allows you to enable and disable parts of the UI as needed
+*/
+#macro PLAY_BUTTON_X ((camera_get_view_width(view_camera[0]) / 2) - (sprite_get_width(spr_play_game_button)/2))
+#macro PLAY_BUTTON_Y TILE_SIZE*2
+
+#macro QUIT_BUTTON_X ((camera_get_view_width(view_camera[0]) / 2) - (sprite_get_width(spr_quit_game_button)/2))
+#macro QUIT_BUTTON_Y TILE_SIZE*4.5
+
+/*
+	In charge of drawing UI elements to the screen
+	
+	Argument Variables:
+	_purchase_data: The purchase data needed for the purchase menu
+	(All other argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	controller_obj: The controller object this manager is created for.
+	
+	TODO: Finish this comment
+	TODO: Should I make a parent UI object for different UI types (GameUI, StartMenuUI, etc.)
+		- Would simplify a decent amount of code.
+*/
+function StartMenuUI() constructor {	
+	//Viewport info
+	view_w =  camera_get_view_width(view_camera[0]);
+	view_h = camera_get_view_height(view_camera[0]);
+	
+	//Buttons
+	start_button = new LevelSelectButton(PLAY_BUTTON_X, PLAY_BUTTON_Y);
+	start_button.activate();
+	
+	quit_button = new QuitGameButton(QUIT_BUTTON_X, QUIT_BUTTON_Y);
+	quit_button.activate();
+	
+	//The cool thing about this is that it lets you prioritize certain GUI elements over others.
+	static gui_element_highlighted = function() {
+		if(start_button.active && start_button.is_highlighted()) {
+			return start_button;
+		}
+		
+		if(quit_button.active && quit_button.is_highlighted()) {
+			return quit_button;
+		}
+		
+		return undefined; //Mouse is not over any UI elements.
+	}
+	
+	
+	static draw = function() {
+		//Unlike with the in-game UI, the buttons should always be active, so no need to check
+		//Might go away in the event I make a parent UI object for various UI types.
+		start_button.draw();
+		quit_button.draw();
+
+		draw_text(TILE_SIZE, view_h - (TILE_SIZE/2), "Music by Eric Matyas, www.soundimage.org");
+	}
+}
+#endregion
+
+#endregion
+
+
+
+#region In-Game UI
+
 #region PauseButton (Class)
 /*
 	Defines a button that can be clicked to pause the game
@@ -160,65 +335,6 @@ function RoundStartButton(_x_pos, _y_pos, _controller_obj) :
 			var _round_manager = get_round_manager(controller_obj);
 			_round_manager.start_round();
 		}
-	}
-}
-#endregion
-
-
-#region PillBar (Class)
-/*
-	Argument Variables:
-	_starting_segment: Which segment should the pill bar initially be highlighted up to when it is created. Should correspond with a "default option"
-	(All other argument variables correspond with non-underscored data variables)
-	
-	Used for creating "pill bars", segmented sliders that can be used to select a range of values
-	x_pos: X-coordinate of the top left of the bar.
-	y_pos: Y-coordinate of the top left of the bar.
-	num_segments: The number of segments this pill bar should have.
-	current_segment: The modifier that the pill bar is set to. Values can be from 0 to num_segments.
-*/
-#macro PILL_WIDTH sprite_get_width(spr_pill_button_light)
-#macro PILL_HEIGHT sprite_get_height(spr_pill_button_light)
-#macro PILL_GAP sprite_get_width(spr_pill_button_light) / 4
-
-function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segments) constructor {
-	x_pos = _x_pos;
-	y_pos = _y_pos;
-	num_segments = _num_segments;
-	current_segment = _starting_segment;
-	
-	static draw = function() {
-		var pill_x_pos = x_pos;
-		for(var i = 0; i < num_segments; ++i) {
-			if(i < current_segment) {
-				draw_sprite(spr_pill_button_light, 0, pill_x_pos, y_pos);
-			}
-			else {
-				draw_sprite(spr_pill_button_dark, 0, pill_x_pos, y_pos);
-			}
-			pill_x_pos += (PILL_WIDTH + PILL_GAP);
-		}
-	}
-	
-	
-	//Returns the segment that the menu should be set to.
-	static on_click = function() {
-		var _pill_x_pos = x_pos;
-		var _click_x = device_mouse_x_to_gui(0);
-		var _click_y = device_mouse_y_to_gui(0);
-		for (var i = 0; i < num_segments; ++i) {
-		    if((_click_x >= _pill_x_pos) && (_click_x <= _pill_x_pos + PILL_WIDTH)
-				&& (_click_y >= y_pos) && (_click_y <= y_pos + PILL_HEIGHT)) {
-					if(i + 1 == current_segment) { //If you click on the current rightmost segment, "un-select it"
-						current_segment = i;	
-					}
-					else {
-						current_segment = i+1;
-					}
-			}
-			_pill_x_pos += (PILL_WIDTH + PILL_GAP);
-		}
-		return current_segment;
 	}
 }
 #endregion
@@ -1288,8 +1404,6 @@ function GameUI(_controller_obj, _purchase_data) constructor {
 		if(pause_menu.active) {
 			pause_menu.draw_menu();
 		}
-
-		draw_text(TILE_SIZE, view_h - (TILE_SIZE/2), "Music by Eric Matyas, www.soundimage.org");
 	}
 	
 	
@@ -1297,4 +1411,6 @@ function GameUI(_controller_obj, _purchase_data) constructor {
 		pause_menu.clean_up();
 	}
 }
+#endregion
+
 #endregion
