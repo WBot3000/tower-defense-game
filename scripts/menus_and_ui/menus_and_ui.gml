@@ -172,7 +172,8 @@ function LevelSelectButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_play_game_button) constructor {
 		
 		static on_click = function() {
-			//TODO: Add functionality
+			//TODO: Add actual functionality
+			room_goto(SampleLevel2);
 		}
 }
 #endregion
@@ -203,10 +204,10 @@ function QuitGameButton(_x_pos, _y_pos) :
 /*
 	Used for managing the entire UI as a unit. Allows you to enable and disable parts of the UI as needed
 */
-#macro PLAY_BUTTON_X ((camera_get_view_width(view_camera[0]) / 2) - (sprite_get_width(spr_play_game_button)/2))
+#macro PLAY_BUTTON_X ((camera_get_view_width(view_camera[0]) - sprite_get_width(spr_play_game_button)) / 2)
 #macro PLAY_BUTTON_Y TILE_SIZE*2
 
-#macro QUIT_BUTTON_X ((camera_get_view_width(view_camera[0]) / 2) - (sprite_get_width(spr_quit_game_button)/2))
+#macro QUIT_BUTTON_X ((camera_get_view_width(view_camera[0]) - sprite_get_width(spr_play_game_button)) / 2)
 #macro QUIT_BUTTON_Y TILE_SIZE*4.5
 
 /*
@@ -279,13 +280,10 @@ function StartMenuUI() constructor {
 	game_controller: Game controller that manages the game that will be paused
 */
 function PauseButton(_x_pos, _y_pos) :
-		Button(_x_pos, _y_pos, spr_pause_menu_toggle) constructor {
-	x_pos = _x_pos;
-	y_pos = _y_pos;
-	
+		Button(_x_pos, _y_pos, spr_pause_menu_toggle) constructor {	
 	
 	static on_click = function() {
-		//TODO: Where the fuck does this game controller come from?
+		//TODO: Where does this game controller come from?
 		//Is it because it's called in a variable with the game controller?
 		//No, it's just because this isn't actually called
 		//game_controller.game_state = GAME_STATE.PAUSED;
@@ -309,11 +307,8 @@ function PauseButton(_x_pos, _y_pos) :
 */
 function RoundStartButton(_x_pos, _y_pos, _controller_obj) :
 		Button(_x_pos, _y_pos, spr_round_start_button_enabled, spr_round_start_button_disabled, spr_round_start_button_enabled) constructor {
-	x_pos = _x_pos;
-	y_pos = _y_pos;
 	controller_obj = _controller_obj;
 
-	
 	
 	static is_enabled = function() {
 		var _round_manager = get_round_manager(controller_obj); //TODO: Implement a cache system for this and other instances like this so we don't have to fetch the manager EVERY time this function is called.
@@ -466,7 +461,7 @@ enum SLIDING_MENU_STATE {
 
 #region UnitPurchaseButton (Class)
 /*
-	Defines a clickable button for the Unit Selection Menu.
+	Defines a button for purchases in the Unit Selection Menu.
 	
 	Argument Variables:
 	(All argument variables correspond with non-underscored data variables)
@@ -653,6 +648,25 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		return undefined;
 	}
 	
+}
+#endregion
+
+
+#region TogglePurchaseMenuButton (Class)
+/*
+	Defines a button to toggle the Unit Selection Menu between opened and closed.
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
+	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
+	
+	TODO: Implement on_click?
+*/
+function TogglePurchaseMenuButton(_x_pos, _y_pos) :
+		Button(_x_pos, _y_pos, spr_pointer_arrow_left) constructor {
 }
 #endregion
 
@@ -1203,6 +1217,25 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 }
 #endregion
 
+
+#region ToggleInfoCardButton (Class)
+/*
+	Defines a button to toggle the Unit Info Card between opened and closed.
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
+	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
+	
+	TODO: Implement on_click?
+*/
+function ToggleInfoCardButton(_x_pos, _y_pos) :
+		Button(_x_pos, _y_pos, spr_pointer_arrow_up) constructor {
+}
+#endregion
+
 #endregion
 
 
@@ -1284,6 +1317,11 @@ function GameInfoDisplay(_controller_obj) constructor {
 #macro ROUND_START_BUTTON_X TILE_SIZE //Round start button is one "tile" away from the left of the screen
 #macro ROUND_START_BUTTON_Y (camera_get_view_height(view_camera[0]) - (TILE_SIZE*1.5)) //Round start button is one and a half "tiles" away from the bottom of the screen
 
+#macro TOGGLE_PURCHASE_MENU_BUTTON_X (camera_get_view_width(view_camera[0]) - (TILE_SIZE*0.5))
+#macro TOGGLE_PURCHASE_MENU_BUTTON_Y ((camera_get_view_height(view_camera[0]) - sprite_get_height(spr_pointer_arrow_left)) / 2)
+
+#macro TOGGLE_INFO_CARD_BUTTON_X ((camera_get_view_width(view_camera[0]) - sprite_get_width(spr_pointer_arrow_up)) / 2)
+#macro TOGGLE_INFO_CARD_BUTTON_Y (camera_get_view_height(view_camera[0]) - (TILE_SIZE*0.5))
 /*
 	In charge of drawing UI elements to the screen
 	
@@ -1306,10 +1344,6 @@ function GameUI(_controller_obj, _purchase_data) constructor {
 	//Pure Display Elements (no interactivity)
 	game_info_display = new GameInfoDisplay(_controller_obj);
 	
-	//Buttons
-	pause_button = new PauseButton(PAUSE_BUTTON_X, PAUSE_BUTTON_Y);
-	round_start_button = new RoundStartButton(ROUND_START_BUTTON_X, ROUND_START_BUTTON_Y, _controller_obj);
-	
 	//Menus
 	pause_menu = new PauseMenu((1/2), (1/2));
 	//NOTE: In the older code, the height was just window_get_height(). See how this changes things.
@@ -1317,20 +1351,19 @@ function GameUI(_controller_obj, _purchase_data) constructor {
 		view_h*(1-UNIT_INFO_CARD_SCREEN_PERCENTAGE), _purchase_data);
 	unit_info_card = new UnitInfoCard(UNIT_INFO_CARD_SCREEN_PERCENTAGE, view_w);
 	
+	//Buttons
+	pause_button = new PauseButton(PAUSE_BUTTON_X, PAUSE_BUTTON_Y);
+	round_start_button = new RoundStartButton(ROUND_START_BUTTON_X, ROUND_START_BUTTON_Y, _controller_obj);
+	toggle_purchase_menu_button = new TogglePurchaseMenuButton(TOGGLE_PURCHASE_MENU_BUTTON_X, TOGGLE_PURCHASE_MENU_BUTTON_Y);
+	toggle_info_card_button = new ToggleInfoCardButton(TOGGLE_INFO_CARD_BUTTON_X, TOGGLE_INFO_CARD_BUTTON_Y);
+	
 	
 	//The cool thing about this is that it lets you prioritize certain GUI elements over others.
+	//Though it could really use some simplifying (ex. getting rid of all these if statements and replace it with some form of array iteration)
 	static gui_element_highlighted = function() {
 		
 		if(game_info_display.active && game_info_display.is_highlighted()) {
 			return game_info_display;
-		}
-		
-		if(pause_button.active && pause_button.is_highlighted()) {
-			return pause_button;
-		}
-		
-		if(round_start_button.active && round_start_button.is_highlighted()) {
-			return round_start_button;
 		}
 		
 		if(purchase_menu.active && purchase_menu.is_highlighted()) {
@@ -1341,16 +1374,34 @@ function GameUI(_controller_obj, _purchase_data) constructor {
 			return unit_info_card;
 		}
 		
+		if(pause_button.active && pause_button.is_highlighted()) {
+			return pause_button;
+		}
+		
+		if(round_start_button.active && round_start_button.is_highlighted()) {
+			return round_start_button;
+		}
+		
+		if(toggle_purchase_menu_button.active && toggle_purchase_menu_button.is_highlighted()) {
+			return toggle_purchase_menu_button;
+		}
+		
+		if(toggle_info_card_button.active && toggle_info_card_button.is_highlighted()) {
+			return toggle_info_card_button;
+		}
+		
 		return undefined; //Mouse is not over any UI elements.
 	}
 	
 	
 	static set_gui_running = function() {
 		game_info_display.activate();
-		pause_button.activate();
-		round_start_button.activate();
 		purchase_menu.activate();
 		unit_info_card.activate();
+		pause_button.activate();
+		round_start_button.activate();
+		toggle_purchase_menu_button.activate();
+		toggle_info_card_button.activate();
 		
 		pause_menu.deactivate();
 	}
@@ -1364,6 +1415,8 @@ function GameUI(_controller_obj, _purchase_data) constructor {
 		
 		pause_button.deactivate();
 		round_start_button.deactivate();
+		toggle_purchase_menu_button.deactivate();
+		toggle_info_card_button.deactivate();
 	}
 	
 	
@@ -1389,6 +1442,14 @@ function GameUI(_controller_obj, _purchase_data) constructor {
 		
 		if(round_start_button.active) {
 			round_start_button.draw();
+		}
+		
+		if(toggle_purchase_menu_button.active) {
+			toggle_purchase_menu_button.draw();
+		}
+		
+		if(toggle_info_card_button.active) {
+			toggle_info_card_button.draw();
 		}
 
 		//Draw purchase menu if it should be present on screen

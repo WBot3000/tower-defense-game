@@ -46,10 +46,15 @@ if(game_state_manager.state != GAME_STATE.RUNNING) {
 	return;
 }
 
-camera_controller.move_camera(!(game_ui.purchase_menu.state != SLIDING_MENU_STATE.CLOSED)); //Disable mouse camera movement while the menu is open (WASD still works though)
+camera_controller.move_camera();
 
 //"Advance" the round spawning timer
 round_manager.on_step();
+
+//TODO: Just another reminder to re-organize, all of this is way too messy!
+var _toggle_purchase_menu = _e_pressed;
+var _toggle_info_card = _f_pressed;
+
 
 //TODO: Refactor this. Can just get the UI element the cursor is on, and then check appropriately. Can cut down on extraneous checks
 if(_mouse_left_released) {
@@ -72,6 +77,14 @@ if(_mouse_left_released) {
 			music_manager.fade_out_current_music(seconds_to_milliseconds(QUICK_MUSIC_FADING_TIME), Music_Round);
 		}
 		round_manager.start_round();
+	}
+	
+	if(game_ui.toggle_purchase_menu_button.is_highlighted()) {
+		_toggle_purchase_menu = true
+	}
+	
+	if(game_ui.toggle_info_card_button.is_highlighted()) {
+		_toggle_info_card = true
 	}
 	
 	var _clicked_on_unit = instance_position(mouse_x, mouse_y, base_unit)
@@ -141,9 +154,11 @@ if(_mouse_right_released) {
 
 
 //Handle different cases for opening and closing the Unit Selection menu
-var _purchase_menu_move_distance = game_ui.purchase_menu.move_menu(_e_pressed);
+var _purchase_menu_move_distance = game_ui.purchase_menu.move_menu(_toggle_purchase_menu);
 game_ui.pause_button.x_pos += _purchase_menu_move_distance; //Move the pause button along with the purchase menu
+game_ui.toggle_purchase_menu_button.x_pos += _purchase_menu_move_distance
 
 //Handle different cases for opening and closing the Unit Info Card
-var _unit_card_move_distance = game_ui.unit_info_card.move_menu(_f_pressed);
+var _unit_card_move_distance = game_ui.unit_info_card.move_menu(_toggle_info_card);
 game_ui.round_start_button.y_pos += _unit_card_move_distance; //Move the round start button along with the unit info card
+game_ui.toggle_info_card_button.y_pos += _unit_card_move_distance;

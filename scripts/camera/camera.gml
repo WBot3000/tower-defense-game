@@ -22,7 +22,7 @@ enum CAMERA_STATE {
 */
 function CameraController() constructor {
 	
-	static move_camera = function(_use_mouse = true, _use_wasd = true) {
+	static move_camera = function(_use_wasd = true, _use_mouse = false) {
 		var _view_x = camera_get_view_x(view_camera[0]);
 		var _view_y = camera_get_view_y(view_camera[0]);
 

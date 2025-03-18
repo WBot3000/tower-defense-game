@@ -9,9 +9,6 @@
 */
 
 
-/*
-	Ranges
-*/
 #region Ranges
 
 #region Range (Class)
@@ -211,23 +208,39 @@ function PersistentHitbox(_range, _effect, _cooldown) constructor {
 #endregion
 
 
-/*
-	Unit Targeting
-*/
 #region Unit Targeting
 
 /*
 	What kind of targeting a unit is using
-	CLOSEST_TO_UNIT: Attack the enemy that's physically closest to the unit. Equivalent to BTD6's "Close"
-	CLOSEST_TO_WALL: Attack the enemy that's closest to the wall. Equivalent to BTD6's "First"
-	FURTHEST_FROM_WALL: Attack the enemy that's furthest from the wall. Equivalent to BTD6's "Last"
+	CLOSEST: Attack the enemy that's physically closest to the unit. Equivalent to BTD6's "Close",
+	FAR_ALONG: Attack the enemy that's closest to the defended area. Equivalent to BTD6's "First",
+	AT_BACK: Attack the enemy that's furthest from the defended area. Equivalent to BTD6's "Last",
+	HEALTHIEST: Attack the enemy with the most health. Equivalent to BTD6's "Strong",
+	WEAKEST: Attack the enemy with the least health. Equivalent to BTD4's "Weak",
+	
+	Each of these should have a corresponding "target_x" function below.
 */
 enum TARGETING_TYPE {
-	CLOSEST_TO_UNIT,	//Close
-	CLOSEST_TO_WALL,	//First
-	FURTHEST_FROM_WALL	//Last
+	CLOSEST,	//Close
+	FAR_ALONG,	//First
+	AT_BACK,	//Last
+	HEALTHIEST, //Strong
+	WEAKEST, //Weak
 }
 
+/*
+targeting_type_to_string_struct = {
+	TARGETING_TYPE.CLOSEST: "Closest",
+	TARGETING_TYPE.FAR_ALONG: "Far Along",
+	TARGETING_TYPE.AT_BACK: "At Back",
+	TARGETING_TYPE.HEALTHIEST: "Healthiest",
+	TARGETING_TYPE.WEAKEST: "Weakest"
+}
+
+function targeting_type_to_string(_targeting_type_enum) {
+	return struct_get_from_hash(targeting_type_to_string_struct, variable_get_hash(_targeting_type_enum));
+}
+*/
 
 #region target_close (Function)
 /*
@@ -311,6 +324,85 @@ function target_last(_unit, _enemy_list) {
 		}
 	}
 	return _most_behind_enemy;
+}
+#endregion
+
+
+#region target_healthy (Function
+/*
+	Given an enemy list, selects the enemy with the most amount of health
+	NOTE: Currently doesn't take into account health buffs/debuffs
+*/
+function target_healthy(_unit, _enemy_list) {
+	if(ds_list_empty(_enemy_list)) {
+		return noone;
+	}
+
+	var _healthiest_enemy = _enemy_list[| 0];
+	var _highest_health = _healthiest_enemy.current_health
+	for(var i = 1; i < ds_list_size(_enemy_list); ++i) {
+		var _enemy = _enemy_list[| i];
+		if(_enemy.current_health > _highest_health) {
+			_highest_health = _enemy.current_health;
+			_healthiest_enemy = _enemy;
+		}
+	}
+	return _healthiest_enemy;
+}
+#endregion
+
+
+#region target_weak (Function)
+/*
+	Given an enemy list, selects the enemy with the least amount of health
+	NOTE: Currently doesn't take into account health buffs/debuffs
+*/
+function target_weak(_unit, _enemy_list) {
+	if(ds_list_empty(_enemy_list)) {
+		return noone;
+	}
+
+	var _weakest_enemy = _enemy_list[| 0];
+	var _lowest_health = _healthiest_enemy.current_health
+	for(var i = 1; i < ds_list_size(_enemy_list); ++i) {
+		var _enemy = _enemy_list[| i];
+		if(_enemy.current_health < _lowest_health) {
+			_lowest_health = _enemy.current_health;
+			_weakest_enemy = _enemy;
+		}
+	}
+	return _weakest_enemy;
+}
+#endregion
+
+
+#region TargetingTracker (Class)
+/*
+	Used to keep track of a unit's current targeting option, as well as changing said option
+	
+	Argument Variables:
+	All correspond to Data Variables
+	
+	Data Variables:
+	potential_targeting_types: A list of all the targeting types a unit can use. Should all be enums from TARGETING_TYPE
+*/
+function TargetingTracker(_potential_target_types = [TARGETING_TYPE.CLOSEST]) constructor {
+	potential_targeting_types = _potential_target_types;
+	currently_selected_targeting_type = 0; //By default, use the first option provided in the list
+	
+	static use_next_targeting_type = function() {
+		currently_selected_targeting_type++;
+		if(currently_selected_targeting_type > array_length(potential_targeting_types)) {
+			currently_selected_targeting_type = 0;
+		}
+	}
+	
+	static use_previous_targeting_type = function() {
+		currently_selected_targeting_type--;
+		if(currently_selected_targeting_type < 0) {
+			currently_selected_targeting_type = array_length(potential_targeting_types) - 1;
+		}
+	}
 }
 #endregion
 
