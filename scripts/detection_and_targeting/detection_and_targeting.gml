@@ -210,37 +210,6 @@ function PersistentHitbox(_range, _effect, _cooldown) constructor {
 
 #region Unit Targeting
 
-/*
-	What kind of targeting a unit is using
-	CLOSEST: Attack the enemy that's physically closest to the unit. Equivalent to BTD6's "Close",
-	FAR_ALONG: Attack the enemy that's closest to the defended area. Equivalent to BTD6's "First",
-	AT_BACK: Attack the enemy that's furthest from the defended area. Equivalent to BTD6's "Last",
-	HEALTHIEST: Attack the enemy with the most health. Equivalent to BTD6's "Strong",
-	WEAKEST: Attack the enemy with the least health. Equivalent to BTD4's "Weak",
-	
-	Each of these should have a corresponding "target_x" function below.
-*/
-enum TARGETING_TYPE {
-	CLOSEST,	//Close
-	FAR_ALONG,	//First
-	AT_BACK,	//Last
-	HEALTHIEST, //Strong
-	WEAKEST, //Weak
-}
-
-/*
-targeting_type_to_string_struct = {
-	TARGETING_TYPE.CLOSEST: "Closest",
-	TARGETING_TYPE.FAR_ALONG: "Far Along",
-	TARGETING_TYPE.AT_BACK: "At Back",
-	TARGETING_TYPE.HEALTHIEST: "Healthiest",
-	TARGETING_TYPE.WEAKEST: "Weakest"
-}
-
-function targeting_type_to_string(_targeting_type_enum) {
-	return struct_get_from_hash(targeting_type_to_string_struct, variable_get_hash(_targeting_type_enum));
-}
-*/
 
 #region target_close (Function)
 /*
@@ -363,7 +332,7 @@ function target_weak(_unit, _enemy_list) {
 	}
 
 	var _weakest_enemy = _enemy_list[| 0];
-	var _lowest_health = _healthiest_enemy.current_health
+	var _lowest_health = _weakest_enemy.current_health
 	for(var i = 1; i < ds_list_size(_enemy_list); ++i) {
 		var _enemy = _enemy_list[| i];
 		if(_enemy.current_health < _lowest_health) {
@@ -376,6 +345,30 @@ function target_weak(_unit, _enemy_list) {
 #endregion
 
 
+#region TargetingTypes (Class)
+/*
+	Struct containing info regarding different targeting types units can select from
+	
+	Argument Variables:
+	All correspond to Data Variables
+	
+	Data Variables:
+	targeting_name: The string value that the targeting type is referred to in the targeting menu
+	targeting_fn: The function used to select a target from a list of enemies.
+*/
+function TargetingType(_targeting_name, _targeting_fn) constructor {
+	targeting_name = _targeting_name;
+	targeting_fn = _targeting_fn;
+}
+
+global.TARGETING_CLOSE = new TargetingType("Close", target_close);
+global.TARGETING_FIRST = new TargetingType("Far Along", target_first);
+global.TARGETING_LAST = new TargetingType("At Back", target_last);
+global.TARGETING_HEALTHY = new TargetingType("Healthiest", target_healthy);
+global.TARGETING_WEAK = new TargetingType("Weakest", target_weak);
+#endregion
+
+
 #region TargetingTracker (Class)
 /*
 	Used to keep track of a unit's current targeting option, as well as changing said option
@@ -384,23 +377,31 @@ function target_weak(_unit, _enemy_list) {
 	All correspond to Data Variables
 	
 	Data Variables:
-	potential_targeting_types: A list of all the targeting types a unit can use. Should all be enums from TARGETING_TYPE
+	potential_targeting_types: A list of all the targeting types a unit can use. Should all be globals labeled TARGETING_[TARGETINGTYPE]
+	currently_selected_idx: Index into the potential_targeting_type list that 
 */
 function TargetingTracker(_potential_target_types = [TARGETING_TYPE.CLOSEST]) constructor {
 	potential_targeting_types = _potential_target_types;
-	currently_selected_targeting_type = 0; //By default, use the first option provided in the list
+	currently_selected_idx = 0; //By default, use the first option provided in the list
+	
+	static get_current_targeting_type = function() {
+		if(array_length(potential_targeting_types) == 0) {
+			return undefined;
+		}
+		return potential_targeting_types[currently_selected_idx];
+	}
 	
 	static use_next_targeting_type = function() {
-		currently_selected_targeting_type++;
-		if(currently_selected_targeting_type > array_length(potential_targeting_types)) {
-			currently_selected_targeting_type = 0;
+		currently_selected_idx++;
+		if(currently_selected_idx >= array_length(potential_targeting_types)) {
+			currently_selected_idx = 0;
 		}
 	}
 	
 	static use_previous_targeting_type = function() {
-		currently_selected_targeting_type--;
-		if(currently_selected_targeting_type < 0) {
-			currently_selected_targeting_type = array_length(potential_targeting_types) - 1;
+		currently_selected_idx--;
+		if(currently_selected_idx < 0) {
+			currently_selected_idx = array_length(potential_targeting_types) - 1;
 		}
 	}
 }

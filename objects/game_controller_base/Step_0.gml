@@ -7,6 +7,8 @@ var _mouse_right_released = mouse_check_button_released(mb_right);
 var _q_pressed = keyboard_check_pressed(ord("Q"));
 var _e_pressed = keyboard_check_pressed(ord("E"));
 var _f_pressed = keyboard_check_pressed(ord("F"));
+var _o_pressed = keyboard_check_pressed(ord("O"));
+var _p_pressed = keyboard_check_pressed(ord("P"));;
 #endregion
 
 //Check to see if the game should be paused or unpaused
@@ -31,7 +33,7 @@ if(_q_pressed) {
 //Check to see if the music should be changed based on events in the game
 music_manager.on_step();
 
-//TODO: Update this to make it more efficient. Currently sets a value every "tick" when it doesn't need to.
+//TODO: Update this to make it more efficient. Doesn't run "every tick" as described before, but should be in some sort of "pause_menu.on_click" function
 //I'm just very tired right now.
 //Honestly organize this entire section in general.
 if(game_state_manager.state == GAME_STATE.PAUSED && _mouse_left_released) {
@@ -150,6 +152,17 @@ if(_mouse_right_released) {
 		game_ui.unit_info_card.on_selected_unit_change(noone); //Don't want this menu referencing a unit that doesn't exist anymore
 		instance_destroy(_unit_to_sell);
 	}
+}
+
+
+//This should really have corresponding buttons but honestly I'm so tired of UI code at this point.
+if(_o_pressed && game_ui.unit_info_card.selected_unit != noone) {
+	game_ui.unit_info_card.selected_unit.targeting_tracker.use_previous_targeting_type();
+}
+
+//This should ALSO really have corresponding buttons but honestly I'm so tired of UI code at this point.
+if(_p_pressed && game_ui.unit_info_card.selected_unit != noone) {
+	game_ui.unit_info_card.selected_unit.targeting_tracker.use_next_targeting_type();
 }
 
 

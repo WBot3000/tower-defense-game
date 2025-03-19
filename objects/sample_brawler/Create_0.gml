@@ -32,6 +32,15 @@ unit_upgrade_3 = undefined;
 //Variables to keep track of and control things
 enemies_in_range = ds_list_create();
 
+targeting_tracker = 
+	new TargetingTracker([
+					global.TARGETING_CLOSE,
+					global.TARGETING_FIRST,
+					global.TARGETING_LAST,
+					global.TARGETING_HEALTHY,
+					global.TARGETING_WEAK,
+	]);
+
 punch_timer = 15;
 curr_direction = DIRECTION.DOWN;
 

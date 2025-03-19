@@ -32,6 +32,15 @@ unit_upgrade_3 = new UpgradeToSampleGunnerUpgrade1();
 //Variables to keep track of and control things
 enemies_in_range = ds_list_create();
 
+targeting_tracker = 
+	new TargetingTracker([
+					global.TARGETING_CLOSE,
+					global.TARGETING_FIRST,
+					global.TARGETING_LAST,
+					global.TARGETING_HEALTHY,
+					global.TARGETING_WEAK,
+	]);
+
 shot_timer = 90; //When the unit is placed, takes less time to take a shot.
 
 sell_price = 100 * SELL_PRICE_REDUCTION;

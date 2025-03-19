@@ -36,11 +36,12 @@ if(current_health <= 0) { //If unit's health drops below zero, then it should ge
 
 range.get_entities_in_range(base_enemy, enemies_in_range, true);
 	
-//TODO: Implement different targeting types. Currently just uses close targeting
-//Ex) pick_target(enemies_in_range), where pick_target is determined by the currently selected targeting system
+	
 if(shot_timer >= _frames_per_shot && ds_list_size(enemies_in_range) > 0) { //More than seconds_per_shot have ellapsed since last shot, so you can shoot again
-	//TODO: Let player select targeting type
-	var _enemy_to_target = target_close(self.id, enemies_in_range, true); //Default to closest targeting for now
+
+	var _targeting_type = targeting_tracker.get_current_targeting_type();
+	
+	var _enemy_to_target = _targeting_type.targeting_fn(self.id, enemies_in_range, true); //Default to closest targeting for now
 	
 	//TODO: Right now, the vector is from the center of the unit to the center of the enemy unit. Will probably want to adjust these positions based on the enemy's position compared to the unit's
 	var _vector_x = (_enemy_to_target.x + _enemy_to_target.sprite_width/2) - (x + sprite_width/2);

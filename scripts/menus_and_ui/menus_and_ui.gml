@@ -972,6 +972,33 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _sele
 #endregion
 
 
+#region TargetingIndicator (Class)
+/*
+	Indicator that shows what kind of targeting a unit is currently using.
+*/
+function TargetingIndicator(_x_pos, _y_pos) constructor {
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	selected_unit = noone;
+	
+	static draw = function(_x_offset, _y_offset) {
+		if(selected_unit == noone || array_length(selected_unit.targeting_tracker.potential_targeting_types) == 0) {
+			return;
+		}
+		var _draw_x_pos = x_pos + _x_offset;
+		var _draw_y_pos = y_pos + _y_offset;
+		var _targeting_type = selected_unit.targeting_tracker.get_current_targeting_type();
+		
+		draw_rectangle_color(_draw_x_pos, _draw_y_pos, _draw_x_pos + 96, _draw_y_pos + 24,
+			c_ltgray, c_ltgray, c_ltgray, c_ltgray, false)
+		draw_set_halign(fa_center);
+		draw_text(_draw_x_pos + 48, _draw_y_pos, _targeting_type.targeting_name);
+		draw_set_halign(fa_left);
+	}
+}
+#endregion
+
+
 #region SellButton (Class)
 /*
 	Button clicked to sell a unit for cash back
@@ -1048,12 +1075,15 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	
 	//Stat Upgrade Info
 	stat_icons = new UnitStatSquare(TILE_SIZE*2, TILE_SIZE/4, noone);
-	stat_upgrade_buttons = new UnitStatUpgradeSquare(TILE_SIZE * 5, TILE_SIZE/4, undefined);
+	stat_upgrade_buttons = new UnitStatUpgradeSquare(TILE_SIZE * 5, TILE_SIZE/4);
 	
 	//Unit Upgrade Info
 	unit_upgrade_button_1 = new UnitUpgradeButton(TILE_SIZE*8, TILE_SIZE/8, undefined, noone);
 	unit_upgrade_button_2 = new UnitUpgradeButton(TILE_SIZE*9.5, TILE_SIZE/8, undefined, noone);
 	unit_upgrade_button_3 = new UnitUpgradeButton(TILE_SIZE*11, TILE_SIZE/8, undefined, noone);
+	
+	//Targeting Indicator
+	targeting_indicator = new TargetingIndicator(TILE_SIZE*13, TILE_SIZE*1.25);
 	
 	//Sell Button
 	sell_button = new SellButton(self, TILE_SIZE*13, TILE_SIZE/4, noone);
@@ -1077,6 +1107,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		stat_icons.selected_unit = selected_unit;
 		stat_upgrade_buttons.on_unit_changed(selected_unit);
 		sell_button.selected_unit = selected_unit
+		targeting_indicator.selected_unit = selected_unit;
 		
 		if(_new_selected_unit != noone) {
 			unit_upgrade_button_1.on_selected_unit_change(selected_unit.unit_upgrade_1, selected_unit);
@@ -1116,6 +1147,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 			unit_upgrade_button_1.draw(0, y_pos_current);
 			unit_upgrade_button_2.draw(0, y_pos_current);
 			unit_upgrade_button_3.draw(0, y_pos_current);
+			targeting_indicator.draw(0, y_pos_current);
 			sell_button.draw(0, y_pos_current);
 			
 			//Draw any necessary highlights. This is done after all of the other drawing so that they'll always be on top.
