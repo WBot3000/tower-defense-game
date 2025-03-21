@@ -15,3 +15,15 @@
 function deal_damage(entity_to_damage, damage_amount){
 	entity_to_damage.current_health -= max(damage_amount, 0);
 }
+
+/*
+	Function used for when an enemy deals damage to a target object.
+	If the enemy reduces the target's HP to zero, the game should be considered lost.
+*/
+function damage_target(_target_to_damage, _damage_amount) {
+	_target_to_damage.current_health = max(_target_to_damage.current_health -_damage_amount, 0); //Prevents targets from having negative health;
+	if(_target_to_damage.current_health == 0) { //Lose game
+		var _game_state_manager = get_game_state_manager();
+		_game_state_manager.lose_game();
+	}
+}

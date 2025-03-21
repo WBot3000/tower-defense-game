@@ -1,17 +1,19 @@
 {
   "$GMObject":"",
-  "%Name":"defended_wall_tile",
-  "eventList":[],
+  "%Name":"giant_potato",
+  "eventList":[
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+  ],
   "managed":true,
-  "name":"defended_wall_tile",
+  "name":"giant_potato",
   "overriddenProperties":[],
   "parent":{
-    "name":"tile_types",
-    "path":"folders/Objects/tile_types.yy",
+    "name":"target_objects",
+    "path":"folders/Objects/target_objects.yy",
   },
   "parentObjectId":{
-    "name":"placeable_tile",
-    "path":"objects/placeable_tile/placeable_tile.yy",
+    "name":"base_target",
+    "path":"objects/base_target/base_target.yy",
   },
   "persistent":false,
   "physicsAngularDamping":0.1,
@@ -31,9 +33,9 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_defended_wall_tile",
-    "path":"sprites/spr_defended_wall_tile/spr_defended_wall_tile.yy",
+    "name":"spr_giant_potato",
+    "path":"sprites/spr_giant_potato/spr_giant_potato.yy",
   },
   "spriteMaskId":null,
-  "visible":false,
+  "visible":true,
 }

@@ -256,7 +256,7 @@ function StartMenuUI() constructor {
 		start_button.draw();
 		quit_button.draw();
 
-		draw_text(TILE_SIZE, view_h - (TILE_SIZE/2), "Music by Eric Matyas, www.soundimage.org");
+		draw_text(TILE_SIZE, view_h - (TILE_SIZE/2), "Music + Sound Effects by Eric Matyas, www.soundimage.org");
 	}
 }
 #endregion
@@ -610,6 +610,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		switch (state) {
 			case SLIDING_MENU_STATE.CLOSED:
 				if(_menu_toggle_pressed) {
+					audio_play_sound(SFX_Menu_Open, 1, false); //TODO: Add volume control
 					state = SLIDING_MENU_STATE.OPENING;
 				}
 			    break;
@@ -627,6 +628,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 				break;
 			case SLIDING_MENU_STATE.OPEN:
 				if(_menu_toggle_pressed) {
+					audio_play_sound(SFX_Menu_Close, 1, false); //TODO: Add volume control
 					state = SLIDING_MENU_STATE.CLOSING;
 				}
 				break;
@@ -1187,6 +1189,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		switch (state) {
 			case SLIDING_MENU_STATE.CLOSED:
 				if(_menu_toggle_pressed) {
+					audio_play_sound(SFX_Menu_Open, 1, false); //TODO: Add volume control
 					state = SLIDING_MENU_STATE.OPENING;
 				}
 			    break;
@@ -1204,6 +1207,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 				break;
 			case SLIDING_MENU_STATE.OPEN:
 				if(_menu_toggle_pressed) {
+					audio_play_sound(SFX_Menu_Close, 1, false) //TODO: Add volume control
 					state = SLIDING_MENU_STATE.CLOSING;
 				}
 				break;
@@ -1280,8 +1284,8 @@ function ToggleInfoCardButton(_x_pos, _y_pos) :
 	Data Variables:
 	controller_obj: Game controller object that manages game state.
 */
-#macro GAME_INFO_DISPLAY_WIDTH TILE_SIZE*4
-#macro GAME_INFO_DISPLAY_HEIGHT TILE_SIZE*2
+#macro GAME_INFO_DISPLAY_WIDTH TILE_SIZE*3
+#macro GAME_INFO_DISPLAY_HEIGHT TILE_SIZE*1.5
 
 function GameInfoDisplay(_controller_obj) constructor {
 	controller_obj = _controller_obj;
@@ -1321,19 +1325,18 @@ function GameInfoDisplay(_controller_obj) constructor {
 		
 		//Draw basic game stats
 		if(_game_state_manager != undefined && _game_state_manager.state== GAME_STATE.VICTORY) {
-			draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(1/2), "Victory!", c_black, c_black, c_black, c_black, 1);
+			draw_text_color(TILE_SIZE*(1/3), TILE_SIZE*(1/3), "Victory!", c_black, c_black, c_black, c_black, 1);
 		}
 		else if(_game_state_manager != undefined && _game_state_manager.state == GAME_STATE.DEFEAT) {
-			draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(1/2), "Defeat...", c_black, c_black, c_black, c_black, 1);
+			draw_text_color(TILE_SIZE*(1/3), TILE_SIZE*(1/3), "Defeat...", c_black, c_black, c_black, c_black, 1);
 		}
 		else if(_round_manager != undefined) {
-			draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(1/2), "Round: " + string(_round_manager.current_round), c_black, c_black, c_black, c_black, 1);
+			draw_text_color(TILE_SIZE*(1/3), TILE_SIZE*(1/3), "Round: " + string(_round_manager.current_round), c_black, c_black, c_black, c_black, 1);
 		}
 		else { //Fallback in the event we have no manager data. Should never actually show up in real play.
-			draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(1/2), "Round: ???", c_black, c_black, c_black, c_black, 1);
+			draw_text_color(TILE_SIZE*(1/3), TILE_SIZE*(1/3), "Round: ???", c_black, c_black, c_black, c_black, 1);
 		}
-		draw_text_color(TILE_SIZE*(1/2), TILE_SIZE, "Money: " + string(global.player_money), c_black, c_black, c_black, c_black, 1);
-		draw_text_color(TILE_SIZE*(1/2), TILE_SIZE*(3/2), "Defense Health: " + string(global.defense_health), c_black, c_black, c_black, c_black, 1);
+		draw_text_color(TILE_SIZE*(1/3), TILE_SIZE, "Money: " + string(global.player_money), c_black, c_black, c_black, c_black, 1);
 	};
 }
 #endregion

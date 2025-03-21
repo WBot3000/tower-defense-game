@@ -59,12 +59,18 @@ function GameStateManager(_controller_obj, _initial_state = GAME_STATE.RUNNING) 
 	static win_game = function() {
 		if(state == GAME_STATE.RUNNING) { //Shouldn't be able to win game if it's paused, already won, or already lost.
 			state = GAME_STATE.VICTORY;
+			with(controller_obj) {
+				event_user(0)
+			}
 		}
 	}
 	
 	static lose_game = function() {
 		if(state == GAME_STATE.RUNNING) { //Shouldn't be lose game if it's paused, already won, or already lost.
 			state = GAME_STATE.DEFEAT;
+			with(controller_obj) {
+				event_user(1)
+			}
 		}
 	}
 }
@@ -78,10 +84,11 @@ function GameStateManager(_controller_obj, _initial_state = GAME_STATE.RUNNING) 
 */
 #region get_game_controller (Function)
 function get_game_controller() {
-	var _game_controller = instance_find(game_controller_base, 1);
+	var _game_controller = instance_find(game_controller_base, 0);
 	return _game_controller
 }
 #endregion
+
 
 #region get_game_state_manager (Function)
 //NOTE: You can also pass a controller object if you have one so that you don't have to fetch it. Should save a tiny bit of time.
@@ -95,6 +102,7 @@ function get_game_state_manager(_controller_obj = undefined) {
 	return _controller_obj.game_state_manager;
 }
 #endregion
+
 
 #region get_round_manager (Function)
 //NOTE: You can also pass a controller object if you have one so that you don't have to fetch it. Should save a tiny bit of time.

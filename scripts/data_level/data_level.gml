@@ -44,12 +44,9 @@ function PathData(_spawn_x, _spawn_y, _default_path) constructor {
 	
 	TODO: Include purchasing data and starting money here? Or will these defined in some sort of player structure if the player is allowed to determine those?
 */
-function LevelData(_basic_level_data = {
-						defense_health: 100
-					}, 
+function LevelData(_basic_level_data = {}, 
 					_round_data = []) constructor {
 						
-	defense_health = _basic_level_data.defense_health;
 	round_data = _round_data;
 }
 #endregion
@@ -67,10 +64,7 @@ global.DATA_LEVEL_PATH_SAMPLELEVEL2_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*7, 
 
 #region Level Data
 //TODO: Round data is ok to read for these sample levels, but I can tell it's gonna be a pain to read with actual levels. Think of the best way to manage this
-global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
-	{
-		defense_health: 100
-	},
+global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData({},
 	[
 		[
 			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
@@ -84,10 +78,7 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 	]
 );
 
-global.DATA_LEVEL_MAIN_SAMPLELEVEL2 = new LevelData(
-	{
-		defense_health: 1000
-	},
+global.DATA_LEVEL_MAIN_SAMPLELEVEL2 = new LevelData({},
 	[
 		[
 			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_1], ENEMY_SPAWN_END, 10, 5)

@@ -13,7 +13,7 @@ if(!variable_instance_exists(self.id, "current_level_data")) {
 */
 global.player_money = 200;
 
-global.defense_health = current_level_data.defense_health;
+//global.defense_health = current_level_data.defense_health;
 #endregion
 
 

@@ -40,6 +40,35 @@ function draw_health_bar(x, y, _current_health, _max_health, recovering_from_ko 
 #endregion
 
 
+#region draw_health_bar_target (Function)
+//Draw the larger health bar used for targets
+//NOTE: Just like the normal health bar, this health bar's origin is center-bottom
+function draw_health_bar_target(x, y, _current_health, _max_health){
+	//Error prevention in the event the target has 0 max health (should only be true in base objects, which shouldn't ever be instantiated anyways, but still good to check)
+	if(_max_health > 0) {
+		//Draw health bar sprite
+		draw_sprite(spr_health_bar_target, 1, x, y);
+
+		//Don't want the health bar to overflow in the event the entity's current health exceeds it's normal max health
+		//Also don't want it to underflow if the entity (somehow) gets negative health
+		//Enemy health casted to real so that division isn't integer division
+		var _percent_health_remaining = max(min(1, real(_current_health) / _max_health), 0);
+	
+		var _spr_health_bar_width = sprite_get_width(spr_health_bar_target)
+		//X-coordinate of the left bound of the health bar (+4 because the border is 4 pixels)
+		var _health_bar_left_bound = x - (_spr_health_bar_width/2) + 4;
+		//Right bound is same as left bound, but now you need to add the extra length and subtract the border (-5 because this draws at the end? of the pixel)
+		var _health_bar_right_bound = x + (_spr_health_bar_width/2) - 5;
+	
+		//Where to draw the green part of the health bar up to
+		var _health_bar_at = map_value(_percent_health_remaining, 0, 1, _health_bar_left_bound, _health_bar_right_bound);
+
+		//Additions to y are also due to sprite borders (maybe make these seem less arbitrary)
+		draw_rectangle_color(_health_bar_left_bound, y - 12, _health_bar_at, y - 5, c_teal, c_teal, c_teal, c_teal, false);
+	}
+}
+#endregion
+
 //TODO: Might move this to the menus_and_ui script, but not 100% about every single application of this, plus that file's getting huge and this component doesn't have any interactable parts.
 #region draw_highlight_info (Function)
 //TODO: For macros that rely on calculated values that shouldn't change, find a good way to get the value once, then cache it

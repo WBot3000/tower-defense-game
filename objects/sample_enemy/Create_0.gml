@@ -25,5 +25,6 @@ enemy_buffs = [];
 attack_timer = 0;
 
 units_in_range = ds_list_create();
+targets_in_range = ds_list_create();
 
 path_start(movement_path, seconds_to_roomspeed_frames(default_movement_speed), path_action_stop, false);

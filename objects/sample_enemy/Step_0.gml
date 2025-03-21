@@ -58,13 +58,17 @@ switch (attack_state) {
 		}
 		ds_list_clear(units_in_range);
 		
-		//Damage the wall
+		//Damage any targets around you
 		if(movement_path != pth_dummypath && path_position == 1) {
 			attack_timer++;
+			range.get_entities_in_range(base_target, targets_in_range, true);
 			if(attack_timer >= seconds_to_roomspeed_frames(seconds_per_attack)) {
-				global.defense_health -= melee_damage;
-				attack_timer = 0;
+				if(!ds_list_empty(targets_in_range)) {
+					damage_target(targets_in_range[| 0], melee_damage);
+					attack_timer = 0;
+				}
 			}
+			ds_list_clear(targets_in_range);
 		}
         break;
 }

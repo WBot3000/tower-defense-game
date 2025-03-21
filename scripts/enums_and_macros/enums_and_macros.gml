@@ -17,6 +17,7 @@
 #macro MENU_LAYER "Menus"
 #macro TILE_LAYER "Placement_Tiles"
 #macro PROJECTILE_LAYER "Projectiles"
+#macro TARGET_LAYER "Targets"
 #macro UNIT_LAYER "Units"
 #macro ENEMY_LAYER "Enemies"
 #macro CONTROLLER_LAYER "Controllers"

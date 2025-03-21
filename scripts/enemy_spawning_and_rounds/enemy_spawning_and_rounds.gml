@@ -163,9 +163,7 @@ function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constru
 		array_delete(rounds_currently_running, _round_index, 1);
 		global.player_money += _round_ptr.reward_count; //TODO: When you create a money manager, update this.
 		if(array_length(rounds_currently_running) == 0 && current_round >= array_length(spawn_data)) { //All rounds have been spawned and defeated. The game has been completed.
-			with(controller_obj) { //This event will "win" the game;
-				event_user(0);
-			}
+			controller_obj.game_state_manager.win_game();
 		}
 	};
 	
