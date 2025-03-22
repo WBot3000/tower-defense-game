@@ -8,7 +8,7 @@
     "TileSerialiseData":[],
   },
   "name":"ts_grass_tiles",
-  "out_columns":5,
+  "out_columns":6,
   "out_tilehborder":2,
   "out_tilevborder":2,
   "parent":{
@@ -34,5 +34,5 @@
   "tileWidth":64,
   "tilexoff":0,
   "tileyoff":0,
-  "tile_count":30,
+  "tile_count":36,
 }

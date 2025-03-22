@@ -173,7 +173,7 @@ function LevelSelectButton(_x_pos, _y_pos) :
 		
 		static on_click = function() {
 			//TODO: Add actual functionality
-			room_goto(SampleLevel2);
+			room_goto(SampleLevel1);
 		}
 }
 #endregion

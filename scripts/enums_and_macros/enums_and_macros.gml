@@ -14,7 +14,6 @@
 
 
 #region Room Layer Macros
-#macro MENU_LAYER "Menus"
 #macro TILE_LAYER "Placement_Tiles"
 #macro PROJECTILE_LAYER "Projectiles"
 #macro TARGET_LAYER "Targets"
