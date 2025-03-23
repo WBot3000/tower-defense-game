@@ -151,6 +151,45 @@ function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segment
 }
 #endregion
 
+
+#region UIManager (Class)
+/*
+	Parent class for all of the various UI managers in the game.
+	
+	Argument Variables:
+	
+	Data Variables:
+	ui_elements: A list of all of the UI elements contained within this UIManager
+		- The elements should be arranged from back (drawn last) to front (drawn first).
+		- If none of your UI elements overlap, the order won't make a difference, but if they do, elements in front will be selected "first"
+*/
+function UIManager() constructor {
+	//Getting viewport dimensions	(TODO: Not sure if I need to keep this, or if I can just fetch these from the appropriate functions when I need to.
+	view_w =  camera_get_view_width(view_camera[0]);
+	view_h = camera_get_view_height(view_camera[0]);
+	
+	ui_elements = [];
+	
+	static gui_element_highlighted = function() {
+		//Array is searched from end to beginning so that elements drawn in the front are checked before elements drawn in the back
+		for(var i = array_length(ui_elements) - 1; i >= 0; i--) {
+			if(ui_elements[i].active && ui_elements[i].is_highlighted()) {
+				return ui_elements[i];
+			}
+		}
+		return undefined;
+	}
+	
+	static draw = function() {
+		for(var i = 0; i < array_length(ui_elements); i++) {
+			if(ui_elements[i].active) {
+				ui_elements[i].draw();
+			}
+		}
+	}
+}
+#endregion
+
 #endregion
 
 
@@ -223,11 +262,7 @@ function QuitGameButton(_x_pos, _y_pos) :
 	TODO: Should I make a parent UI object for different UI types (GameUI, StartMenuUI, etc.)
 		- Would simplify a decent amount of code.
 */
-function StartMenuUI() constructor {	
-	//Viewport info
-	view_w =  camera_get_view_width(view_camera[0]);
-	view_h = camera_get_view_height(view_camera[0]);
-	
+function StartMenuUI() : UIManager() constructor {		
 	//Buttons
 	start_button = new LevelSelectButton(PLAY_BUTTON_X, PLAY_BUTTON_Y);
 	start_button.activate();
@@ -235,26 +270,13 @@ function StartMenuUI() constructor {
 	quit_button = new QuitGameButton(QUIT_BUTTON_X, QUIT_BUTTON_Y);
 	quit_button.activate();
 	
-	//The cool thing about this is that it lets you prioritize certain GUI elements over others.
-	static gui_element_highlighted = function() {
-		if(start_button.active && start_button.is_highlighted()) {
-			return start_button;
-		}
-		
-		if(quit_button.active && quit_button.is_highlighted()) {
-			return quit_button;
-		}
-		
-		return undefined; //Mouse is not over any UI elements.
-	}
+	ui_elements = [start_button, quit_button];
 	
+	
+	static draw_parent = draw;
 	
 	static draw = function() {
-		//Unlike with the in-game UI, the buttons should always be active, so no need to check
-		//Might go away in the event I make a parent UI object for various UI types.
-		start_button.draw();
-		quit_button.draw();
-
+		draw_parent();
 		draw_text(TILE_SIZE, view_h - (TILE_SIZE/2), "Music + Sound Effects by Eric Matyas, www.soundimage.org");
 	}
 }
@@ -279,7 +301,11 @@ function LevelCard(_x_pos, _y_pos, _level_data) :
 		static draw_parent = self.draw;
 		
 		static draw = function(_x_offset = 0, _y_offset = 0) {
+			shader_set(shader_levelcards);
+			shader_set_uniform_f_array( shader_get_uniform(shader_levelcards, "cardColor"),
+				level_data.card_color);
 			draw_parent(_x_offset, _y_offset);
+			shader_reset();
 			draw_sprite(level_data.level_portrait, 1,
 				x_pos + _x_offset + 16, y_pos + _y_offset + 16)
 			draw_text_color(x_pos + _x_offset + 16, y_pos + _y_offset + 100, level_data.level_name,
@@ -297,11 +323,7 @@ function LevelCard(_x_pos, _y_pos, _level_data) :
 /*
 	Handles the UI for the Level Selection Menu
 */
-function LevelSelectUI() constructor {
-	//Viewport info
-	view_w =  camera_get_view_width(view_camera[0]);
-	view_h = camera_get_view_height(view_camera[0]);
-	
+function LevelSelectUI() : UIManager() constructor {
 	//Buttons (NOTE: Positions don't use enums since these are more than likely temporary)
 	button_samplelevel1 = new LevelCard(TILE_SIZE * 0.5, TILE_SIZE, global.DATA_LEVEL_MAIN_SAMPLELEVEL1);
 	button_samplelevel1.activate();
@@ -312,31 +334,7 @@ function LevelSelectUI() constructor {
 	button_samplelevel1_2 = new LevelCard(TILE_SIZE * 10.5, TILE_SIZE, global.DATA_LEVEL_MAIN_SAMPLELEVEL1);
 	button_samplelevel1_2.activate();
 	
-	//The cool thing about this is that it lets you prioritize certain GUI elements over others.
-	static gui_element_highlighted = function() {
-		if(button_samplelevel1.active && button_samplelevel1.is_highlighted()) {
-			return button_samplelevel1;
-		}
-		
-		if(button_samplelevel2.active && button_samplelevel2.is_highlighted()) {
-			return button_samplelevel2;
-		}
-		
-		if(button_samplelevel1_2.active && button_samplelevel1_2.is_highlighted()) {
-			return button_samplelevel1_2;
-		}
-		
-		return undefined; //Mouse is not over any UI elements.
-	}
-	
-	
-	static draw = function() {
-		//Unlike with the in-game UI, the buttons should always be active, so no need to check
-		//Might go away in the event I make a parent UI object for various UI types.
-		button_samplelevel1.draw();
-		button_samplelevel2.draw();
-		button_samplelevel1_2.draw();
-	}
+	ui_elements = [button_samplelevel1, button_samplelevel2, button_samplelevel1_2];
 }
 #endregion
 
@@ -390,14 +388,8 @@ function RoundStartButton(_x_pos, _y_pos, _controller_obj) :
 	
 	static is_enabled = function() {
 		var _round_manager = get_round_manager(controller_obj); //TODO: Implement a cache system for this and other instances like this so we don't have to fetch the manager EVERY time this function is called.
-		if(_round_manager == undefined ) {
-			return false;
-		}
-		//If we're on the final round, you shouldn't be able to trigger more rounds.
-		if(_round_manager.current_round >= _round_manager.max_round) {
-			return false;
-		}
-		return true;
+		//If round manager doesn't exist, or we're on the final round, you shouldn't be able to trigger more rounds.
+		return _round_manager != undefined && (_round_manager.max_round > _round_manager.current_round);
 	}
 	
 	
@@ -467,7 +459,6 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage/*, _music_man
 	
 	//Basically just a wrapper for activating the button
 	static activate = function() {
-		create_pause_background();
 		active = true;
 	}
 	
@@ -475,31 +466,15 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage/*, _music_man
 	//Basically just a wrapper for deactivating the button
 	static deactivate = function() {
 		active = false;
-		if(pause_background != -1) {
-			free_pause_background();
-		}
 	}
 	
 	
-	static create_pause_background = function() {
-		if(pause_background != -1) {
-			free_pause_background();
-		}
-		pause_background = sprite_create_from_surface(application_surface, 0, 0, camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]), false, false, 0, 0);
+	static is_highlighted = function() {
+		return mouse_x >= x1 && mouse_x <= x2 && mouse_y >= y1 && mouse_y <= y2;
 	}
 	
 	
-	static free_pause_background = function() {
-		sprite_delete(pause_background);
-		pause_background = -1;
-	}
-	
-	
-	static draw_paused_bg = function() {
-		draw_sprite(pause_background, 0, 0, 0);
-	}
-	
-	static draw_menu = function() {
+	static draw = function() {
 		draw_rectangle_color(x1, y1, x2, y2, c_black, c_black, c_black, c_black, false);
 		draw_set_halign(fa_center);
 		draw_text_color((x1 + x2) / 2, y1 + 32, "PAUSED", c_white, c_white, c_white, c_white, 1);
@@ -557,10 +532,7 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 	
 	
 	static is_enabled = function() {
-		if(global.player_money < purchase_data.price) {
-			return false;
-		}
-		return true;
+		return global.player_money >= purchase_data.price;
 	}
 	
 
@@ -669,13 +641,13 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	}
 	
 	
-	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
-	static draw = function(_button_highlight_enabled = true) {
+	static draw = function() {
+		var _game_state_manager = get_game_state_manager();
 		var _view_w = camera_get_view_width(view_camera[0]);
 		
 		draw_rectangle_color(x_pos_current, 0, _view_w, y_pos, c_silver, c_silver, c_silver, c_silver, false);
 		for(var i = 0; i < array_length(buttons); ++i) {
-			buttons[i].draw(x_pos_current, 0, _button_highlight_enabled);
+			buttons[i].draw(x_pos_current, 0, _game_state_manager != undefined && _game_state_manager.state == GAME_STATE.RUNNING);
 		}
 	}
 	
@@ -1212,7 +1184,10 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	
 	
 	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
-	static draw = function(_button_highlight_enabled = true) {
+	static draw = function() {
+		var _game_state_manager = get_game_state_manager();
+		var _button_highlight_enabled = (_game_state_manager != undefined && _game_state_manager.state == GAME_STATE.RUNNING);
+		
 		var _view_h = camera_get_view_height(view_camera[0]);
 		
 		draw_rectangle_color(0, y_pos_current, x_pos, _view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
@@ -1224,9 +1199,9 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 			draw_set_halign(fa_left)
 			stat_icons.draw(0, y_pos_current);
 			stat_upgrade_buttons.draw(0, y_pos_current);
-			unit_upgrade_button_1.draw(0, y_pos_current);
-			unit_upgrade_button_2.draw(0, y_pos_current);
-			unit_upgrade_button_3.draw(0, y_pos_current);
+			unit_upgrade_button_1.draw(0, y_pos_current, _button_highlight_enabled);
+			unit_upgrade_button_2.draw(0, y_pos_current, _button_highlight_enabled);
+			unit_upgrade_button_3.draw(0, y_pos_current, _button_highlight_enabled);
 			targeting_indicator.draw(0, y_pos_current);
 			sell_button.draw(0, y_pos_current);
 			
@@ -1446,16 +1421,14 @@ function GameInfoDisplay(_controller_obj) constructor {
 	
 	TODO: Finish this comment
 */
-function GameUI(_controller_obj, _purchase_data) constructor {
+function GameUI(_controller_obj, _purchase_data) : UIManager() constructor {
 	//Manager Info
-	controller_obj = _controller_obj;
-	
-	//Viewport info
-	view_w =  camera_get_view_width(view_camera[0]);
-	view_h = camera_get_view_height(view_camera[0]);
+	//controller_obj = _controller_obj;
 	
 	//Pure Display Elements (no interactivity)
 	game_info_display = new GameInfoDisplay(_controller_obj);
+	pause_background = -1; //Used in conjunction with the pause menu in order to continue showing all the instances on screen after they're deactivated
+	//NOTE: pause_background IS NOT a UI element, so don't treat it like one.
 	
 	//Menus
 	pause_menu = new PauseMenu((1/2), (1/2));
@@ -1470,7 +1443,10 @@ function GameUI(_controller_obj, _purchase_data) constructor {
 	toggle_purchase_menu_button = new TogglePurchaseMenuButton(TOGGLE_PURCHASE_MENU_BUTTON_X, TOGGLE_PURCHASE_MENU_BUTTON_Y);
 	toggle_info_card_button = new ToggleInfoCardButton(TOGGLE_INFO_CARD_BUTTON_X, TOGGLE_INFO_CARD_BUTTON_Y);
 	
-	
+	ui_elements = [game_info_display,
+		purchase_menu, unit_info_card, pause_menu,
+		pause_button, round_start_button, toggle_purchase_menu_button, toggle_info_card_button];
+	/*
 	//The cool thing about this is that it lets you prioritize certain GUI elements over others.
 	//Though it could really use some simplifying (ex. getting rid of all these if statements and replace it with some form of array iteration)
 	static gui_element_highlighted = function() {
@@ -1504,10 +1480,15 @@ function GameUI(_controller_obj, _purchase_data) constructor {
 		}
 		
 		return undefined; //Mouse is not over any UI elements.
-	}
+	}*/
 	
 	
 	static set_gui_running = function() {
+		if(pause_background != -1) {
+			sprite_delete(pause_background);
+			pause_background = -1;
+		}
+		
 		game_info_display.activate();
 		purchase_menu.activate();
 		unit_info_card.activate();
@@ -1521,6 +1502,12 @@ function GameUI(_controller_obj, _purchase_data) constructor {
 	
 	
 	static set_gui_paused = function() {
+		if(pause_background != -1) {
+			sprite_delete(pause_background);
+			pause_background = -1;
+		}
+		pause_background = sprite_create_from_surface(application_surface, 0, 0, camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]), false, false, 0, 0);
+		
 		game_info_display.activate();
 		purchase_menu.activate();
 		unit_info_card.activate();
@@ -1532,7 +1519,15 @@ function GameUI(_controller_obj, _purchase_data) constructor {
 		toggle_info_card_button.deactivate();
 	}
 	
+	static draw_parent = draw;
 	
+	static draw = function() {
+		if(pause_background != -1) {
+			draw_sprite(pause_background, 0, 0, 0);
+		}
+		draw_parent();
+	}
+	/*
 	static draw = function() {
 		//var view_w = camera_get_view_width(view_camera[0]);
 		//var view_h = camera_get_view_height(view_camera[0]);
@@ -1578,11 +1573,14 @@ function GameUI(_controller_obj, _purchase_data) constructor {
 		if(pause_menu.active) {
 			pause_menu.draw_menu();
 		}
-	}
+	}*/
 	
 	
 	static clean_up = function() {
-		pause_menu.clean_up();
+		if(pause_background != -1) {
+			sprite_delete(pause_background);
+			pause_background = -1;
+		}
 	}
 }
 #endregion

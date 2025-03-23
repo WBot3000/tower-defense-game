@@ -134,6 +134,7 @@
     {"id":{"name":"persistent_hitbox_effects","path":"scripts/persistent_hitbox_effects/persistent_hitbox_effects.yy",},},
     {"id":{"name":"utility","path":"scripts/utility/utility.yy",},},
     {"id":{"name":"shader_grayscale","path":"shaders/shader_grayscale/shader_grayscale.yy",},},
+    {"id":{"name":"shader_levelcards","path":"shaders/shader_levelcards/shader_levelcards.yy",},},
     {"id":{"name":"Music_Defeat","path":"sounds/Music_Defeat/Music_Defeat.yy",},},
     {"id":{"name":"Music_PreRound","path":"sounds/Music_PreRound/Music_PreRound.yy",},},
     {"id":{"name":"Music_Round","path":"sounds/Music_Round/Music_Round.yy",},},

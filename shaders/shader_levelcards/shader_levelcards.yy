@@ -1,0 +1,12 @@
+{
+  "$GMShader":"",
+  "%Name":"shader_levelcards",
+  "name":"shader_levelcards",
+  "parent":{
+    "name":"Shaders",
+    "path":"folders/Shaders.yy",
+  },
+  "resourceType":"GMShader",
+  "resourceVersion":"2.0",
+  "type":1,
+}

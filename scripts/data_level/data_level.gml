@@ -30,12 +30,17 @@ function PathData(_spawn_x, _spawn_y, _default_path) constructor {
 }
 #endregion
 
+
 #region LevelData (Class)
 /*
 	A struct that contains all of the unique data for a level.
 	
 	Argument Variables:
 	_basic_level_data: A struct containing all of the numerical and text values needed for the level
+		- level_room: The room instance that this data corresponds to
+		- level_name: The name of the level, displayed on the level select screen
+		- level_portrait: The portait on the level select screen used to represent this level
+		- card_color: An array of floats from 0-1 that corresponds to the color the level's card should be. The first value is the percentage of red red, the second value is of green, and the third is of blue.
 	The rest correspond to Data Variables
 	
 	Data Variables:
@@ -47,12 +52,15 @@ function PathData(_spawn_x, _spawn_y, _default_path) constructor {
 function LevelData(_basic_level_data = {
 						level_room: undefined,
 						level_name: "Default Name",
-						level_portrait: spr_level_portrait_PortraitNotFound
+						level_portrait: spr_level_portrait_PortraitNotFound,
+						card_color: [255/255, 255/255, 255/255]
 					}, 
 					_round_data = []) constructor {
 	level_room = _basic_level_data.level_room;
 	level_name = _basic_level_data.level_name;
 	level_portrait = _basic_level_data.level_portrait;
+	card_color = _basic_level_data.card_color;
+	
 	round_data = _round_data;
 }
 #endregion
@@ -74,8 +82,9 @@ global.DATA_LEVEL_PATH_SAMPLELEVEL2_2 = new PathData(TILE_SIZE*-1, TILE_SIZE*6, 
 global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 	{
 		level_room: SampleLevel1,
-		level_name: "Farmer Daniel's Potato Patch 1",
+		level_name: "Daniel's Potato Farm 1",
 		level_portrait: spr_level_portrait_SampleLevel1,
+		card_color: [148/255, 224/255, 168/255],
 	},
 	[
 		[
@@ -93,8 +102,9 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 global.DATA_LEVEL_MAIN_SAMPLELEVEL2 = new LevelData(
 	{
 		level_room: SampleLevel2,
-		level_name: "Farmer Daniel's Potato Patch 2",
+		level_name: "Daniel's Potato Farm 2",
 		level_portrait: spr_level_portrait_SampleLevel1,
+		card_color: [148/255, 224/255, 168/255],
 	},
 	[
 		[
