@@ -155,7 +155,7 @@ function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segment
 
 
 
-#region Menu UI
+#region Start Menu UI
 
 #region LevelSelectButton (Class)
 /*
@@ -172,8 +172,7 @@ function LevelSelectButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_play_game_button) constructor {
 		
 		static on_click = function() {
-			//TODO: Add actual functionality
-			room_goto(SampleLevel1);
+			room_goto(LevelSelectScreen);
 		}
 }
 #endregion
@@ -263,6 +262,85 @@ function StartMenuUI() constructor {
 
 #endregion
 
+
+#region Level Selection Menu UI
+
+#region LevelCard (Class)
+/*
+	Draws a level card that can be clicked on to select a level
+	
+	TODO: Should this inherit from the standard button? Functions somewhat the same
+*/
+function LevelCard(_x_pos, _y_pos, _level_data) :
+	Button(_x_pos, _y_pos, spr_level_select_base) constructor {
+		
+		level_data = _level_data;
+		
+		static draw_parent = self.draw;
+		
+		static draw = function(_x_offset = 0, _y_offset = 0) {
+			draw_parent(_x_offset, _y_offset);
+			draw_sprite(level_data.level_portrait, 1,
+				x_pos + _x_offset + 16, y_pos + _y_offset + 16)
+			draw_text_color(x_pos + _x_offset + 16, y_pos + _y_offset + 100, level_data.level_name,
+				c_black, c_black, c_black, c_black, 1)
+		}
+		
+		static on_click = function() {
+			room_goto(level_data.level_room);
+		}
+}
+#endregion
+
+
+#region LevelSelectUI
+/*
+	Handles the UI for the Level Selection Menu
+*/
+function LevelSelectUI() constructor {
+	//Viewport info
+	view_w =  camera_get_view_width(view_camera[0]);
+	view_h = camera_get_view_height(view_camera[0]);
+	
+	//Buttons (NOTE: Positions don't use enums since these are more than likely temporary)
+	button_samplelevel1 = new LevelCard(TILE_SIZE * 0.5, TILE_SIZE, global.DATA_LEVEL_MAIN_SAMPLELEVEL1);
+	button_samplelevel1.activate();
+	
+	button_samplelevel2 = new LevelCard(TILE_SIZE * 5.5, TILE_SIZE, global.DATA_LEVEL_MAIN_SAMPLELEVEL2);
+	button_samplelevel2.activate();
+	
+	button_samplelevel1_2 = new LevelCard(TILE_SIZE * 10.5, TILE_SIZE, global.DATA_LEVEL_MAIN_SAMPLELEVEL1);
+	button_samplelevel1_2.activate();
+	
+	//The cool thing about this is that it lets you prioritize certain GUI elements over others.
+	static gui_element_highlighted = function() {
+		if(button_samplelevel1.active && button_samplelevel1.is_highlighted()) {
+			return button_samplelevel1;
+		}
+		
+		if(button_samplelevel2.active && button_samplelevel2.is_highlighted()) {
+			return button_samplelevel2;
+		}
+		
+		if(button_samplelevel1_2.active && button_samplelevel1_2.is_highlighted()) {
+			return button_samplelevel1_2;
+		}
+		
+		return undefined; //Mouse is not over any UI elements.
+	}
+	
+	
+	static draw = function() {
+		//Unlike with the in-game UI, the buttons should always be active, so no need to check
+		//Might go away in the event I make a parent UI object for various UI types.
+		button_samplelevel1.draw();
+		button_samplelevel2.draw();
+		button_samplelevel1_2.draw();
+	}
+}
+#endregion
+
+#endregion
 
 
 #region In-Game UI

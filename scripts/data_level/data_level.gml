@@ -44,9 +44,15 @@ function PathData(_spawn_x, _spawn_y, _default_path) constructor {
 	
 	TODO: Include purchasing data and starting money here? Or will these defined in some sort of player structure if the player is allowed to determine those?
 */
-function LevelData(_basic_level_data = {}, 
+function LevelData(_basic_level_data = {
+						level_room: undefined,
+						level_name: "Default Name",
+						level_portrait: spr_level_portrait_PortraitNotFound
+					}, 
 					_round_data = []) constructor {
-						
+	level_room = _basic_level_data.level_room;
+	level_name = _basic_level_data.level_name;
+	level_portrait = _basic_level_data.level_portrait;
 	round_data = _round_data;
 }
 #endregion
@@ -65,7 +71,12 @@ global.DATA_LEVEL_PATH_SAMPLELEVEL2_2 = new PathData(TILE_SIZE*-1, TILE_SIZE*6, 
 
 #region Level Data
 //TODO: Round data is ok to read for these sample levels, but I can tell it's gonna be a pain to read with actual levels. Think of the best way to manage this
-global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData({},
+global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
+	{
+		level_room: SampleLevel1,
+		level_name: "Farmer Daniel's Potato Patch 1",
+		level_portrait: spr_level_portrait_SampleLevel1,
+	},
 	[
 		[
 			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
@@ -79,7 +90,12 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData({},
 	]
 );
 
-global.DATA_LEVEL_MAIN_SAMPLELEVEL2 = new LevelData({},
+global.DATA_LEVEL_MAIN_SAMPLELEVEL2 = new LevelData(
+	{
+		level_room: SampleLevel2,
+		level_name: "Farmer Daniel's Potato Patch 2",
+		level_portrait: spr_level_portrait_SampleLevel1,
+	},
 	[
 		[
 			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_1], ENEMY_SPAWN_END, 10, 5)
