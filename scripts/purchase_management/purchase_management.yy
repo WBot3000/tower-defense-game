@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"purchase_management",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"purchase_management",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

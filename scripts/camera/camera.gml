@@ -22,7 +22,10 @@ enum CAMERA_STATE {
 */
 function CameraController() constructor {
 	
-	static move_camera = function(_use_wasd = true, _use_mouse = false) {
+	static move_camera = function(_curr_game_state, _use_wasd = true, _use_mouse = false) {
+		if(_curr_game_state == GAME_STATE.PAUSED) {
+			return; //Don't allow camera movement while the game is paused.
+		}
 		var _view_x = camera_get_view_x(view_camera[0]);
 		var _view_y = camera_get_view_y(view_camera[0]);
 

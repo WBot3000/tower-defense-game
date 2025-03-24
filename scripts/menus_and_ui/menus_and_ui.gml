@@ -360,11 +360,10 @@ function PauseButton(_x_pos, _y_pos) :
 		Button(_x_pos, _y_pos, spr_pause_menu_toggle) constructor {	
 	
 	static on_click = function() {
-		//TODO: Where does this game controller come from?
-		//Is it because it's called in a variable with the game controller?
-		//No, it's just because this isn't actually called
-		//game_controller.game_state = GAME_STATE.PAUSED;
-		//game_ui.set_gui_paused();
+		var _game_state_manager = get_game_state_manager();
+		if(_game_state_manager != undefined) {
+			_game_state_manager.pause_game();
+		}
 	}
 }
 #endregion
@@ -380,26 +379,26 @@ function PauseButton(_x_pos, _y_pos) :
 	Data Variables:
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
 	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
-	controller_obj: Game controller object that manages game state.
 */
-function RoundStartButton(_x_pos, _y_pos, _controller_obj) :
+function RoundStartButton(_x_pos, _y_pos) :
 		Button(_x_pos, _y_pos, spr_round_start_button_enabled, spr_round_start_button_disabled, spr_round_start_button_enabled) constructor {
-	controller_obj = _controller_obj;
-
+	cached_round_manager = get_round_manager();
 	
 	static is_enabled = function() {
-		var _round_manager = get_round_manager(controller_obj); //TODO: Implement a cache system for this and other instances like this so we don't have to fetch the manager EVERY time this function is called.
+		cached_round_manager = cached_round_manager ?? get_round_manager();
 		//If round manager doesn't exist, or we're on the final round, you shouldn't be able to trigger more rounds.
-		return _round_manager != undefined && (_round_manager.max_round > _round_manager.current_round);
+		return cached_round_manager != undefined && (cached_round_manager.max_round > cached_round_manager.current_round);
 	}
 	
 	
-	//Also not used
 	static on_click = function() {
 		if(is_enabled()) {
+			var _music_manager = get_music_manager(); //TODO: Cache this too? Main issue with caching is outdated references, but that really shouldn't be an issue here
+			if(_music_manager != undefined && _music_manager.current_music == Music_PreRound) {
+				_music_manager.fade_out_current_music(seconds_to_milliseconds(QUICK_MUSIC_FADING_TIME), Music_Round);
+			}
 			//Round manager MUST exist if is_enabled returns true, so we don't have to check again in here.
-			var _round_manager = get_round_manager(controller_obj);
-			_round_manager.start_round();
+			cached_round_manager.start_round();
 		}
 	}
 }
@@ -502,6 +501,7 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage) constructor 
 		}
 		else {
 			//TODO: Can probably merge first two lines in pill bar
+			//TODO: Sometimes, the pill bar glitches out, not sure why. To be honest, I'm probably just gonna replace it with a slider
 			var _selected_pill = volume_options.on_click();
 			volume_options.current_segment = _selected_pill;
 			var _music_manager = get_music_manager();
@@ -619,7 +619,8 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 	x_pos_open: Horizontal coordinate of the menu's top-left corner when the menu is open.
 	x_pos_current: Current horizontal coordinate of the menu's top-left corner (useful for scrolling).
 	y_pos: Vertical coordinate of the menu's top-right corner when the menu is open.
-	buttons: All of the unit purchase buttons within the menu itself.
+	purchase_buttons: All of the unit purchase buttons within the menu itself.
+	toggle_button: Button that toggles the menu state
 */
 #macro PURCHASE_MENU_BPR 3 //BPR = Buttons Per Row
 
@@ -637,7 +638,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	y_pos = _y_pos;
 
 	//Array that contains all of the button data.
-	buttons = [];
+	purchase_buttons = [];
 	
 	var _menu_width = _view_w - x_pos_open;
 	var _button_width = sprite_get_width(spr_unit_purchase_button_default);
@@ -652,9 +653,11 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 			_button_y += _button_width;
 		}
 	
-		array_push(buttons, new UnitPurchaseButton(_button_x, _button_y, _purchase_data_list[i]));
+		array_push(purchase_buttons, new UnitPurchaseButton(_button_x, _button_y, _purchase_data_list[i]));
 		_button_x += (_button_width + _x_gap);
 	}
+	
+	toggle_button = new TogglePurchaseMenuButton(-32, (y_pos - sprite_get_width(spr_pointer_arrow_left))/2, self);
 	
 	
 	active = false;
@@ -678,7 +681,8 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		var _view_x = camera_get_view_x(view_camera[0]);
 		var _view_y = camera_get_view_y(view_camera[0]);
 
-		return mouse_x - _view_x >= x_pos_current && y_pos >= mouse_y - _view_y; 
+		return (mouse_x - _view_x >= x_pos_current && y_pos >= mouse_y - _view_y) || 
+			toggle_button.is_highlighted(x_pos_current, 0); 
 	}
 	
 	
@@ -687,9 +691,22 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		var _view_w = camera_get_view_width(view_camera[0]);
 		
 		draw_rectangle_color(x_pos_current, 0, _view_w, y_pos, c_silver, c_silver, c_silver, c_silver, false);
-		for(var i = 0; i < array_length(buttons); ++i) {
-			buttons[i].draw(x_pos_current, 0, _game_state_manager != undefined && _game_state_manager.state == GAME_STATE.RUNNING);
+		toggle_button.draw(x_pos_current, 0);
+		for(var i = 0; i < array_length(purchase_buttons); ++i) {
+			purchase_buttons[i].draw(x_pos_current, 0, _game_state_manager != undefined && _game_state_manager.state == GAME_STATE.RUNNING);
 		}
+	}
+	
+	
+	static toggle_open = function() {
+		audio_play_sound(SFX_Menu_Open, 1, false); //TODO: Add volume control
+		state = SLIDING_MENU_STATE.OPENING;
+	}
+	
+	
+	static toggle_closed = function() {
+		audio_play_sound(SFX_Menu_Close, 1, false) //TODO: Add volume control
+		state = SLIDING_MENU_STATE.CLOSING;
 	}
 	
 	
@@ -701,8 +718,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		switch (state) {
 			case SLIDING_MENU_STATE.CLOSED:
 				if(_menu_toggle_pressed) {
-					audio_play_sound(SFX_Menu_Open, 1, false); //TODO: Add volume control
-					state = SLIDING_MENU_STATE.OPENING;
+					toggle_open();
 				}
 			    break;
 			case SLIDING_MENU_STATE.CLOSING:
@@ -719,8 +735,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 				break;
 			case SLIDING_MENU_STATE.OPEN:
 				if(_menu_toggle_pressed) {
-					audio_play_sound(SFX_Menu_Close, 1, false); //TODO: Add volume control
-					state = SLIDING_MENU_STATE.CLOSING;
+					toggle_closed();
 				}
 				break;
 			default:
@@ -732,13 +747,19 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	}
 	
 	
-	static select_purchase = function() {
-		for(var i = 0; i < array_length(buttons); ++i) {
-			if(buttons[i].is_highlighted(x_pos_current, 0)) {
-				return buttons[i].purchase_data;
+	static on_click = function() {
+		if(toggle_button.is_highlighted(x_pos_current, 0)) { //Not checking for if enabled, since it will always be enabled if this menu is enabled
+			toggle_button.on_click();
+			return;
+		}
+		var _purchase_manager = get_purchase_manager();
+		if(_purchase_manager != undefined) {
+			for(var i = 0; i < array_length(purchase_buttons); ++i) {
+				if(purchase_buttons[i].is_highlighted(x_pos_current, 0)) {
+					_purchase_manager.set_selected_purchase(purchase_buttons[i].purchase_data);
+				}
 			}
 		}
-		return undefined;
 	}
 	
 }
@@ -755,11 +776,24 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	Data Variables:
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
 	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
-	
-	TODO: Implement on_click?
+	purchase_menu: Reference to the purchase menu that this button belongs to
 */
-function TogglePurchaseMenuButton(_x_pos, _y_pos) :
-		Button(_x_pos, _y_pos, spr_pointer_arrow_left) constructor {
+function TogglePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
+	Button(_x_pos, _y_pos, spr_pointer_arrow_left) constructor {
+	purchase_menu = _purchase_menu;
+	
+	static on_click = function() {
+		switch (purchase_menu.state) {
+		    case SLIDING_MENU_STATE.OPEN:
+		        purchase_menu.toggle_closed();
+		        break;
+			case SLIDING_MENU_STATE.CLOSED:
+				purchase_menu.toggle_open();
+		        break;
+		    default:
+		        break;
+		}
+	}
 }
 #endregion
 
@@ -1067,10 +1101,14 @@ function SellButton(_unit_info_card, _x_pos, _y_pos, _selected_unit = noone) :
 	y_pos_open: Vertical coordinate of the menu's top-left corner when the menu is open.
 	//TODO: Add stat icons and the like
 */
+//#macro TOGGLE_INFO_CARD_BUTTON_X ((camera_get_view_width(view_camera[0]) - sprite_get_width(spr_pointer_arrow_up)) / 2)
+//#macro TOGGLE_INFO_CARD_BUTTON_Y (camera_get_view_height(view_camera[0]) - (TILE_SIZE*0.5))
+
 function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the bottom is opened or closed
 	selected_unit = noone;
 	
+	var _view_w = camera_get_view_width(view_camera[0]);
 	var _view_h = camera_get_view_height(view_camera[0]);
 	y_pos_open = (1-_menu_height_percentage) * _view_h;
 	y_pos_current = _view_h; //Window should start out closed
@@ -1079,7 +1117,6 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	active = false;
 	
 	//Stat Upgrade Info
-	//stat_icons = new UnitStatSquare(TILE_SIZE*2, TILE_SIZE/4, noone);
 	stat_upgrade_buttons = new StatUpgradeDisplay(TILE_SIZE * 4.5, TILE_SIZE/2);
 	
 	//Unit Upgrade Info
@@ -1092,6 +1129,10 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	
 	//Sell Button
 	sell_button = new SellButton(self, TILE_SIZE*13, TILE_SIZE/4, noone);
+	
+	//Menu Toggle Button
+	toggle_button = new ToggleInfoCardButton((_view_w - sprite_get_width(spr_pointer_arrow_up))/2, 
+		-32, self);
 	
 	
 	//Basically just a wrapper for activating the button
@@ -1130,8 +1171,8 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		//mouse_y is based on room position, not camera position, so need to correct selection
 		//TODO: Passable view_camera index?
 		var _view_y = camera_get_view_y(view_camera[0]);
-		//Only need to do one calculation because the menu takes up the whole bottom of the screen
-		return mouse_y - _view_y >= y_pos_current; 
+		//Need to include check for toggle button, since it peaks past the normal boundaries of the menu
+		return mouse_y - _view_y >= y_pos_current || toggle_button.is_highlighted(0, y_pos_current); 
 	}
 	
 	
@@ -1143,6 +1184,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		var _view_h = camera_get_view_height(view_camera[0]);
 		
 		draw_rectangle_color(0, y_pos_current, x_pos, _view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
+		toggle_button.draw(0, y_pos_current);
 		if(selected_unit != noone) {
 			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE/2, y_pos_current + TILE_SIZE/4);
 			draw_set_halign(fa_middle);
@@ -1150,8 +1192,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 				selected_unit.unit_name, c_white, c_white, c_white, c_white, 1);
 			draw_text_color(TILE_SIZE, y_pos_current + TILE_SIZE*1.6, 
 				string(selected_unit.current_health) + "/" + string(selected_unit.max_health), c_white, c_white, c_white, c_white, 1);
-			draw_set_halign(fa_left)
-			//stat_icons.draw(0, y_pos_current);
+			draw_set_halign(fa_left);
 			stat_upgrade_buttons.draw(0, y_pos_current);
 			unit_upgrade_button_1.draw(0, y_pos_current, _button_highlight_enabled);
 			unit_upgrade_button_2.draw(0, y_pos_current, _button_highlight_enabled);
@@ -1160,44 +1201,31 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 			sell_button.draw(0, y_pos_current);
 			
 			//Draw any necessary highlights. This is done after all of the other drawing so that they'll always be on top.
-			with(stat_upgrade_buttons) {
-				for(var i = 0; i < array_length(buttons); i++) {
-					var _mouse_x_gui = device_mouse_x_to_gui(0);
-					var _mouse_y_gui = device_mouse_y_to_gui(0);
-					var _region_highlighted = _mouse_x_gui >= buttons[i].x_pos && _mouse_x_gui <= buttons[i].x_pos + STAT_BUTTON_SIZE &&
-						_mouse_y_gui >= buttons[i].y_pos + other.y_pos_current - STAT_BUTTON_SIZE && _mouse_y_gui <= buttons[i].y_pos + other.y_pos_current + STAT_BUTTON_SIZE
+			for(var i = 0; i < array_length(stat_upgrade_buttons.buttons); i++) {
+				var _mouse_x_gui = device_mouse_x_to_gui(0);
+				var _mouse_y_gui = device_mouse_y_to_gui(0);
+				var _region_highlighted = _mouse_x_gui >= stat_upgrade_buttons.buttons[i].x_pos && _mouse_x_gui <= stat_upgrade_buttons.buttons[i].x_pos + STAT_BUTTON_SIZE &&
+					_mouse_y_gui >= stat_upgrade_buttons.buttons[i].y_pos + y_pos_current - STAT_BUTTON_SIZE && _mouse_y_gui <= stat_upgrade_buttons.buttons[i].y_pos + y_pos_current + STAT_BUTTON_SIZE
 					
-					if(buttons[i].stat_upgrade_data != undefined && _region_highlighted) { //Need more than just standard highlight since this should include the icon along with the button
-						draw_highlight_info(buttons[i].stat_upgrade_data.title, 
-						buttons[i].stat_upgrade_data.description);
-						break; //Only need to draw one highlight
-					}
+				if(stat_upgrade_buttons.buttons[i].stat_upgrade_data != undefined && _region_highlighted) { //Need more than just standard highlight since this should include the icon along with the button
+					draw_highlight_info(stat_upgrade_buttons.buttons[i].stat_upgrade_data.title, 
+					stat_upgrade_buttons.buttons[i].stat_upgrade_data.description);
+					break; //Only need to draw one highlight
 				}
-				/*
-				//Can use else if here, since only one should ever be highlighted at a time
-				if(stat_upgrade_button_1.stat_upgrade_data != undefined && 
-					stat_upgrade_button_1.is_highlighted(0, other.y_pos_current)) {
-					draw_highlight_info(stat_upgrade_button_1.stat_upgrade_data.title, 
-						stat_upgrade_button_1.stat_upgrade_data.description);
-				}
-				else if(stat_upgrade_button_2.stat_upgrade_data != undefined && 
-					stat_upgrade_button_2.is_highlighted(0, other.y_pos_current)) {
-					draw_highlight_info(stat_upgrade_button_2.stat_upgrade_data.title, 
-						stat_upgrade_button_2.stat_upgrade_data.description);
-				}
-				else if(stat_upgrade_button_3.stat_upgrade_data != undefined && 
-					stat_upgrade_button_3.is_highlighted(0, other.y_pos_current)) {
-					draw_highlight_info(stat_upgrade_button_3.stat_upgrade_data.title, 
-						stat_upgrade_button_3.stat_upgrade_data.description);
-				}
-				else if(stat_upgrade_button_4.stat_upgrade_data != undefined && 
-					stat_upgrade_button_4.is_highlighted(0, other.y_pos_current)) {
-					draw_highlight_info(stat_upgrade_button_4.stat_upgrade_data.title, 
-						stat_upgrade_button_4.stat_upgrade_data.description);
-				}*/
-				
 			}
 		}
+	}
+	
+	
+	static toggle_open = function() {
+		audio_play_sound(SFX_Menu_Open, 1, false); //TODO: Add volume control
+		state = SLIDING_MENU_STATE.OPENING;
+	}
+	
+	
+	static toggle_closed = function() {
+		audio_play_sound(SFX_Menu_Close, 1, false) //TODO: Add volume control
+		state = SLIDING_MENU_STATE.CLOSING;
 	}
 	
 	
@@ -1209,8 +1237,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		switch (state) {
 			case SLIDING_MENU_STATE.CLOSED:
 				if(_menu_toggle_pressed) {
-					audio_play_sound(SFX_Menu_Open, 1, false); //TODO: Add volume control
-					state = SLIDING_MENU_STATE.OPENING;
+					toggle_open();
 				}
 			    break;
 			case SLIDING_MENU_STATE.CLOSING:
@@ -1227,8 +1254,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 				break;
 			case SLIDING_MENU_STATE.OPEN:
 				if(_menu_toggle_pressed) {
-					audio_play_sound(SFX_Menu_Close, 1, false) //TODO: Add volume control
-					state = SLIDING_MENU_STATE.CLOSING;
+					toggle_closed();
 				}
 				break;
 			default:
@@ -1264,6 +1290,10 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 				sell_button.is_highlighted(0, y_pos_current)) {
 				_selected_button = sell_button;
 			}
+			else if(toggle_button.is_enabled() &&
+				toggle_button.is_highlighted(0, y_pos_current)) {
+				_selected_button = toggle_button;
+			}
 		}
 		
 		if(_selected_button != undefined) {
@@ -1284,11 +1314,25 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	Data Variables:
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
 	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
-	
-	TODO: Implement on_click?
+	unit_info_card: Reference to the Unit Info Card this button belongs to.
 */
-function ToggleInfoCardButton(_x_pos, _y_pos) :
-		Button(_x_pos, _y_pos, spr_pointer_arrow_up) constructor {
+function ToggleInfoCardButton(_x_pos, _y_pos, _unit_info_card) :
+	Button(_x_pos, _y_pos, spr_pointer_arrow_up) constructor {
+	unit_info_card = _unit_info_card;
+	
+	static on_click = function() {
+		switch (unit_info_card.state) {
+		    case SLIDING_MENU_STATE.OPEN:
+		        unit_info_card.toggle_closed();
+		        break;
+			case SLIDING_MENU_STATE.CLOSED:
+				unit_info_card.toggle_open();
+		        break;
+		    default:
+		        break;
+		}
+	}
+		
 }
 #endregion
 
@@ -1372,11 +1416,8 @@ function GameInfoDisplay(_controller_obj) constructor {
 #macro ROUND_START_BUTTON_X TILE_SIZE //Round start button is one "tile" away from the left of the screen
 #macro ROUND_START_BUTTON_Y (camera_get_view_height(view_camera[0]) - (TILE_SIZE*1.5)) //Round start button is one and a half "tiles" away from the bottom of the screen
 
-#macro TOGGLE_PURCHASE_MENU_BUTTON_X (camera_get_view_width(view_camera[0]) - (TILE_SIZE*0.5))
-#macro TOGGLE_PURCHASE_MENU_BUTTON_Y ((camera_get_view_height(view_camera[0]) - sprite_get_height(spr_pointer_arrow_left)) / 2)
-
-#macro TOGGLE_INFO_CARD_BUTTON_X ((camera_get_view_width(view_camera[0]) - sprite_get_width(spr_pointer_arrow_up)) / 2)
-#macro TOGGLE_INFO_CARD_BUTTON_Y (camera_get_view_height(view_camera[0]) - (TILE_SIZE*0.5))
+//#macro TOGGLE_PURCHASE_MENU_BUTTON_X (camera_get_view_width(view_camera[0]) - (TILE_SIZE*0.5))
+//#macro TOGGLE_PURCHASE_MENU_BUTTON_Y ((camera_get_view_height(view_camera[0]) - sprite_get_height(spr_pointer_arrow_left)) / 2)
 /*
 	In charge of drawing UI elements to the screen
 	
@@ -1406,12 +1447,12 @@ function GameUI(_controller_obj, _purchase_data) : UIManager() constructor {
 	
 	//Buttons
 	pause_button = new PauseButton(PAUSE_BUTTON_X, PAUSE_BUTTON_Y);
-	round_start_button = new RoundStartButton(ROUND_START_BUTTON_X, ROUND_START_BUTTON_Y, _controller_obj);
-	toggle_purchase_menu_button = new TogglePurchaseMenuButton(TOGGLE_PURCHASE_MENU_BUTTON_X, TOGGLE_PURCHASE_MENU_BUTTON_Y);
-	toggle_info_card_button = new ToggleInfoCardButton(TOGGLE_INFO_CARD_BUTTON_X, TOGGLE_INFO_CARD_BUTTON_Y);
+	round_start_button = new RoundStartButton(ROUND_START_BUTTON_X, ROUND_START_BUTTON_Y);
+	//toggle_purchase_menu_button = new TogglePurchaseMenuButton(TOGGLE_PURCHASE_MENU_BUTTON_X, TOGGLE_PURCHASE_MENU_BUTTON_Y);
+	//toggle_info_card_button = new ToggleInfoCardButton(TOGGLE_INFO_CARD_BUTTON_X, TOGGLE_INFO_CARD_BUTTON_Y);
 	
 	ui_elements = [game_info_display,
-		pause_button, round_start_button, toggle_purchase_menu_button, toggle_info_card_button,
+		pause_button, round_start_button, //toggle_purchase_menu_button, //toggle_info_card_button,
 		purchase_menu, unit_info_card, pause_menu];
 	
 	
@@ -1426,8 +1467,8 @@ function GameUI(_controller_obj, _purchase_data) : UIManager() constructor {
 		unit_info_card.activate();
 		pause_button.activate();
 		round_start_button.activate();
-		toggle_purchase_menu_button.activate();
-		toggle_info_card_button.activate();
+		//toggle_purchase_menu_button.activate();
+		//toggle_info_card_button.activate();
 		
 		pause_menu.deactivate();
 	}
@@ -1447,8 +1488,8 @@ function GameUI(_controller_obj, _purchase_data) : UIManager() constructor {
 		
 		pause_button.deactivate();
 		round_start_button.deactivate();
-		toggle_purchase_menu_button.deactivate();
-		toggle_info_card_button.deactivate();
+		//toggle_purchase_menu_button.deactivate();
+		//toggle_info_card_button.deactivate();
 	}
 	
 	static draw_parent = draw;

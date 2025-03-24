@@ -1,5 +1,2 @@
-TODO: Check explosion hitbox to see if it's correct.
-
-TODO: Fix mortar cannonballs not exploding if they explode offscreen.
-
-TODO: Put all data on upgrade into a single data class, so creating upgrade and deleting original is easier.
+NOTE: For any managers with an on_step function, they should just take the game state as a parameter input. 
+Less costly than fetching the game state manager in each of them.

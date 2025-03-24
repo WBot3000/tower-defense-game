@@ -137,6 +137,7 @@ function Round(_spawn_list, _timer_count, _on_round_finish_callback) constructor
 */
 function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constructor {
 	controller_obj = _controller_obj;
+	game_state_manager = get_game_state_manager(controller_obj);
 	current_round = 0;
 	max_round = _max_round;
 	
@@ -167,9 +168,11 @@ function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constru
 		}
 	};
 	
-	static on_step = function() {
-		for(var i = 0; i < array_length(rounds_currently_running); i++) { //Run each round
-			rounds_currently_running[i].on_step();
+	static on_step = function(_curr_game_state) {
+		if(_curr_game_state == GAME_STATE.RUNNING) {
+			for(var i = 0; i < array_length(rounds_currently_running); i++) { //Run each round
+				rounds_currently_running[i].on_step();
+			}
 		}
 	};
 }

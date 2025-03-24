@@ -133,6 +133,7 @@
     {"id":{"name":"menus_and_ui","path":"scripts/menus_and_ui/menus_and_ui.yy",},},
     {"id":{"name":"music","path":"scripts/music/music.yy",},},
     {"id":{"name":"persistent_hitbox_effects","path":"scripts/persistent_hitbox_effects/persistent_hitbox_effects.yy",},},
+    {"id":{"name":"purchase_management","path":"scripts/purchase_management/purchase_management.yy",},},
     {"id":{"name":"utility","path":"scripts/utility/utility.yy",},},
     {"id":{"name":"shader_grayscale","path":"shaders/shader_grayscale/shader_grayscale.yy",},},
     {"id":{"name":"shader_levelcards","path":"shaders/shader_levelcards/shader_levelcards.yy",},},

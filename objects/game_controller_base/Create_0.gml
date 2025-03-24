@@ -27,6 +27,8 @@ game_state_manager = new GameStateManager(self.id);
 
 round_manager = new RoundManager(self.id, array_length(current_level_data.round_data), current_level_data.round_data);
 
+purchase_manager = new PurchaseManager();
+
 camera_controller = new CameraController();
 
 music_manager = new MusicManager(Music_PreRound);
@@ -42,7 +44,7 @@ purchase_data = [
 ]
 
 //Which unit the user has selected (make this more sophisticated)
-purchase_selected = undefined;
+//purchase_selected = undefined;
 #endregion
 
 
