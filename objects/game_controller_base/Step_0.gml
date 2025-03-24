@@ -36,14 +36,14 @@ music_manager.on_step();
 //TODO: Update this to make it more efficient. Doesn't run "every tick" as described before, but should be in some sort of "pause_menu.on_click" function
 //I'm just very tired right now.
 //Honestly organize this entire section in general.
+//NOTE: This is only here because of the return if the game state isn't RUNNING. Will rework this once I rework that (and probably make this a responsibility of the UI like all of the other on-click stuff)
 if(game_state_manager.state == GAME_STATE.PAUSED && _mouse_left_released) {
-	var _selected_pill = game_ui.pause_menu.volume_options.on_click();
-	game_ui.pause_menu.volume_options.current_segment = _selected_pill;
-	music_manager.set_volume(game_ui.pause_menu.volume_options.current_segment / game_ui.pause_menu.volume_options.num_segments);
+	game_ui.pause_menu.on_click();
 }
 
 
 //Stuff below this section will only run if the game isn't paused
+//TODO: Just have managers handle their own behavior based on game state, this cuts off too much
 if(game_state_manager.state != GAME_STATE.RUNNING) {
 	return;
 }

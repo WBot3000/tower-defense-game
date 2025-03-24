@@ -79,6 +79,7 @@
   },
   "name":"Tower Defense Game",
   "resources":[
+    {"id":{"name":"fnt_Test","path":"fonts/fnt_Test/fnt_Test.yy",},},
     {"id":{"name":"Data Storage","path":"notes/Data Storage/Data Storage.yy",},},
     {"id":{"name":"Movement","path":"notes/Movement/Movement.yy",},},
     {"id":{"name":"Script Assets Have Changed For v2.3.0","path":"notes/Script Assets Have Changed For v2.3.0/Script Assets Have Changed For v2.3.0.yy",},},
@@ -143,7 +144,7 @@
     {"id":{"name":"SFX_Menu_Open","path":"sounds/SFX_Menu_Open/SFX_Menu_Open.yy",},},
     {"id":{"name":"spr_blank_stat_icon","path":"sprites/spr_blank_stat_icon/spr_blank_stat_icon.yy",},},
     {"id":{"name":"spr_border_tile","path":"sprites/spr_border_tile/spr_border_tile.yy",},},
-    {"id":{"name":"spr_defended_wall_tile","path":"sprites/spr_defended_wall_tile/spr_defended_wall_tile.yy",},},
+    {"id":{"name":"spr_close_button","path":"sprites/spr_close_button/spr_close_button.yy",},},
     {"id":{"name":"spr_enemy_spawner","path":"sprites/spr_enemy_spawner/spr_enemy_spawner.yy",},},
     {"id":{"name":"spr_giant_potato","path":"sprites/spr_giant_potato/spr_giant_potato.yy",},},
     {"id":{"name":"spr_grass_tiles","path":"sprites/spr_grass_tiles/spr_grass_tiles.yy",},},

@@ -18,12 +18,6 @@ bullet_damage = 10;
 unit_buffs = [];
 
 //Stat Upgrades
-/*
-stat_upgrade_1 = new SampleGunnerAttackSpeedUpgrade(self.id);
-stat_upgrade_2 = new SampleGunnerDamageUpgrade(self.id);
-stat_upgrade_3 = new SampleGunnerRangeUpgrade(self.id);
-stat_upgrade_4 = undefined;
-*/
 stat_upgrades = [new SampleGunnerAttackSpeedUpgrade(self.id), new SampleGunnerDamageUpgrade(self.id), 
 	new SampleGunnerRangeUpgrade(self.id), undefined]
 

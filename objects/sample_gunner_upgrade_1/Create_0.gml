@@ -45,18 +45,6 @@ if(!variable_instance_exists(self.id, "unit_buffs")) {
 }
 
 //Upgradable Stats
-/*
-if(!variable_instance_exists(self.id, "stat_upgrade_1")) { 
-	stat_upgrade_1 = new SampleGunnerAttackSpeedUpgrade(self.id);
-}
-if(!variable_instance_exists(self.id, "stat_upgrade_2")) { 
-	stat_upgrade_2 = new SampleGunnerDamageUpgrade(self.id);
-}
-if(!variable_instance_exists(self.id, "stat_upgrade_3")) { 
-	stat_upgrade_3 = new SampleGunnerRangeUpgrade(self.id);
-}
-//TODO: Add Stat Upgrade 4
-stat_upgrade_4 = undefined;*/
 if(!variable_instance_exists(self.id, "stat_upgrades")) {
 	stat_upgrades = [new SampleGunnerAttackSpeedUpgrade(self.id), new SampleGunnerDamageUpgrade(self.id), 
 	new SampleGunnerRangeUpgrade(self.id), undefined]

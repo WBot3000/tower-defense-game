@@ -163,6 +163,7 @@ function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segment
 		- The elements should be arranged from back (drawn last) to front (drawn first).
 		- If none of your UI elements overlap, the order won't make a difference, but if they do, elements in front will be selected "first"
 */
+//TODO: I can honestly use a component like this for all UI components, not just the top level ones, makes iterating through sub-elements easier.
 function UIManager() constructor {
 	//Getting viewport dimensions	(TODO: Not sure if I need to keep this, or if I can just fetch these from the appropriate functions when I need to.
 	view_w =  camera_get_view_width(view_camera[0]);
@@ -405,6 +406,25 @@ function RoundStartButton(_x_pos, _y_pos, _controller_obj) :
 #endregion
 
 
+#region Pause Menu Classes
+
+#region ExitPauseMenuButton (Class)
+/*
+	TODO: Write this and other comments
+*/
+function ExitPauseMenuButton(_x_pos, _y_pos) : 
+	Button(_x_pos, _y_pos, spr_close_button, spr_close_button, spr_close_button) constructor {
+	
+	static on_click = function() {
+		var _game_state_manager = get_game_state_manager();
+		if(_game_state_manager != undefined) {
+			_game_state_manager.resume_game();
+		}
+	}
+}
+#endregion
+
+
 #region PauseMenu (Class)
 /*
 	Defines all of the data for the Pause Menu
@@ -431,7 +451,7 @@ enum PAUSE_MENU_STATE {
 }
 
 #macro NUM_VOLUME_PILLS 10
-function PauseMenu(_menu_width_percentage, _menu_height_percentage/*, _music_manager*/) constructor {
+function PauseMenu(_menu_width_percentage, _menu_height_percentage) constructor {
 	pause_background = -1;
 	
 	var _view_w = camera_get_view_width(view_camera[0]);
@@ -442,8 +462,10 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage/*, _music_man
 	x2 = (_view_w/2) + (_menu_width_percentage/2 * _view_w); //From middle point, go to the right by the percentage amount
 	y2 = (_view_h/2) + (_menu_height_percentage/2 * _view_h); //From middle point, go down by the percentage amount
 	
-	//music_manager = _music_manager;
+	close_button = new ExitPauseMenuButton(x2 - 40, y1 + 8);
+	close_button.activate();
 	
+	//TODO: Might want to move pill bar stuff into it's own class
 	/*
 		Gross math equation that basically says
 		- From the center of the pause menu [(_x1 + _x2) / 2]
@@ -474,10 +496,27 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage/*, _music_man
 	}
 	
 	
+	static on_click = function() {
+		if(close_button.is_highlighted()) {
+			close_button.on_click();
+		}
+		else {
+			//TODO: Can probably merge first two lines in pill bar
+			var _selected_pill = volume_options.on_click();
+			volume_options.current_segment = _selected_pill;
+			var _music_manager = get_music_manager();
+			if(_music_manager != undefined) {
+				_music_manager.set_volume(volume_options.current_segment / volume_options.num_segments);
+			}
+		}
+	}
+	
+	
 	static draw = function() {
 		draw_rectangle_color(x1, y1, x2, y2, c_black, c_black, c_black, c_black, false);
 		draw_set_halign(fa_center);
 		draw_text_color((x1 + x2) / 2, y1 + 32, "PAUSED", c_white, c_white, c_white, c_white, 1);
+		close_button.draw();
 		draw_text_color((x1 + x2) / 2, y1 + 64, "Music Volume", c_white, c_white, c_white, c_white, 1);
 		volume_options.draw();
 		draw_set_halign(fa_left);
@@ -490,6 +529,8 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage/*, _music_man
 		}
 	}
 }
+#endregion
+
 #endregion
 
 
@@ -825,11 +866,6 @@ function StatUpgradeDisplay(_x_pos, _y_pos/*, _unit*/) constructor {
 	y_pos = _y_pos;
 	selected_unit = noone;
 	
-	//stat_upgrade_button_1 = new StatUpgradeButton(x_pos, y_pos);
-	//stat_upgrade_button_2 = new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE, y_pos);
-	//stat_upgrade_button_3 = new StatUpgradeButton(x_pos, y_pos + STAT_BUTTON_SIZE);
-	//stat_upgrade_button_4 = new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE, y_pos + STAT_BUTTON_SIZE);
-	
 	buttons = [new StatUpgradeButton(x_pos, y_pos + STAT_BUTTON_SIZE), new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE, y_pos + STAT_BUTTON_SIZE),
 		new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE*2, y_pos + STAT_BUTTON_SIZE), new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE*3, y_pos + STAT_BUTTON_SIZE)];
 	
@@ -848,11 +884,6 @@ function StatUpgradeDisplay(_x_pos, _y_pos/*, _unit*/) constructor {
 			}
 			buttons[i].draw(_x_offset, _y_offset);
 		}
-		/*
-		stat_upgrade_button_1.draw(_x_offset, _y_offset);
-		stat_upgrade_button_2.draw(_x_offset, _y_offset);
-		stat_upgrade_button_3.draw(_x_offset, _y_offset);
-		stat_upgrade_button_4.draw(_x_offset, _y_offset);*/
 	}
 	
 	
@@ -862,20 +893,6 @@ function StatUpgradeDisplay(_x_pos, _y_pos/*, _unit*/) constructor {
 		for(var i = 0; i < array_length(buttons); i++) {
 			buttons[i].stat_upgrade_data = _new_upgrades[i];
 		}
-		/*
-		if(_new_unit != noone) {
-			stat_upgrade_button_1.stat_upgrade_data = _new_unit.stat_upgrade_1;
-			stat_upgrade_button_2.stat_upgrade_data = _new_unit.stat_upgrade_2;
-			stat_upgrade_button_3.stat_upgrade_data = _new_unit.stat_upgrade_3;
-			stat_upgrade_button_4.stat_upgrade_data = _new_unit.stat_upgrade_4;
-		}
-		else {
-			stat_upgrade_button_1.stat_upgrade_data = undefined;
-			stat_upgrade_button_2.stat_upgrade_data = undefined;
-			stat_upgrade_button_3.stat_upgrade_data = undefined;
-			stat_upgrade_button_4.stat_upgrade_data = undefined;
-		}*/
-		
 	}
 	
 	
@@ -886,26 +903,6 @@ function StatUpgradeDisplay(_x_pos, _y_pos/*, _unit*/) constructor {
 			}
 		}
 		return undefined;
-		/*
-		if(stat_upgrade_button_1.is_enabled() &&
-			stat_upgrade_button_1.is_highlighted(_x_offset, _y_offset)) {
-			return stat_upgrade_button_1;
-		}
-		else if(stat_upgrade_button_2.is_enabled() &&
-			stat_upgrade_button_2.is_highlighted(_x_offset, _y_offset)) {
-			return stat_upgrade_button_2;
-		}
-		else if(stat_upgrade_button_3.is_enabled() &&
-			stat_upgrade_button_3.is_highlighted(_x_offset, _y_offset)) {
-			return stat_upgrade_button_3;
-		}
-		else if(stat_upgrade_button_4.is_enabled() &&
-			stat_upgrade_button_4.is_highlighted(_x_offset, _y_offset)) {
-			return stat_upgrade_button_4;
-		}
-		else {
-			return undefined;
-		}*/
 	}
 	
 }
@@ -1112,7 +1109,6 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	//Called when the selected unit is changed
 	static on_selected_unit_change = function(_new_selected_unit) {
 		selected_unit = _new_selected_unit;
-		//stat_icons.selected_unit = selected_unit;
 		stat_upgrade_buttons.on_unit_changed(selected_unit);
 		sell_button.selected_unit = selected_unit
 		targeting_indicator.selected_unit = selected_unit;
@@ -1166,8 +1162,12 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 			//Draw any necessary highlights. This is done after all of the other drawing so that they'll always be on top.
 			with(stat_upgrade_buttons) {
 				for(var i = 0; i < array_length(buttons); i++) {
-					if(buttons[i].stat_upgrade_data != undefined && 
-						buttons[i].is_highlighted(0, other.y_pos_current)) {
+					var _mouse_x_gui = device_mouse_x_to_gui(0);
+					var _mouse_y_gui = device_mouse_y_to_gui(0);
+					var _region_highlighted = _mouse_x_gui >= buttons[i].x_pos && _mouse_x_gui <= buttons[i].x_pos + STAT_BUTTON_SIZE &&
+						_mouse_y_gui >= buttons[i].y_pos + other.y_pos_current - STAT_BUTTON_SIZE && _mouse_y_gui <= buttons[i].y_pos + other.y_pos_current + STAT_BUTTON_SIZE
+					
+					if(buttons[i].stat_upgrade_data != undefined && _region_highlighted) { //Need more than just standard highlight since this should include the icon along with the button
 						draw_highlight_info(buttons[i].stat_upgrade_data.title, 
 						buttons[i].stat_upgrade_data.description);
 						break; //Only need to draw one highlight
@@ -1411,8 +1411,8 @@ function GameUI(_controller_obj, _purchase_data) : UIManager() constructor {
 	toggle_info_card_button = new ToggleInfoCardButton(TOGGLE_INFO_CARD_BUTTON_X, TOGGLE_INFO_CARD_BUTTON_Y);
 	
 	ui_elements = [game_info_display,
-		purchase_menu, unit_info_card, pause_menu,
-		pause_button, round_start_button, toggle_purchase_menu_button, toggle_info_card_button];
+		pause_button, round_start_button, toggle_purchase_menu_button, toggle_info_card_button,
+		purchase_menu, unit_info_card, pause_menu];
 	
 	
 	static set_gui_running = function() {

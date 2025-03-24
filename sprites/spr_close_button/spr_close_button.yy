@@ -1,10 +1,10 @@
 {
   "$GMSprite":"",
-  "%Name":"spr_defended_wall_tile",
+  "%Name":"spr_close_button",
   "bboxMode":0,
-  "bbox_bottom":63,
+  "bbox_bottom":31,
   "bbox_left":0,
-  "bbox_right":63,
+  "bbox_right":31,
   "bbox_top":0,
   "collisionKind":1,
   "collisionTolerance":0,
@@ -14,26 +14,26 @@
   "frames":[
     {"$GMSpriteFrame":"","%Name":"10f7aa4b-b556-4549-9b66-6723de5fbf4d","name":"10f7aa4b-b556-4549-9b66-6723de5fbf4d","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
   ],
-  "gridX":0,
-  "gridY":0,
-  "height":64,
+  "gridX":4,
+  "gridY":4,
+  "height":32,
   "HTile":false,
   "layers":[
     {"$GMImageLayer":"","%Name":"503b2672-9f32-41bb-aadf-7fb4542d5f32","blendMode":0,"displayName":"default","isLocked":false,"name":"503b2672-9f32-41bb-aadf-7fb4542d5f32","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
   ],
-  "name":"spr_defended_wall_tile",
+  "name":"spr_close_button",
   "nineSlice":null,
   "origin":0,
   "parent":{
-    "name":"tile_types",
-    "path":"folders/Sprites/tile_types.yy",
+    "name":"buttons",
+    "path":"folders/Sprites/ui_components/buttons.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",
   "resourceVersion":"2.0",
   "sequence":{
     "$GMSequence":"",
-    "%Name":"spr_defended_wall_tile",
+    "%Name":"spr_close_button",
     "autoRecord":true,
     "backdropHeight":768,
     "backdropImageOpacity":0.5,
@@ -57,7 +57,7 @@
       "resourceType":"KeyframeStore<MomentsEventKeyframe>",
       "resourceVersion":"2.0",
     },
-    "name":"spr_defended_wall_tile",
+    "name":"spr_close_button",
     "playback":1,
     "playbackSpeed":30.0,
     "playbackSpeedType":0,
@@ -69,7 +69,7 @@
     "tracks":[
       {"$GMSpriteFramesTrack":"","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"$KeyframeStore<SpriteFrameKeyframe>":"","Keyframes":[
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"10f7aa4b-b556-4549-9b66-6723de5fbf4d","path":"sprites/spr_defended_wall_tile/spr_defended_wall_tile.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"10f7aa4b-b556-4549-9b66-6723de5fbf4d","path":"sprites/spr_close_button/spr_close_button.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
               },"Disabled":false,"id":"0d23ea6a-2c0d-4585-a281-fd320fc8b297","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
           ],"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"2.0",},"modifiers":[],"name":"frames","resourceType":"GMSpriteFramesTrack","resourceVersion":"2.0","spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
@@ -86,5 +86,5 @@
   },
   "type":0,
   "VTile":false,
-  "width":64,
+  "width":32,
 }
