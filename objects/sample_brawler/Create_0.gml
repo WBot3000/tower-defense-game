@@ -19,10 +19,12 @@ seconds_per_punch = 0.5
 unit_buffs = [];
 
 //Stat Upgrades
+/*
 stat_upgrade_1 = undefined;
 stat_upgrade_2 = undefined;
 stat_upgrade_3 = undefined;
-stat_upgrade_4 = undefined;
+stat_upgrade_4 = undefined;*/
+stat_upgrades = [];
 
 //Unit Upgrades
 unit_upgrade_1 = undefined;
