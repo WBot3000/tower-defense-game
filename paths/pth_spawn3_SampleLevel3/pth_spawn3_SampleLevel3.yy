@@ -1,0 +1,25 @@
+{
+  "$GMPath":"",
+  "%Name":"pth_spawn3_SampleLevel3",
+  "closed":false,
+  "kind":0,
+  "name":"pth_spawn3_SampleLevel3",
+  "parent":{
+    "name":"SampleLevel3",
+    "path":"folders/Paths/enemy_spawner_paths/SampleLevel3.yy",
+  },
+  "points":[
+    {"speed":100.0,"x":0.0,"y":0.0,},
+    {"speed":100.0,"x":832.0,"y":0.0,},
+    {"speed":100.0,"x":832.0,"y":-256.0,},
+    {"speed":100.0,"x":192.0,"y":-256.0,},
+    {"speed":100.0,"x":192.0,"y":-448.0,},
+    {"speed":100.0,"x":320.0,"y":-448.0,},
+    {"speed":100.0,"x":320.0,"y":-704.0,},
+    {"speed":100.0,"x":192.0,"y":-704.0,},
+    {"speed":100.0,"x":192.0,"y":-896.0,},
+  ],
+  "precision":8,
+  "resourceType":"GMPath",
+  "resourceVersion":"2.0",
+}

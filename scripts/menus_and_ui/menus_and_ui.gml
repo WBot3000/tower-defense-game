@@ -194,7 +194,6 @@ function UIManager() constructor {
 #endregion
 
 
-
 #region Start Menu UI
 
 #region LevelSelectButton (Class)
@@ -292,7 +291,13 @@ function StartMenuUI() : UIManager() constructor {
 /*
 	Draws a level card that can be clicked on to select a level
 	
-	TODO: Should this inherit from the standard button? Functions somewhat the same
+	Argument Variables:
+	Correspond to data variables
+	
+	Data Variables:
+	x_pos: X-coordinate of the level card
+	y_pos: Y-coordinate of the level card
+	level_data: The data of the level that this card corresponds to (global.DATA_LEVEL_MAIN_[LEVELNAME])
 */
 function LevelCard(_x_pos, _y_pos, _level_data) :
 	Button(_x_pos, _y_pos, spr_level_select_base) constructor {
@@ -332,10 +337,10 @@ function LevelSelectUI() : UIManager() constructor {
 	button_samplelevel2 = new LevelCard(TILE_SIZE * 5.5, TILE_SIZE, global.DATA_LEVEL_MAIN_SAMPLELEVEL2);
 	button_samplelevel2.activate();
 	
-	button_samplelevel1_2 = new LevelCard(TILE_SIZE * 10.5, TILE_SIZE, global.DATA_LEVEL_MAIN_SAMPLELEVEL1);
-	button_samplelevel1_2.activate();
+	button_samplelevel3 = new LevelCard(TILE_SIZE * 10.5, TILE_SIZE, global.DATA_LEVEL_MAIN_SAMPLELEVEL3);
+	button_samplelevel3.activate();
 	
-	ui_elements = [button_samplelevel1, button_samplelevel2, button_samplelevel1_2];
+	ui_elements = [button_samplelevel1, button_samplelevel2, button_samplelevel3];
 }
 #endregion
 
@@ -491,7 +496,9 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage) constructor 
 	
 	
 	static is_highlighted = function() {
-		return mouse_x >= x1 && mouse_x <= x2 && mouse_y >= y1 && mouse_y <= y2;
+		var _mouse_x_gui = device_mouse_x_to_gui(0);
+		var _mouse_y_gui = device_mouse_y_to_gui(0);
+		return _mouse_x_gui >= x1 && _mouse_x_gui <= x2 && _mouse_y_gui >= y1 && _mouse_y_gui <= y2;
 	}
 	
 	
@@ -552,6 +559,9 @@ enum SLIDING_MENU_STATE {
 
 
 #region Unit Purchase Menu Classes
+#macro PURCHASE_MENU_BPROW 3 //BPROW = Buttons Per Row
+#macro PURCHASE_MENU_BPCOL 3 //BPCOL = Buttons Per Page
+#macro PURCHASE_MENU_BPPAGE (PURCHASE_MENU_BPROW * PURCHASE_MENU_BPCOL) //BPPAGE = Buttons Per Page
 
 #region UnitPurchaseButton (Class)
 /*
@@ -577,7 +587,7 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 	}
 	
 
-	//static draw_parent = method(self, draw); //TODO: For some reason, the bind method was causing all of the button backgrounds to appear in the first section. Need to figure out why.
+	static draw_parent = draw;
 	
 	//_x_offset and _y_offset are the origins of the menu
 	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
@@ -585,21 +595,91 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 		var _draw_x_pos = x_pos + _x_offset;
 		var _draw_y_pos = y_pos + _y_offset;
 		
-		var _spr;
-		if(!is_enabled()) {
-			_spr = button_sprite_disabled;
-		}
-		else if(_button_highlight_enabled && is_highlighted(_x_offset, _y_offset)) {
-			_spr = button_sprite_highlighted;
-		}
-		else {
-			_spr = button_sprite_default;
-		}
-		draw_sprite(_spr, 0, _draw_x_pos, _draw_y_pos);
+		draw_parent(_x_offset, _y_offset);
 		draw_sprite(object_get_sprite(purchase_data.unit), 0, _draw_x_pos + 8, _draw_y_pos + 4);
 		draw_set_halign(fa_right);
 		draw_text(_draw_x_pos + sprite_get_width(button_sprite_default) - 8, _draw_y_pos + 72, string(purchase_data.price));
 		draw_set_halign(fa_left);
+	}
+}
+#endregion
+
+
+#region PreviousPagePurchaseMenuButton (Class)
+/*
+	TODO: Comment
+*/
+function PreviousPagePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
+	Button(_x_pos, _y_pos, spr_page_left_default, spr_page_left_disabled) constructor {
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	purchase_menu = _purchase_menu;
+	
+	static is_enabled = function() {
+		return purchase_menu.current_page > 0;
+	}
+	
+	static on_click = function() {
+		if(is_enabled()) {
+			purchase_menu.current_page--;
+		}
+	}
+	
+}
+#endregion
+
+
+#region NextPagePurchaseMenuButton (Class)
+/*
+	TODO: Comment
+*/
+function NextPagePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
+	Button(_x_pos, _y_pos, spr_page_right_default, spr_page_right_disabled) constructor {
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	purchase_menu = _purchase_menu;
+	
+	static is_enabled = function() {
+		return array_length(purchase_menu.purchase_buttons) > (purchase_menu.current_page + 1) * PURCHASE_MENU_BPPAGE;
+	}
+	
+	static on_click = function() {
+		if(is_enabled()) {
+			purchase_menu.current_page++;
+		}
+	}
+	
+}
+#endregion
+
+
+#region TogglePurchaseMenuButton (Class)
+/*
+	Defines a button to toggle the Unit Selection Menu between opened and closed.
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
+	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
+	purchase_menu: Reference to the purchase menu that this button belongs to
+*/
+function TogglePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
+	Button(_x_pos, _y_pos, spr_pointer_arrow_left) constructor {
+	purchase_menu = _purchase_menu;
+	
+	static on_click = function() {
+		switch (purchase_menu.state) {
+		    case SLIDING_MENU_STATE.OPEN:
+		        purchase_menu.toggle_closed();
+		        break;
+			case SLIDING_MENU_STATE.CLOSED:
+				purchase_menu.toggle_open();
+		        break;
+		    default:
+		        break;
+		}
 	}
 }
 #endregion
@@ -622,8 +702,6 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 	purchase_buttons: All of the unit purchase buttons within the menu itself.
 	toggle_button: Button that toggles the menu state
 */
-#macro PURCHASE_MENU_BPR 3 //BPR = Buttons Per Row
-
 //How much of the screen should the unit purchase menu take up while it is open
 //NOTE: I don't think this is used right now
 #macro PURCHASE_MENU_SCREEN_PERCENTAGE (2/7)
@@ -640,22 +718,31 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	//Array that contains all of the button data.
 	purchase_buttons = [];
 	
-	var _menu_width = _view_w - x_pos_open;
+	menu_width = _view_w - x_pos_open;
 	var _button_width = sprite_get_width(spr_unit_purchase_button_default);
+	var _button_height = sprite_get_height(spr_unit_purchase_button_default);
 
-	var _button_x = 0;
-	var _button_y = 0;
-	var _x_gap = (_menu_width - PURCHASE_MENU_BPR*_button_width) / (PURCHASE_MENU_BPR + 1); //Gap in between buttons (also used as x_margins)
+	var _x_gap = (menu_width - PURCHASE_MENU_BPROW*_button_width) / (PURCHASE_MENU_BPROW + 1); //Gap in between buttons (also used as x_margins)
+	var _button_x = _x_gap;
+	var _button_y = TILE_SIZE;
+	var _init_button_y = TILE_SIZE;
 	//Create buttons
 	for(var i = 0; i < array_length(_purchase_data_list); ++i) {
-		if(i % PURCHASE_MENU_BPR == 0) { //Start of a new row
-			_button_x = _x_gap;
-			_button_y += _button_width;
-		}
-	
 		array_push(purchase_buttons, new UnitPurchaseButton(_button_x, _button_y, _purchase_data_list[i]));
 		_button_x += (_button_width + _x_gap);
+		
+		if(i % PURCHASE_MENU_BPROW == PURCHASE_MENU_BPROW - 1) { //Time to start a new row
+			_button_x = _x_gap;
+			_button_y += _button_height + 4;
+			if(i % PURCHASE_MENU_BPPAGE == PURCHASE_MENU_BPPAGE - 1) { //Time to start a new page
+				_button_y = _init_button_y;
+			}
+		}
 	}
+	
+	current_page = 0;
+	prev_page_button = new PreviousPagePurchaseMenuButton(64 ,y_pos - 40, self);
+	next_page_button = new NextPagePurchaseMenuButton(menu_width - sprite_get_width(spr_page_right_default) - 64 , y_pos - 40, self);
 	
 	toggle_button = new TogglePurchaseMenuButton(-32, (y_pos - sprite_get_width(spr_pointer_arrow_left))/2, self);
 	
@@ -692,9 +779,23 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		
 		draw_rectangle_color(x_pos_current, 0, _view_w, y_pos, c_silver, c_silver, c_silver, c_silver, false);
 		toggle_button.draw(x_pos_current, 0);
-		for(var i = 0; i < array_length(purchase_buttons); ++i) {
+		prev_page_button.draw(x_pos_current, 0);
+		next_page_button.draw(x_pos_current, 0);
+		
+		draw_set_halign(fa_center);
+		draw_set_valign(fa_center);
+		draw_text_color(x_pos_current + menu_width/2 , TILE_SIZE/2, "PURCHASE",
+			c_black, c_black, c_black, c_black, 1);
+		draw_set_halign(fa_left);
+		draw_set_valign(fa_top);
+		
+		//current_page * PURCHASE_MENU_BPPAGE is the index of the first button on the current page
+		//(current_page+1) * PURCHASE_MENU_BPPAGE is the index of the first button on the NEXT page
+		//The i < array_length(purchase_buttons) exists so, on the last page, if there are less than PURCHASE_MENU_BPPAGE buttons, the loop will stop at the last one, instead of trying to access non-existent buttons
+		for(var i = current_page * PURCHASE_MENU_BPPAGE; i < (current_page+1) * PURCHASE_MENU_BPPAGE && i < array_length(purchase_buttons); ++i) {
 			purchase_buttons[i].draw(x_pos_current, 0, _game_state_manager != undefined && _game_state_manager.state == GAME_STATE.RUNNING);
 		}
+		//shader_reset();
 	}
 	
 	
@@ -752,9 +853,18 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 			toggle_button.on_click();
 			return;
 		}
+		if(prev_page_button.is_highlighted(x_pos_current, 0)) { //is_enabled check is in the on_click function
+			prev_page_button.on_click();
+			return;
+		}
+		if(next_page_button.is_highlighted(x_pos_current, 0)) { //is_enabled check is in the on_click function
+			next_page_button.on_click();
+			return;
+		}
+		
 		var _purchase_manager = get_purchase_manager();
 		if(_purchase_manager != undefined) {
-			for(var i = 0; i < array_length(purchase_buttons); ++i) {
+			for(var i = current_page * PURCHASE_MENU_BPPAGE; i < (current_page+1) * PURCHASE_MENU_BPPAGE && i < array_length(purchase_buttons); ++i) {
 				if(purchase_buttons[i].is_highlighted(x_pos_current, 0)) {
 					_purchase_manager.set_selected_purchase(purchase_buttons[i].purchase_data);
 				}
@@ -766,36 +876,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 #endregion
 
 
-#region TogglePurchaseMenuButton (Class)
-/*
-	Defines a button to toggle the Unit Selection Menu between opened and closed.
-	
-	Argument Variables:
-	(All argument variables correspond with non-underscored data variables)
-	
-	Data Variables:
-	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
-	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
-	purchase_menu: Reference to the purchase menu that this button belongs to
-*/
-function TogglePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
-	Button(_x_pos, _y_pos, spr_pointer_arrow_left) constructor {
-	purchase_menu = _purchase_menu;
-	
-	static on_click = function() {
-		switch (purchase_menu.state) {
-		    case SLIDING_MENU_STATE.OPEN:
-		        purchase_menu.toggle_closed();
-		        break;
-			case SLIDING_MENU_STATE.CLOSED:
-				purchase_menu.toggle_open();
-		        break;
-		    default:
-		        break;
-		}
-	}
-}
-#endregion
+
 
 #endregion
 
@@ -1406,9 +1487,127 @@ function GameInfoDisplay(_controller_obj) constructor {
 #endregion
 
 
+#region End Results Card Classes
+
+#region EndResultsHeader (Class)
+/*
+	TODO: Comment
+*/
+function EndResultsHeader(_x_pos, _y_pos) constructor {
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	header_sprite = spr_game_over;
+	
+	static set_to_victory = function() {
+		header_sprite = spr_victory;
+	}
+	
+	static draw = function() {
+		draw_sprite(header_sprite, 0, x_pos, y_pos);
+	}
+	
+}
+
+#endregion
+
+
+#region RestartLevelButton (Class)
+/*
+	TODO: Comment
+*/
+function RestartLevelButton(_x_pos, _y_pos) :
+	Button(_x_pos, _y_pos, spr_restart_button) constructor {
+		
+	static on_click = function() {
+		audio_stop_all();
+		room_restart();
+	}
+}
+#endregion
+
+
+#region BackToLevelSelectButton (Class)
+/*
+	TODO: Comment
+	
+	TODO: Technically has the same functionality as the one on the title screen, just looks different.
+	Should I even be defining all of these buttons like this, or should I just pass parameters into the base button function?
+*/
+function BackToLevelSelectionButton(_x_pos, _y_pos) :
+	Button(_x_pos, _y_pos, spr_back_to_menu_button) constructor {
+		
+	static on_click = function() {
+		audio_stop_all();
+		room_goto(LevelSelectScreen);
+	}
+}
+#endregion
+
+
+#region EndResultsCard (Class)
+/*
+	TODO: Comment
+*/
+function EndResultsCard(_menu_width_percentage, _menu_height_percentage) constructor {
+	
+	var _view_w = camera_get_view_width(view_camera[0]);
+	var _view_h = camera_get_view_height(view_camera[0]);
+	
+	x1 = (_view_w/2) - (_menu_width_percentage/2 * _view_w); //From middle point, go to the left by the percentage amount
+	y1 = (_view_h/2) - (_menu_height_percentage/2 * _view_h); //From middle point, go up by the percentage amount
+	x2 = (_view_w/2) + (_menu_width_percentage/2 * _view_w); //From middle point, go to the right by the percentage amount
+	y2 = (_view_h/2) + (_menu_height_percentage/2 * _view_h); //From middle point, go down by the percentage amount
+	
+	active = false;
+	
+	header = new EndResultsHeader((_view_w - sprite_get_width(spr_game_over)) / 2, 64);
+	
+	restart_level_button = new RestartLevelButton(x1 + 256, 256);
+	back_to_level_select_button = new BackToLevelSelectionButton(x2 - sprite_get_width(spr_back_to_menu_button) - 256, 256);
+	
+	static activate = function() {
+		active = true;
+	}
+	
+	
+	static deactivate = function() {
+		active = false;
+	}
+	
+	
+	static draw = function() {
+		draw_rectangle_color(x1, y1, x2, y2, c_white, c_white, c_white, c_white, false);
+		header.draw();
+		restart_level_button.draw();
+		back_to_level_select_button.draw();
+	}
+	
+	
+	static is_highlighted = function() {
+		var _mouse_x_gui = device_mouse_x_to_gui(0);
+		var _mouse_y_gui = device_mouse_y_to_gui(0);
+		return _mouse_x_gui >= x1 && _mouse_x_gui <= x2 && _mouse_y_gui >= y1 && _mouse_y_gui <= y2;
+	}
+	
+	
+	static on_click = function() {
+		if(restart_level_button.is_highlighted()) {
+			restart_level_button.on_click();
+		}
+		else if(back_to_level_select_button.is_highlighted()) {
+			back_to_level_select_button.on_click();
+		}
+	}
+}
+#endregion
+
+#endregion
+
+
 #region GameUI (Class)
 /*
 	Used for managing the entire UI as a unit. Allows you to enable and disable parts of the UI as needed
+	TODO: Finish comment
 */
 #macro PAUSE_BUTTON_X (camera_get_view_width(view_camera[0]) - TILE_SIZE*1.5) //Pause button is one "tile" away from right side of the screen by default (if not moved by a side menu)
 #macro PAUSE_BUTTON_Y TILE_SIZE*0.5 //Pause button is one "tile" away from the top of the screen
@@ -1444,16 +1643,15 @@ function GameUI(_controller_obj, _purchase_data) : UIManager() constructor {
 	purchase_menu = new UnitPurchaseMenu(PURCHASE_MENU_SCREEN_PERCENTAGE, 
 		view_h*(1-UNIT_INFO_CARD_SCREEN_PERCENTAGE), _purchase_data);
 	unit_info_card = new UnitInfoCard(UNIT_INFO_CARD_SCREEN_PERCENTAGE, view_w);
+	end_results_card = new EndResultsCard((3/4), (3/4));
 	
 	//Buttons
 	pause_button = new PauseButton(PAUSE_BUTTON_X, PAUSE_BUTTON_Y);
 	round_start_button = new RoundStartButton(ROUND_START_BUTTON_X, ROUND_START_BUTTON_Y);
-	//toggle_purchase_menu_button = new TogglePurchaseMenuButton(TOGGLE_PURCHASE_MENU_BUTTON_X, TOGGLE_PURCHASE_MENU_BUTTON_Y);
-	//toggle_info_card_button = new ToggleInfoCardButton(TOGGLE_INFO_CARD_BUTTON_X, TOGGLE_INFO_CARD_BUTTON_Y);
 	
 	ui_elements = [game_info_display,
-		pause_button, round_start_button, //toggle_purchase_menu_button, //toggle_info_card_button,
-		purchase_menu, unit_info_card, pause_menu];
+		pause_button, round_start_button,
+		purchase_menu, unit_info_card, pause_menu, end_results_card];
 	
 	
 	static set_gui_running = function() {
@@ -1467,10 +1665,9 @@ function GameUI(_controller_obj, _purchase_data) : UIManager() constructor {
 		unit_info_card.activate();
 		pause_button.activate();
 		round_start_button.activate();
-		//toggle_purchase_menu_button.activate();
-		//toggle_info_card_button.activate();
 		
 		pause_menu.deactivate();
+		end_results_card.deactivate();
 	}
 	
 	
@@ -1488,9 +1685,29 @@ function GameUI(_controller_obj, _purchase_data) : UIManager() constructor {
 		
 		pause_button.deactivate();
 		round_start_button.deactivate();
-		//toggle_purchase_menu_button.deactivate();
-		//toggle_info_card_button.deactivate();
+		end_results_card.deactivate();
 	}
+	
+	
+	static set_gui_end_results = function(gameWon) {
+		if(pause_background != -1) { //This should never be true (since you can't go from PAUSED -> VICTORY), but juuuuust in case...
+			sprite_delete(pause_background);
+			pause_background = -1;
+		}
+		
+		if(gameWon) { //So we can use this for both victory and loss
+			end_results_card.header.set_to_victory();
+		}
+		end_results_card.activate();
+		
+		game_info_display.activate();
+		purchase_menu.activate();
+		unit_info_card.activate();
+		
+		pause_button.deactivate();
+		round_start_button.deactivate();	
+	}
+	
 	
 	static draw_parent = draw;
 	

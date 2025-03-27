@@ -60,7 +60,10 @@ function GameStateManager(_controller_obj, _initial_state = GAME_STATE.RUNNING) 
 		if(state == GAME_STATE.RUNNING) { //Shouldn't be able to win game if it's paused, already won, or already lost.
 			state = GAME_STATE.VICTORY;
 			with(controller_obj) {
-				event_user(0)
+				event_user(0);
+				if(game_ui != undefined) {
+					game_ui.set_gui_end_results(true);
+				}
 			}
 		}
 	}
@@ -69,7 +72,10 @@ function GameStateManager(_controller_obj, _initial_state = GAME_STATE.RUNNING) 
 		if(state == GAME_STATE.RUNNING) { //Shouldn't be lose game if it's paused, already won, or already lost.
 			state = GAME_STATE.DEFEAT;
 			with(controller_obj) {
-				event_user(1)
+				event_user(1);
+				if(game_ui != undefined) {
+					game_ui.set_gui_end_results(false);
+				}
 			}
 		}
 	}

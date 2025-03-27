@@ -13,7 +13,6 @@ if(!variable_instance_exists(self.id, "current_level_data")) {
 */
 global.player_money = 200;
 
-//global.defense_health = current_level_data.defense_health;
 #endregion
 
 
@@ -36,15 +35,40 @@ music_manager = new MusicManager(Music_PreRound);
 
 
 #region Purchase Data Initialization
-//Data for purchases. Not really sure what to do with this just yet. Might make it it's own manager?
+
 purchase_data = [
 	global.DATA_PURCHASE_SAMPLE_GUNNER,
 	global.DATA_PURCHASE_SAMPLE_BRAWLER,
 	global.DATA_PURCHASE_SAMPLE_MORTAR,
+	
+	global.DATA_PURCHASE_SAMPLE_GUNNER,
+	global.DATA_PURCHASE_SAMPLE_BRAWLER,
+	global.DATA_PURCHASE_SAMPLE_MORTAR,
+	
+	global.DATA_PURCHASE_SAMPLE_GUNNER,
+	global.DATA_PURCHASE_SAMPLE_BRAWLER,
+	global.DATA_PURCHASE_SAMPLE_MORTAR,
+	
+	global.DATA_PURCHASE_SAMPLE_GUNNER,
+	global.DATA_PURCHASE_SAMPLE_BRAWLER,
+	global.DATA_PURCHASE_SAMPLE_MORTAR,
+	
+	global.DATA_PURCHASE_SAMPLE_GUNNER,
+	global.DATA_PURCHASE_SAMPLE_BRAWLER,
+	global.DATA_PURCHASE_SAMPLE_MORTAR,
+	
+	global.DATA_PURCHASE_SAMPLE_GUNNER,
+	global.DATA_PURCHASE_SAMPLE_BRAWLER,
+	global.DATA_PURCHASE_SAMPLE_MORTAR,
+	
+	global.DATA_PURCHASE_SAMPLE_GUNNER,
+	global.DATA_PURCHASE_SAMPLE_BRAWLER,
+	global.DATA_PURCHASE_SAMPLE_MORTAR,
+	
+	global.DATA_PURCHASE_SAMPLE_GUNNER,
+	global.DATA_PURCHASE_SAMPLE_BRAWLER,
 ]
 
-//Which unit the user has selected (make this more sophisticated)
-//purchase_selected = undefined;
 #endregion
 
 

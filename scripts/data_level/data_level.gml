@@ -71,10 +71,14 @@ function LevelData(_basic_level_data = {
 #region Data Definitions
 
 #region Path Data
-global.DATA_LEVEL_PATH_SAMPLELEVEL1_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*7, pth_spawn1_SampleLevel1)
+global.DATA_LEVEL_PATH_SAMPLELEVEL1_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*7, pth_spawn1_SampleLevel1);
 
-global.DATA_LEVEL_PATH_SAMPLELEVEL2_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*5, pth_spawn1_SampleLevel2)
-global.DATA_LEVEL_PATH_SAMPLELEVEL2_2 = new PathData(TILE_SIZE*-1, TILE_SIZE*6, pth_spawn2_SampleLevel2)
+global.DATA_LEVEL_PATH_SAMPLELEVEL2_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*5, pth_spawn1_SampleLevel2);
+global.DATA_LEVEL_PATH_SAMPLELEVEL2_2 = new PathData(TILE_SIZE*-1, TILE_SIZE*6, pth_spawn2_SampleLevel2);
+
+global.DATA_LEVEL_PATH_SAMPLELEVEL3_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*19, pth_spawn1_SampleLevel3);
+global.DATA_LEVEL_PATH_SAMPLELEVEL3_2 = new PathData(TILE_SIZE*-1, TILE_SIZE*19, pth_spawn2_SampleLevel3);
+global.DATA_LEVEL_PATH_SAMPLELEVEL3_3 = new PathData(TILE_SIZE*-1, TILE_SIZE*19, pth_spawn3_SampleLevel3);
 #endregion
 
 #region Level Data
@@ -115,6 +119,26 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL2 = new LevelData(
 		],
 		[
 			new EnemySpawningData([sample_enemy, sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_1, global.DATA_LEVEL_PATH_SAMPLELEVEL2_2], ENEMY_SPAWN_END, 10, 5)
+		]
+	]
+);
+
+global.DATA_LEVEL_MAIN_SAMPLELEVEL3 = new LevelData(
+	{
+		level_room: SampleLevel3,
+		level_name: "Daniel's Potato Farm 3",
+		level_portrait: spr_level_portrait_SampleLevel1,
+		card_color: [148/255, 224/255, 168/255],
+	},
+	[
+		[
+			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_1], ENEMY_SPAWN_END, 10, 5)
+		],
+		[
+			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_2], ENEMY_SPAWN_END, 10, 5)
+		],
+		[
+			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_3], ENEMY_SPAWN_END, 10, 5)
 		]
 	]
 );

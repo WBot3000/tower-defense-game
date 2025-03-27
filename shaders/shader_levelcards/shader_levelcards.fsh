@@ -1,6 +1,5 @@
 //
-// Grayscale shader from https://manual.gamemaker.io/monthly/en/Additional_Information/Guide_To_Using_Shaders.htm, but modified to make the sprite slightly darker
-// Instead of vec3(0.299, 0.587, 0.114), uses vec3(0.199, 0.487, 0.014)
+// Used to color level cards based on provided color data
 //
 varying vec2 v_vTexcoord;
 
