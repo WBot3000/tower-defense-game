@@ -30,6 +30,8 @@ function PurchaseData(_unit, _price, _button_sprite = object_get_sprite(_unit)) 
 global.DATA_PURCHASE_SAMPLE_GUNNER = new PurchaseData(sample_gunner, 100);
 global.DATA_PURCHASE_SAMPLE_BRAWLER = new PurchaseData(sample_brawler, 100);
 global.DATA_PURCHASE_SAMPLE_MORTAR = new PurchaseData(sample_mortar, 200);
+
+global.DATA_PURCHASE_DIRT = new PurchaseData(dirt_construct, 100);
 #endregion
 
 #endregion

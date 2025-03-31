@@ -37,7 +37,7 @@ music_manager = new MusicManager(Music_PreRound);
 #region Purchase Data Initialization
 
 purchase_data = [
-	global.DATA_PURCHASE_SAMPLE_GUNNER,
+	global.DATA_PURCHASE_DIRT,
 	global.DATA_PURCHASE_SAMPLE_BRAWLER,
 	global.DATA_PURCHASE_SAMPLE_MORTAR,
 	

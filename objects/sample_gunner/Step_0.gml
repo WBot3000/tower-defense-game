@@ -3,7 +3,6 @@
 
 
 /*
-List is sorted to make "close" targeting easier (ordered = true)
 TODO: Really only need the closest instance, so I don't technically have to sort list, just have to go through it once, then pick object with smallest distance.
 		- O(n) vs O(n*log(n)) [probably anyway IDK what sorting function GameMaker uses]
 		- Will see performance before changing this though
@@ -14,7 +13,7 @@ animation_controller.on_step();
 
 //Increment shot timer
 var _frames_per_shot = seconds_to_roomspeed_frames(seconds_per_shot)
-shot_timer = min(shot_timer + 1, _frames_per_shot); //Done to prevent overflow
+shot_timer++;
 
 if(health_state == UNIT_STATE.KNOCKED_OUT) {
 	var _amount_to_recover = recovery_rate / seconds_to_roomspeed_frames(1);
@@ -41,7 +40,7 @@ if(shot_timer >= _frames_per_shot && ds_list_size(enemies_in_range) > 0) { //Mor
 
 	var _targeting_type = targeting_tracker.get_current_targeting_type();
 	
-	var _enemy_to_target = _targeting_type.targeting_fn(self.id, enemies_in_range, true); //Default to closest targeting for now
+	var _enemy_to_target = _targeting_type.targeting_fn(self.id, enemies_in_range, true);
 	
 	//TODO: Right now, the vector is from the center of the unit to the center of the enemy unit. Will probably want to adjust these positions based on the enemy's position compared to the unit's
 	var _vector_x = (_enemy_to_target.x + _enemy_to_target.sprite_width/2) - (x + sprite_width/2);

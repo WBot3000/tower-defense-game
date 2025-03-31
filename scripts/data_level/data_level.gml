@@ -92,13 +92,13 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 	},
 	[
 		[
-			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
 		],
 		[
-			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
 		],
 		[
-			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
 		]
 	]
 );

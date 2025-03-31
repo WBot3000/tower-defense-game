@@ -64,7 +64,7 @@ switch (attack_state) {
 			range.get_entities_in_range(base_target, targets_in_range, true);
 			if(attack_timer >= seconds_to_roomspeed_frames(seconds_per_attack)) {
 				if(!ds_list_empty(targets_in_range)) {
-					damage_target(targets_in_range[| 0], melee_damage);
+					deal_damage(targets_in_range[| 0], melee_damage);
 					attack_timer = 0;
 				}
 			}

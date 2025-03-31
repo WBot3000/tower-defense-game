@@ -40,6 +40,11 @@ function seconds_to_milliseconds(_seconds) { //Basically just multiplying by 100
 }
 
 
+function seconds_to_microseconds(_seconds) { //Basically just multiplying by 1000000, but I felt like it should be encapsulated anyways.
+	return _seconds*1000000;
+}
+
+
 function microseconds_to_milliseconds(_seconds) { //Basically just dividing by 1000, but I felt like it should be encapsulated anyways.
 	return _seconds/1000;
 }
