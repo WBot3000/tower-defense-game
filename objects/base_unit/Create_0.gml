@@ -6,7 +6,7 @@ max_health = 0;
 current_health = 0;
 health_state = UNIT_STATE.ACTIVE;
 recovery_rate = 0; //In health points per second
-defense_multiplier = 1;
+defense_factor = 1;
 
 unit_buffs = [];
 

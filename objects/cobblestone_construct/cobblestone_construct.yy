@@ -1,18 +1,22 @@
 {
   "$GMObject":"",
-  "%Name":"visual_effect",
+  "%Name":"cobblestone_construct",
   "eventList":[
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":2,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":12,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"visual_effect",
+  "name":"cobblestone_construct",
   "overriddenProperties":[],
   "parent":{
-    "name":"Objects",
-    "path":"folders/Objects.yy",
+    "name":"Cobblestone",
+    "path":"folders/Objects/unit_types/Cobblestone.yy",
   },
-  "parentObjectId":null,
+  "parentObjectId":{
+    "name":"base_unit",
+    "path":"objects/base_unit/base_unit.yy",
+  },
   "persistent":false,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,
@@ -30,7 +34,10 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":null,
+  "spriteId":{
+    "name":"spr_cobblestone_construct",
+    "path":"sprites/spr_cobblestone_construct/spr_cobblestone_construct.yy",
+  },
   "spriteMaskId":null,
   "visible":true,
 }

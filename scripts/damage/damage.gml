@@ -9,8 +9,8 @@
 */
 function deal_damage(_entity_to_damage, _damage_amount){
 	var _true_damage_amount = _damage_amount;
-	if(variable_instance_exists(_entity_to_damage, "defense_multiplier")) {
-		_true_damage_amount *= _entity_to_damage.defense_multiplier
+	if(variable_instance_exists(_entity_to_damage, "defense_factor")) {
+		_true_damage_amount /= _entity_to_damage.defense_factor
 	}
 	_entity_to_damage.current_health = max(_entity_to_damage.current_health - _true_damage_amount, 0);
 	if(_entity_to_damage.current_health == 0 && object_is_ancestor(_entity_to_damage.object_index, base_target)) { //If a target reaches zero health, end the game

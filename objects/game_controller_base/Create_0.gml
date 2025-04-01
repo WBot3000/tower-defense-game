@@ -38,7 +38,7 @@ music_manager = new MusicManager(Music_PreRound);
 
 purchase_data = [
 	global.DATA_PURCHASE_DIRT,
-	global.DATA_PURCHASE_SAMPLE_BRAWLER,
+	global.DATA_PURCHASE_COBBLESTONE,
 	global.DATA_PURCHASE_SAMPLE_MORTAR,
 	
 	global.DATA_PURCHASE_SAMPLE_GUNNER,

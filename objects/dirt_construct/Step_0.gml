@@ -2,7 +2,6 @@
 
 switch (health_state) {
     case UNIT_STATE.ACTIVE:
-        // code here
 		shot_timer++;
 		if(shot_timer >= frames_per_shot) {
 			range.get_entities_in_range(base_enemy, enemies_in_range, true);
@@ -37,7 +36,6 @@ switch (health_state) {
 		
         break;
 	case UNIT_STATE.KNOCKED_OUT:
-		//code here
 		var _amount_to_recover = recovery_rate / seconds_to_roomspeed_frames(1);
 		current_health = min(max_health, current_health + _amount_to_recover);
 		if(current_health >= max_health) {

@@ -9,7 +9,7 @@ max_health = 100;
 current_health = 100;
 health_state = UNIT_STATE.ACTIVE;
 recovery_rate = 10; //In health points per second
-defense_multiplier = 1;
+defense_factor = 1;
 
 //Variables for managing unit's attack
 range = new CircularRange(self.id, x + sprite_width/2, y + sprite_height/2, tilesize_to_pixels(3))
@@ -25,7 +25,7 @@ targeting_tracker =
 frames_per_shot = seconds_to_roomspeed_frames(2);
 shot_timer = 0;
 shot_damage = 10;
-shot_speed = 10;
+shot_speed = 15;
 
 unit_buffs = [];
 

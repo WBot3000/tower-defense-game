@@ -2,8 +2,8 @@
 // TODO: Inherit from base enemy in case a value isn't defined?
 name = "Chompy Worm"
 
-max_health = 300;
-current_health = 300;
+max_health = 30;
+current_health = 30;
 
 default_movement_speed = 0.025; //Not sure what unit this is, but I'm converting it using seconds_to_roomspeed_frames for some reason (despite seconds not being a unit of speed)
 if(!variable_instance_exists(self.id, "movement_path")) { //If the enemy wasn't given a movement path upon creation, just have it stay still. Shouldn't occur during normal gameplay.

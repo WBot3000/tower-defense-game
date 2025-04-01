@@ -74,10 +74,11 @@ function draw_health_bar_target(x, y, _current_health, _max_health){
 //Used to draw sprites indicating damage. These will draw at a random location on the entity
 //Unlike all the other functions, this actually creates an object instance, since it was the simplest way to accomplish this.
 function draw_damage_effect(_entity_to_draw_on, _sprite_to_draw) {
-	var _draw_x_pos = irandom_range(_entity_to_draw_on.bbox_left, _entity_to_draw_on.bbox_right);
-	var _draw_y_pos = irandom_range(_entity_to_draw_on.bbox_top, _entity_to_draw_on.bbox_bottom);
+	var _draw_x_pos = irandom_range(_entity_to_draw_on.bbox_left + 4, _entity_to_draw_on.bbox_right - 4); //+4 is so that the effect stays closer to the center of the entity's sprite
+	var _draw_y_pos = irandom_range(_entity_to_draw_on.bbox_top + 4, _entity_to_draw_on.bbox_bottom - 4);
 	instance_create_layer(_draw_x_pos, _draw_y_pos, PROJECTILE_LAYER, visual_effect, {
-		sprite_index: _sprite_to_draw		
+		sprite_index: _sprite_to_draw,
+		entity_to_follow: _entity_to_draw_on
 	});
 }
 #endregion
