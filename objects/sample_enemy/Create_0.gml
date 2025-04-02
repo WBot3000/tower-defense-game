@@ -13,7 +13,7 @@ if(!variable_instance_exists(self.id, "movement_path")) { //If the enemy wasn't 
 attack_state = ENEMY_ATTACKING_STATE.NOT_ATTACKING;
 unit_currently_attacking = noone;
 
-range = new BrawlerRange(id);
+range = new MeleeRange(id);
 melee_damage = 5;
 seconds_per_attack = 1;
 

@@ -11,7 +11,7 @@ health_state = UNIT_STATE.ACTIVE;
 recovery_rate = 10; //In health points per second
 
 radius = 1.0;
-range = new BrawlerRange(id); //CircularRange(id, x + sprite_width/2, y + sprite_height/2, tilesize_to_pixels(radius));
+range = new MeleeRange(id); //CircularRange(id, x + sprite_width/2, y + sprite_height/2, tilesize_to_pixels(radius));
 
 punch_damage = 5
 seconds_per_punch = 0.5

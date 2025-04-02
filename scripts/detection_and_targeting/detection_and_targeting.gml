@@ -122,15 +122,18 @@ function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor 
 */
 
 
-#region BrawlerRange (Class)
+#region MeleeRange (Class)
 /*
 	A Circular Range that's used for units/enemies that attack up close.
-	ex) Sample Brawler, Sample Enemy
+	ex) Cobblestone Construct, Sword Beetle
+	
+	In order to accomodate for melee units having different bounding boxes, the radius is proportional to said bounding box
+	If you give all melee units the same range radius, then you have situations where the larger melee unit can't reach the smaller one.
 */
-function BrawlerRange(_unit) : CircularRange(_unit) constructor {
+function MeleeRange(_unit) : CircularRange(_unit) constructor {
 	origin_x = _unit.x + (_unit.sprite_width/2);
 	origin_y = _unit.y + (_unit.sprite_width/2);
-	radius = tilesize_to_pixels(1);
+	radius = max(_unit.bbox_right - _unit.bbox_left, _unit.bbox_bottom - _unit.bbox_top);
 }
 #endregion
 

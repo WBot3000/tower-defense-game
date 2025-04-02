@@ -13,7 +13,7 @@ defense_factor = 1.5;
 
 
 radius = 1.0;
-range = new BrawlerRange(id); //CircularRange(id, x + sprite_width/2, y + sprite_height/2, tilesize_to_pixels(radius));
+range = new MeleeRange(self.id);
 punch_damage = 5
 frames_per_punch = seconds_to_roomspeed_frames(0.5)
 punch_timer = 0;

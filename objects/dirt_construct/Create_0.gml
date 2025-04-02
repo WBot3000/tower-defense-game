@@ -12,7 +12,7 @@ recovery_rate = 10; //In health points per second
 defense_factor = 1;
 
 //Variables for managing unit's attack
-range = new CircularRange(self.id, x + sprite_width/2, y + sprite_height/2, tilesize_to_pixels(3))
+range = new CircularRange(self.id, x + sprite_width/2, y + sprite_height/2, tilesize_to_pixels(3));
 enemies_in_range = ds_list_create();
 targeting_tracker = 
 	new TargetingTracker([

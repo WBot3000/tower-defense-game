@@ -92,13 +92,19 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 	},
 	[
 		[
-			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([gun_beetle], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
 		],
 		[
-			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 4, 5),
+			new EnemySpawningData([sword_beetle], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 1, 5),
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 4, 5),
+			new EnemySpawningData([sword_beetle], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 1, 5),
 		],
 		[
-			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 3, 1),
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 3, 1),
+			new EnemySpawningData([sword_beetle], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 3, 1),
+			new EnemySpawningData([gun_beetle], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 3, 5),
 		]
 	]
 );
@@ -112,13 +118,13 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL2 = new LevelData(
 	},
 	[
 		[
-			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_1], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_1], ENEMY_SPAWN_END, 10, 5)
 		],
 		[
-			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_2], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_2], ENEMY_SPAWN_END, 10, 5)
 		],
 		[
-			new EnemySpawningData([sample_enemy, sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_1, global.DATA_LEVEL_PATH_SAMPLELEVEL2_2], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm, chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_1, global.DATA_LEVEL_PATH_SAMPLELEVEL2_2], ENEMY_SPAWN_END, 10, 5)
 		]
 	]
 );
@@ -132,13 +138,13 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL3 = new LevelData(
 	},
 	[
 		[
-			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_1], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_1], ENEMY_SPAWN_END, 10, 5)
 		],
 		[
-			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_2], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_2], ENEMY_SPAWN_END, 10, 5)
 		],
 		[
-			new EnemySpawningData([sample_enemy], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_3], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_3], ENEMY_SPAWN_END, 10, 5)
 		]
 	]
 );

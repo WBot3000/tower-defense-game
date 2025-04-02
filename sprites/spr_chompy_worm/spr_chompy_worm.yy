@@ -30,8 +30,8 @@
   "nineSlice":null,
   "origin":0,
   "parent":{
-    "name":"Bugs",
-    "path":"folders/Sprites/enemy_types/Bugs.yy",
+    "name":"Chompy Worm",
+    "path":"folders/Sprites/enemy_types/Bugs/Chompy Worm.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

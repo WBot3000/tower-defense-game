@@ -29,39 +29,23 @@ switch (attack_state) {
 			}
 			//If there are no enemies nearby but target(s), attack the closest target
 			if(_entity_to_attack == noone && !ds_list_empty(targets_in_range)) {
-				_entity_to_attack = targets_in_range[| i];
+				_entity_to_attack = targets_in_range[| 0];
 			}
 			if(_entity_to_attack != noone) {
 				path_speed = 0;
 				deal_damage(_entity_to_attack, melee_damage);
-				draw_damage_effect(_entity_to_attack, spr_bite); //TODO: Need to draw in a draw event.
+				draw_damage_effect(_entity_to_attack, spr_bite);
 				
 				state_timer = 0;
 				attack_state = ENEMY_ATTACKING_STATE.IN_ATTACK;
 			}
 			ds_list_clear(enemies_in_range);
 			ds_list_clear(targets_in_range);
-			
-			/*
-			if(!ds_list_empty(enemies_in_range) || !ds_list_empty(targets_in_range)) { //TODO: Maybe change this so it does the attack in the middle of the pause instead of at the very beginning?
-				path_speed = 0;
-				var _entity_to_attack = noone;
-				for(var i = 0; i < ds_list_size(enemies_in_range); i++) { //Do NOT attempt to attack recovering enemies
-					if(enemies_in_range[| i].health_state == UNIT_STATE.ACTIVE) {
-						_entity_to_attack = enemies_in_range[| i];
-						break;
-					}
-				}
-				if(_entity_to_attack == noone) { //If there are no enemies to attack, attack the nearest structure instead
-					_entity_to_attack = targets_in_range[| 0];
-				}
-				
-			}*/
 		}
 		break;
 	case ENEMY_ATTACKING_STATE.IN_ATTACK:
 		if(state_timer >= num_frames_paused) {
-			path_speed = seconds_to_roomspeed_frames(default_movement_speed);
+			path_speed = default_movement_speed;
 			attack_state = ENEMY_ATTACKING_STATE.NOT_ATTACKING;
 			state_timer = 0;
 		}

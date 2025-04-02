@@ -1,17 +1,17 @@
 {
   "$GMObject":"",
-  "%Name":"chompy_worm",
+  "%Name":"sword_beetle",
   "eventList":[
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":12,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"chompy_worm",
+  "name":"sword_beetle",
   "overriddenProperties":[],
   "parent":{
-    "name":"Chompy Worm",
-    "path":"folders/Objects/enemy_types/Bugs/Chompy Worm.yy",
+    "name":"Sword Beetle",
+    "path":"folders/Objects/enemy_types/Bugs/Sword Beetle.yy",
   },
   "parentObjectId":{
     "name":"base_enemy",
@@ -35,8 +35,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_chompy_worm",
-    "path":"sprites/spr_chompy_worm/spr_chompy_worm.yy",
+    "name":"spr_sword_beetle",
+    "path":"sprites/spr_sword_beetle/spr_sword_beetle.yy",
   },
   "spriteMaskId":null,
   "visible":true,
