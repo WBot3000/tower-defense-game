@@ -411,3 +411,28 @@ function TargetingTracker(_potential_target_types = [TARGETING_TYPE.CLOSEST]) co
 #endregion
 
 #endregion
+
+
+#region Enemy Targeting
+
+#region enemy_target_close (Function)
+//NOTE: Currently assumes that both lists are sorted
+function enemy_target_close(_unit_list, _target_list, _prioritize_targets = false) {
+	if(!ds_list_empty(_target_list) && _prioritize_targets) {
+		return _target_list[| 0];
+	}
+	for(var i = 0; i < ds_list_size(_unit_list); i++) {
+		var _current_unit = _unit_list[| i];
+		if(_current_unit.health_state == UNIT_STATE.ACTIVE) {
+			return _current_unit;
+		}
+	}
+	if(!ds_list_empty(_target_list)) {
+		return _target_list[| 0];
+	}
+	return noone;
+	
+}
+#endregion
+
+#endregion

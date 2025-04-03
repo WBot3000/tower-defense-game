@@ -24,7 +24,7 @@ enemy_buffs = [];
 //Variables to keep track of things
 state_timer = 0;
 
-enemies_in_range = ds_list_create();
+units_in_range = ds_list_create();
 targets_in_range = ds_list_create();
 focused_entity = noone;
 
