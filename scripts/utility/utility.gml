@@ -26,6 +26,42 @@ function number_is_between(_num, _boundary1, _boundary2) {
 #endregion
 
 
+#region get_bbox_center_x (Function)
+//Get the horizontal center of an instance's bounding box
+function get_bbox_center_x(inst) {
+	return (inst.bbox_left + inst.bbox_right)/2
+}
+#endregion
+
+
+#region get_bbox_center_y (Function)
+//Get the vertical center of an instance's bounding box
+function get_bbox_center_y(inst) {
+	return (inst.bbox_top + inst.bbox_bottom)/2
+}
+#endregion
+
+
+#region vector_to_get_components (Functions)
+#macro VEC_X 0
+#macro VEC_Y 1
+#macro VEC_LEN 2
+//Returns x and y components of a vector originating from source_inst, pointing towards destination_inst, along with the vector's length
+function vector_to_get_components(source_inst, destination_inst, normalized = false) {
+	var _vector_x = get_bbox_center_x(destination_inst) - get_bbox_center_x(source_inst);
+	var _vector_y = get_bbox_center_y(destination_inst) - get_bbox_center_y(source_inst);
+	var _vector_len = sqrt(sqr(_vector_x) + sqr(_vector_y));
+	
+	if(normalized) { //Set this when you want to use these components in a Step event for things like movement
+		_vector_x = _vector_x / _vector_len;
+		_vector_y = _vector_y / _vector_len;
+	}
+	
+	return [_vector_x, _vector_y, _vector_len];
+}
+#endregion
+
+
 #region can_purchase_unit (Function)
 //Used for determining if a unit can be placed on a certain tile
 //TODO: Will probably move to a different file eventually

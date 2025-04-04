@@ -14,6 +14,10 @@ enum UNIT_STATE {
 }
 
 
+function Unit() constructor {
+}
+
+
 #region StatUpgrade
 /*
 	Contains code that keep tracks of a unit's "level" in a certain stat.
