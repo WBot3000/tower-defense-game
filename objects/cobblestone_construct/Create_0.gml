@@ -1,8 +1,5 @@
 /// @description Initialize data structures
 
-//NOTE: This unit is somewhat broken and kind of outdated, probably won't resemble how the game handles melee combat.
-//NOTE 2: Wait, I think it might actually be an issue with the enemies having a larger attack radius.
-
 unit_name = "Cobblestone Construct";
 
 max_health = 100;

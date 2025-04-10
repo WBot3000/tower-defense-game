@@ -14,7 +14,7 @@ state_timer++;
 
 switch (attack_state) {
 	case ENEMY_ATTACKING_STATE.NOT_ATTACKING:
-		range.move_range(x + sprite_width/2, y + sprite_height/2); //If the enemy is in the attacking state, it's not moving, so you only need to update it here
+		range.move_range(get_bbox_center_x(self.id), get_bbox_center_y(self.id)); //If the enemy is in the attacking state, it's not moving, so you only need to update it here
 		if(state_timer >= frames_per_attack) { //Enemy can now attack again
 			//Prioritize units over targets (they'll be at the front of the list
 			range.get_entities_in_range(base_unit, units_in_range, true);

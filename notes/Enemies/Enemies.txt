@@ -1,0 +1,2 @@
+All enemies have their point set at bottom-centre, as it works best with the path spawning system.
+	- This is where their "feet" are

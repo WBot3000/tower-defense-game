@@ -21,8 +21,8 @@
     {"$GMFolder":"","%Name":"Bugs","folderPath":"folders/Objects/enemy_types/Bugs.yy","name":"Bugs","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Butterfly-barian","folderPath":"folders/Objects/enemy_types/Bugs/Butterfly-barian.yy","name":"Butterfly-barian","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Chompy Worm","folderPath":"folders/Objects/enemy_types/Bugs/Chompy Worm.yy","name":"Chompy Worm","resourceType":"GMFolder","resourceVersion":"2.0",},
-    {"$GMFolder":"","%Name":"King Worm","folderPath":"folders/Objects/enemy_types/Bugs/King Worm.yy","name":"King Worm","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Gun Beetle","folderPath":"folders/Objects/enemy_types/Bugs/Gun Beetle.yy","name":"Gun Beetle","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"King Worm","folderPath":"folders/Objects/enemy_types/Bugs/King Worm.yy","name":"King Worm","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Magic Mosquito","folderPath":"folders/Objects/enemy_types/Bugs/Magic Mosquito.yy","name":"Magic Mosquito","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Sword Beetle","folderPath":"folders/Objects/enemy_types/Bugs/Sword Beetle.yy","name":"Sword Beetle","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"logic_controllers","folderPath":"folders/Objects/logic_controllers.yy","name":"logic_controllers","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -102,6 +102,7 @@
   "resources":[
     {"id":{"name":"fnt_Test","path":"fonts/fnt_Test/fnt_Test.yy",},},
     {"id":{"name":"Data Storage","path":"notes/Data Storage/Data Storage.yy",},},
+    {"id":{"name":"Enemies","path":"notes/Enemies/Enemies.yy",},},
     {"id":{"name":"Movement","path":"notes/Movement/Movement.yy",},},
     {"id":{"name":"Script Assets Have Changed For v2.3.0","path":"notes/Script Assets Have Changed For v2.3.0/Script Assets Have Changed For v2.3.0.yy",},},
     {"id":{"name":"Spare Note","path":"notes/Spare Note/Spare Note.yy",},},

@@ -12,7 +12,7 @@ if(!variable_instance_exists(self.id, "movement_path")) { //If the enemy wasn't 
 
 attack_state = ENEMY_ATTACKING_STATE.NOT_ATTACKING;
 
-range = new CircularRange(self.id, x + sprite_width/2, y + sprite_height/2, tilesize_to_pixels(3));
+range = new CircularRange(self.id, get_bbox_center_x(self.id), get_bbox_center_y(self.id), tilesize_to_pixels(3));
 shot_damage = 10;
 shot_speed = 15;
 frames_per_attack = seconds_to_roomspeed_frames(2);	//How many frames have to go by before the enemy can attack again.

@@ -15,7 +15,7 @@ if(current_health <= 0) {
 //Increment state timer
 //state_timer++;
 
-range.move_range(x + sprite_width/2, y + sprite_height/2); //If the enemy is in the attacking state, it's not moving, so you only need to update it here
+range.move_range(get_bbox_center_x(self.id), get_bbox_center_y(self.id)); //If the enemy is in the attacking state, it's not moving, so you only need to update it here
 range.get_entities_in_range(base_unit, entities_in_range, true);
 range.get_entities_in_range(base_target, entities_in_range, true);
 for(var i = 0; i < ds_list_size(entities_in_range); i++) {

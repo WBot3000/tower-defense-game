@@ -13,7 +13,7 @@ if(!variable_instance_exists(self.id, "movement_path")) { //If the enemy wasn't 
 //attack_state = ENEMY_ATTACKING_STATE.NOT_ATTACKING;
 
 //Doesn't use the default melee range because the sprite is too small. Not an issue anyway since this enemy doesn't move
-range = new CircularRange(self.id, x + sprite_width/2, y + sprite_height/2, tilesize_to_pixels(0.75));
+range = new CircularRange(self.id, get_bbox_center_x(self.id), get_bbox_center_y(self.id), tilesize_to_pixels(0.75));
 melee_damage = 20;
 frames_per_attack = seconds_to_roomspeed_frames(1);	//How many frames have to go by before the enemy can attack again.
 //num_frames_paused = seconds_to_roomspeed_frames(0.5); //How many frames the enemy pauses to attack.
@@ -23,7 +23,6 @@ monetary_value = 100;
 enemy_buffs = [];
 
 //Variables to keep track of things
-//state_timer = 0;
 
 entities_in_range = ds_list_create();
 //targets_in_range = ds_list_create();

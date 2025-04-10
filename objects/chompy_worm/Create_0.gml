@@ -23,6 +23,8 @@ enemy_buffs = [];
 
 //Variables to keep track of things
 state_timer = 0;
+x_center = get_bbox_center_x(self.id);
+y_center = get_bbox_center_y(self.id);
 
 units_in_range = ds_list_create();
 targets_in_range = ds_list_create();

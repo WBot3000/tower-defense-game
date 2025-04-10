@@ -71,14 +71,14 @@ function LevelData(_basic_level_data = {
 #region Data Definitions
 
 #region Path Data
-global.DATA_LEVEL_PATH_SAMPLELEVEL1_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*7, pth_spawn1_SampleLevel1);
+global.DATA_LEVEL_PATH_SAMPLELEVEL1_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*8, pth_spawn1_SampleLevel1);
 
-global.DATA_LEVEL_PATH_SAMPLELEVEL2_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*5, pth_spawn1_SampleLevel2);
-global.DATA_LEVEL_PATH_SAMPLELEVEL2_2 = new PathData(TILE_SIZE*-1, TILE_SIZE*6, pth_spawn2_SampleLevel2);
+global.DATA_LEVEL_PATH_SAMPLELEVEL2_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*6, pth_spawn1_SampleLevel2);
+global.DATA_LEVEL_PATH_SAMPLELEVEL2_2 = new PathData(TILE_SIZE*-1, TILE_SIZE*7, pth_spawn2_SampleLevel2);
 
-global.DATA_LEVEL_PATH_SAMPLELEVEL3_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*19, pth_spawn1_SampleLevel3);
-global.DATA_LEVEL_PATH_SAMPLELEVEL3_2 = new PathData(TILE_SIZE*-1, TILE_SIZE*19, pth_spawn2_SampleLevel3);
-global.DATA_LEVEL_PATH_SAMPLELEVEL3_3 = new PathData(TILE_SIZE*-1, TILE_SIZE*19, pth_spawn3_SampleLevel3);
+global.DATA_LEVEL_PATH_SAMPLELEVEL3_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*20, pth_spawn1_SampleLevel3);
+global.DATA_LEVEL_PATH_SAMPLELEVEL3_2 = new PathData(TILE_SIZE*-1, TILE_SIZE*20, pth_spawn2_SampleLevel3);
+global.DATA_LEVEL_PATH_SAMPLELEVEL3_3 = new PathData(TILE_SIZE*-1, TILE_SIZE*20, pth_spawn3_SampleLevel3);
 #endregion
 
 #region Level Data

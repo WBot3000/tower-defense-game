@@ -131,9 +131,9 @@ function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor 
 	If you give all melee units the same range radius, then you have situations where the larger melee unit can't reach the smaller one.
 */
 function MeleeRange(_unit) : CircularRange(_unit) constructor {
-	origin_x = _unit.x + (_unit.sprite_width/2);
-	origin_y = _unit.y + (_unit.sprite_width/2);
-	radius = max(_unit.bbox_right - _unit.bbox_left, _unit.bbox_bottom - _unit.bbox_top);
+	origin_x = get_bbox_center_x(_unit);
+	origin_y = get_bbox_center_y(_unit);
+	radius = max((_unit.bbox_right - _unit.bbox_left)/2, (_unit.bbox_bottom - _unit.bbox_top)/2) * 1.5; //So that melee units have just a bit more range.
 }
 #endregion
 
