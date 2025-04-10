@@ -92,7 +92,7 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 	},
 	[
 		[
-			new EnemySpawningData([magic_mosquito], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
 		],
 		[
 			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 4, 5),
@@ -105,7 +105,10 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 3, 1),
 			new EnemySpawningData([sword_beetle], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 3, 1),
 			new EnemySpawningData([gun_beetle], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 3, 5),
-		]
+		],
+		[
+			new EnemySpawningData([king_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 0, 1)
+		],
 	]
 );
 
