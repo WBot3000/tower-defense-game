@@ -27,10 +27,10 @@
 	Enums for different directions
 */
 enum DIRECTION {
-	UP,
-	DOWN,
 	LEFT,
-	RIGHT
+	RIGHT,
+	UP, //Probably won't be used in the final game, kept for Sample Brawler
+	DOWN //Probably won't be used in the final game, kept for Sample Brawler
 }
 
 #macro SELL_PRICE_REDUCTION 0.8 //How much a unit sells for in comparison to how much it cost.

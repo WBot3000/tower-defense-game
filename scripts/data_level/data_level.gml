@@ -144,11 +144,14 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL3 = new LevelData(
 			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_1], ENEMY_SPAWN_END, 10, 5)
 		],
 		[
-			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_2], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([butterflybarian], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_2], ENEMY_SPAWN_END, 10, 5)
 		],
 		[
-			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_3], ENEMY_SPAWN_END, 10, 5)
-		]
+			new EnemySpawningData([gun_beetle], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_3], ENEMY_SPAWN_END, 10, 5)
+		],
+		[
+			new EnemySpawningData([king_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL3_3], ENEMY_SPAWN_END, 0, 1)
+		],
 	]
 );
 #endregion
