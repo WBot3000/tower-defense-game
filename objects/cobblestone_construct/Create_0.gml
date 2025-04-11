@@ -8,6 +8,7 @@ health_state = UNIT_STATE.ACTIVE;
 recovery_rate = 10; //In health points per second
 defense_factor = 1.5;
 
+direction_facing = DIRECTION_LEFT;
 
 radius = 1.0;
 range = new MeleeRange(self.id);

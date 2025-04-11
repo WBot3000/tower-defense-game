@@ -35,20 +35,17 @@ switch (attack_state) {
 			*/
 			if(focused_entity != noone) {
 				path_speed = 0;
-				/*
-				var _vector_x = get_bbox_center_x(focused_entity) - get_bbox_center_x(self);
-				var _vector_y = get_bbox_center_y(focused_entity) - get_bbox_center_y(self);
-				var _vector_len = sqrt(sqr(_vector_x) + sqr(_vector_y));
-	
-				_vector_x = _vector_x / _vector_len;
-				_vector_y = _vector_y / _vector_len;*/
+				
 				var _vector = vector_to_get_components(self, focused_entity, true);
+				direction_facing = get_entity_facing_direction(self, focused_entity.x)
+				image_xscale = direction_facing;
 	
 				instance_create_layer((self.bbox_left + self.bbox_right)/2, (self.bbox_top + self.bbox_bottom)/2, PROJECTILE_LAYER, gun_beetle_bullet,
 					{
 						x_speed: _vector[VEC_X] * other.shot_speed,
 						y_speed: _vector[VEC_Y] * other.shot_speed,
-						bullet_damage: other.shot_damage
+						bullet_damage: other.shot_damage,
+						image_xscale: other.direction_facing,
 					});
 				
 				state_timer = 0;

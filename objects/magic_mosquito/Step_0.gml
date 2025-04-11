@@ -41,9 +41,10 @@ state_timer++;
 
 switch (attack_state) {
 	case ENEMY_ATTACKING_STATE.NOT_ATTACKING:
-		self.x += move_x;
-		self.y += move_y;
-		focused_entity = instance_place(self.x, self.y, base_unit);
+		image_xscale = get_entity_facing_direction(self, move_x);
+		x += move_x;
+		y += move_y;
+		focused_entity = instance_place(x, y, base_unit);
 		if(focused_entity != noone) {
 			attack_state = ENEMY_ATTACKING_STATE.IN_ATTACK;
 		}

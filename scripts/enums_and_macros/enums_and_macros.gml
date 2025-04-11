@@ -24,13 +24,17 @@
 
 
 /*
-	Enums for different directions
+	Macros for left and right directions.
+	Based on what value is needed to flip the sprite in the correct direction using image_xscale
 */
+#macro DIRECTION_LEFT 1
+#macro DIRECTION_RIGHT -1
+/*
 enum DIRECTION {
 	LEFT,
 	RIGHT,
 	UP, //Probably won't be used in the final game, kept for Sample Brawler
 	DOWN //Probably won't be used in the final game, kept for Sample Brawler
-}
+}*/
 
 #macro SELL_PRICE_REDUCTION 0.8 //How much a unit sells for in comparison to how much it cost.

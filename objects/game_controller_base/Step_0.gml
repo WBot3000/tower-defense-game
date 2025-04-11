@@ -33,13 +33,6 @@ if(game_state_manager.state == GAME_STATE.PAUSED && _mouse_left_released) {
 }
 
 
-//Stuff below this section will only run if the game isn't paused
-//TODO: Just have managers handle their own behavior based on game state, this cuts off too much
-/*
-if(game_state_manager.state != GAME_STATE.RUNNING) {
-	return;
-}*/
-
 //"Advance" the round spawning timer
 round_manager.on_step(game_state_manager.state);
 
@@ -73,7 +66,7 @@ if(_mouse_left_released) {
 				with(_tile_at_mouse) {
 					var _purchase = other.purchase_manager.currently_selected_purchase;
 					if(can_purchase_unit(self.id, _purchase)) {
-						placed_unit = instance_create_layer(x, y, UNIT_LAYER, _purchase.unit);
+						placed_unit = instance_create_layer(x + TILE_SIZE/2, y + TILE_SIZE, UNIT_LAYER, _purchase.unit);
 						global.player_money -= _purchase.price
 					}
 				}

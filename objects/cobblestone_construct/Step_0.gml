@@ -9,6 +9,10 @@ switch (health_state) {
 			if(ds_list_size(enemies_in_range) > 0) {
 				var _targeting_type = targeting_tracker.get_current_targeting_type();
 				var _enemy_to_target = _targeting_type.targeting_fn(self.id, enemies_in_range, true);
+				
+				direction_facing = get_entity_facing_direction(self, _enemy_to_target.x);
+				image_xscale = direction_facing;
+				
 				deal_damage(_enemy_to_target, punch_damage);
 				draw_damage_effect(_enemy_to_target, spr_punch);
 				punch_timer = 0;

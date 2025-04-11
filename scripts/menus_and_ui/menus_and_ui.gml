@@ -596,7 +596,7 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 		var _draw_y_pos = y_pos + _y_offset;
 		
 		draw_parent(_x_offset, _y_offset);
-		draw_sprite(object_get_sprite(purchase_data.unit), 0, _draw_x_pos + 8, _draw_y_pos + 4);
+		draw_sprite(object_get_sprite(purchase_data.unit), 0, _draw_x_pos + 8 + TILE_SIZE/2, _draw_y_pos + 4 + TILE_SIZE);
 		draw_set_halign(fa_right);
 		draw_text(_draw_x_pos + sprite_get_width(button_sprite_default) - 8, _draw_y_pos + 72, string(purchase_data.price));
 		draw_set_halign(fa_left);

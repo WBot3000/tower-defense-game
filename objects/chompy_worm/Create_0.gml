@@ -5,7 +5,8 @@ name = "Chompy Worm"
 max_health = 30;
 current_health = 30;
 
-direction_facing = DIRECTION.RIGHT;
+direction_facing = DIRECTION_RIGHT;
+image_xscale = direction_facing;
 
 default_movement_speed = 1.5; //In pixels per game step (frame I think)
 if(!variable_instance_exists(self.id, "movement_path")) { //If the enemy wasn't given a movement path upon creation, just have it stay still. Shouldn't occur during normal gameplay.

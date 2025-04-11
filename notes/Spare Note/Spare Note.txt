@@ -1,2 +1,4 @@
 NOTE: For any managers with an on_step function, they should just take the game state as a parameter input. 
 Less costly than fetching the game state manager in each of them.
+
+TODO: For drawing and placing units, should I add macros for the offsets (since units have their origin at the bottom-centre instead of the top-left)?

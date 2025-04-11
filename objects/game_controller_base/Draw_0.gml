@@ -34,6 +34,7 @@ draw_set_alpha(1);
 //Draw the currently selected unit in grayscale
 if(purchase_manager.currently_selected_purchase != undefined) {
 	shader_set(shader_grayscale);
-	draw_sprite(object_get_sprite(purchase_manager.currently_selected_purchase.unit), 0, _tile_at_mouse.x, _tile_at_mouse.y);
+	draw_sprite(object_get_sprite(purchase_manager.currently_selected_purchase.unit), 0, 
+		_tile_at_mouse.x + TILE_SIZE/2, _tile_at_mouse.y + TILE_SIZE);
 	shader_reset();
 }

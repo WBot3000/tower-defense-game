@@ -27,7 +27,7 @@
   ],
   "name":"spr_sample_gunner_upgrade_1_ko",
   "nineSlice":null,
-  "origin":0,
+  "origin":7,
   "parent":{
     "name":"Upgrade 1",
     "path":"folders/Sprites/unit_types/! Sample Units/Sample Gunner/Upgrade 1.yy",
@@ -67,21 +67,31 @@
     "playbackSpeedType":0,
     "resourceType":"GMSequence",
     "resourceVersion":"2.0",
+    "seqHeight":64.0,
+    "seqWidth":64.0,
     "showBackdrop":true,
     "showBackdropImage":false,
     "timeUnits":1,
     "tracks":[
       {"$GMSpriteFramesTrack":"","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"$KeyframeStore<SpriteFrameKeyframe>":"","Keyframes":[
-            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{"0":{"$SpriteFrameKeyframe":"","Id":{"name":"b7d2e086-b59f-47c1-b4b6-5f0968660821","path":"sprites/spr_sample_gunner_upgrade_1_ko/spr_sample_gunner_upgrade_1_ko.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},},"Disabled":false,"id":"ca2c6c59-f10d-44d1-b9c6-c6028eaca0ef","IsCreationKey":false,"Key":0.0,"Length":2.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
-            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{"0":{"$SpriteFrameKeyframe":"","Id":{"name":"69db42b8-c07f-4a52-86b8-b2671a25fd7e","path":"sprites/spr_sample_gunner_upgrade_1_ko/spr_sample_gunner_upgrade_1_ko.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},},"Disabled":false,"id":"8489d4e2-d0b9-48c0-95c9-f71cd4a4c150","IsCreationKey":false,"Key":2.0,"Length":2.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
-            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{"0":{"$SpriteFrameKeyframe":"","Id":{"name":"065dfdd2-7f5f-4efc-bb99-88e794deb643","path":"sprites/spr_sample_gunner_upgrade_1_ko/spr_sample_gunner_upgrade_1_ko.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},},"Disabled":false,"id":"7e5384bb-2b6d-4ff8-8053-40b3cc7c26d6","IsCreationKey":false,"Key":4.0,"Length":2.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
-            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{"0":{"$SpriteFrameKeyframe":"","Id":{"name":"ac2d80c9-cee7-440a-9682-ac02d21a4a2e","path":"sprites/spr_sample_gunner_upgrade_1_ko/spr_sample_gunner_upgrade_1_ko.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},},"Disabled":false,"id":"c881b8a5-c96e-430d-9bbd-4bdff01165c6","IsCreationKey":false,"Key":6.0,"Length":2.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"b7d2e086-b59f-47c1-b4b6-5f0968660821","path":"sprites/spr_sample_gunner_upgrade_1_ko/spr_sample_gunner_upgrade_1_ko.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"ca2c6c59-f10d-44d1-b9c6-c6028eaca0ef","IsCreationKey":false,"Key":0.0,"Length":2.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"69db42b8-c07f-4a52-86b8-b2671a25fd7e","path":"sprites/spr_sample_gunner_upgrade_1_ko/spr_sample_gunner_upgrade_1_ko.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"8489d4e2-d0b9-48c0-95c9-f71cd4a4c150","IsCreationKey":false,"Key":2.0,"Length":2.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"065dfdd2-7f5f-4efc-bb99-88e794deb643","path":"sprites/spr_sample_gunner_upgrade_1_ko/spr_sample_gunner_upgrade_1_ko.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"7e5384bb-2b6d-4ff8-8053-40b3cc7c26d6","IsCreationKey":false,"Key":4.0,"Length":2.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"ac2d80c9-cee7-440a-9682-ac02d21a4a2e","path":"sprites/spr_sample_gunner_upgrade_1_ko/spr_sample_gunner_upgrade_1_ko.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+              },"Disabled":false,"id":"c881b8a5-c96e-430d-9bbd-4bdff01165c6","IsCreationKey":false,"Key":6.0,"Length":2.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
           ],"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"2.0",},"modifiers":[],"name":"frames","resourceType":"GMSpriteFramesTrack","resourceVersion":"2.0","spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange":null,
     "volume":1.0,
-    "xorigin":0,
-    "yorigin":0,
+    "xorigin":32,
+    "yorigin":64,
   },
   "swatchColours":null,
   "swfPrecision":0.5,

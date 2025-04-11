@@ -37,27 +37,28 @@ if(punch_timer >= _frames_per_punch && ds_list_size(enemies_in_range) > 0) { //M
 	var _vector_x = (_enemy_to_target.x + _enemy_to_target.sprite_width/2) - (x + sprite_width/2);
 	var _vector_y = (_enemy_to_target.y + _enemy_to_target.sprite_height/2) - (y + sprite_height/2);
 
-	var _x_dir = _vector_x > 0 ? DIRECTION.RIGHT : DIRECTION.LEFT;
-	var _y_dir = _vector_y >= 0 ? DIRECTION.DOWN : DIRECTION.UP;
+	var _x_dir = _vector_x > 0 ? DIRECTION_RIGHT : DIRECTION_LEFT;
+	//var _y_dir = _vector_y >= 0 ? DIRECTION.DOWN : DIRECTION.UP;
 	//show_debug_message(_vector_x);
 	//show_debug_message(_vector_y);
 	//NOTE: > used for _x_dir, since I wanted facing left to be the "default" direction. Same reasoning for >= with _y_dir. This isn't an error.
 	
 	//If the enemy is further in the y-direction, face up or down. If the enemy is further in the x-direction, face left or right.
-	var _dir = abs(_vector_y) > abs(_vector_x) ? _y_dir : _x_dir
+	//var _dir = abs(_vector_y) > abs(_vector_x) ? _y_dir : _x_dir
 	
 	//TODO: Punching animation
-	switch (_dir) {
-	    case DIRECTION.LEFT:
+	switch (_x_dir) {
+	    case DIRECTION_LEFT:
 			animation_controller.set_animation(spr_sample_brawler_left_punch, 1, spr_sample_brawler_left);
 	        break;
-		case DIRECTION.RIGHT:
+		case DIRECTION_RIGHT:
 			animation_controller.set_animation(spr_sample_brawler_right_punch, 1, spr_sample_brawler_right);
 	        break;
+		/*
 		case DIRECTION.UP:
 			animation_controller.set_animation(spr_sample_brawler_up_punch, 1, spr_sample_brawler_up);
 	        break;
-		case DIRECTION.DOWN: //Same as default. Technically don't need this statement, but keeping it for clarity.
+		case DIRECTION.DOWN: //Same as default. Technically don't need this statement, but keeping it for clarity.*/
 	    default:
 			animation_controller.set_animation(spr_sample_brawler_down_punch, 1, spr_sample_brawler_down);
 	        break;

@@ -42,7 +42,8 @@ function get_bbox_center_y(inst) {
 #endregion
 
 
-#region vector_to_get_components (Functions)
+#region vector_to_get_components (Function)
+//When referencing values returned from this function, use these values to make code more understandable
 #macro VEC_X 0
 #macro VEC_Y 1
 #macro VEC_LEN 2
@@ -58,6 +59,13 @@ function vector_to_get_components(source_inst, destination_inst, normalized = fa
 	}
 	
 	return [_vector_x, _vector_y, _vector_len];
+}
+#endregion
+
+
+#region get_entity_facing_direction (Function)
+function get_entity_facing_direction(_entity, _x_coord) {
+	return (_entity.x < _x_coord ? DIRECTION_RIGHT : DIRECTION_LEFT);
 }
 #endregion
 
