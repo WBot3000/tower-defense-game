@@ -5,7 +5,7 @@ if(game_ui.unit_info_card.selected_unit != undefined) { //Draw range on the curr
 }
 
 /// @description Draw tile highlights and grayscale unit on tiles without enemies
-if(game_ui.gui_element_highlighted() != undefined) { //Draw nothing if you're hovering over a GUI component
+if(game_ui.gui_element_highlighted() != undefined) { //Draw nothing else if you're hovering over a GUI component
 	exit;
 }
 

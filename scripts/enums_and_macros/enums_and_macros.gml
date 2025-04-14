@@ -19,6 +19,7 @@
 #macro TARGET_LAYER "Targets"
 #macro UNIT_LAYER "Units"
 #macro ENEMY_LAYER "Enemies"
+#macro GROUND_INSTANCES_LAYER "Ground_Instances"
 #macro CONTROLLER_LAYER "Controllers"
 #endregion
 

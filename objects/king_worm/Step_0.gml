@@ -22,7 +22,7 @@ switch (attack_state) {
 		
 		if(worm_hole_timer >= frames_per_worm_hole_summon) {
 			//Create a worm hole on the next tile (or the current tile if that one is the last tile)
-			var _next_tile_path_percentage = min(path_position + path_data.percentage_per_tile, 1);
+			var _next_tile_path_percentage = min(path_position + path_data.percentage_per_tile*2, 1);
 			//Subtracting tile size is for adjusting the difference in the path using bottom-center origins, while the tiles use top-left origins
 			var _spawn_worm_hole_x = path_get_x(path_data.default_path, _next_tile_path_percentage) + path_data.spawn_x - TILE_SIZE/2;
 			var _spawn_worm_hole_y = path_get_y(path_data.default_path, _next_tile_path_percentage) + path_data.spawn_y - TILE_SIZE;
@@ -34,10 +34,11 @@ switch (attack_state) {
 			var tile_at_position = instance_position(_spawn_worm_hole_x, _spawn_worm_hole_y, base_tile);
 			if(tile_at_position != noone) {
 				show_debug_message("Worm hole summoned");
-				instance_create_layer(tile_at_position.x, tile_at_position.y, ENEMY_LAYER, worm_hole,
+				instance_create_layer(tile_at_position.x, tile_at_position.y, GROUND_INSTANCES_LAYER, worm_hole,
 				{
 					enemy_path_data: other.path_data,
-					path_starting_percentage: _next_tile_path_percentage, //TODO: Make this more precise so that 
+					//I think this adjustment is needed because of the differences in origins between the worm hole and the enemies
+					path_starting_percentage: _next_tile_path_percentage - other.path_data.percentage_per_tile,
 					round_spawned_in: round_spawned_in,
 				})
 			}

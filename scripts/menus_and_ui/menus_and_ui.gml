@@ -1154,7 +1154,8 @@ function SellButton(_unit_info_card, _x_pos, _y_pos, _selected_unit = noone) :
 	
 	static on_click = function() {
 		if(selected_unit != noone) {
-			var _tile = instance_position(selected_unit.x, selected_unit.y, placeable_tile);
+			//Since the origin of units is centre-bottom, check one point above the origin for the tile. Otherwise, we accidentally mark the tile below as free for placement.
+			var _tile = instance_position(selected_unit.x, selected_unit.y - 1, placeable_tile);
 			_tile.placed_unit = noone;
 			global.player_money += selected_unit.sell_price;
 			instance_destroy(selected_unit);
@@ -1267,7 +1268,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 		draw_rectangle_color(0, y_pos_current, x_pos, _view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
 		toggle_button.draw(0, y_pos_current);
 		if(selected_unit != noone) {
-			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE/2, y_pos_current + TILE_SIZE/4);
+			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE, y_pos_current + 5*TILE_SIZE/4);
 			draw_set_halign(fa_middle);
 			draw_text_color(TILE_SIZE, y_pos_current + TILE_SIZE*1.25, 
 				selected_unit.unit_name, c_white, c_white, c_white, c_white, 1);

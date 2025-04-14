@@ -13,16 +13,16 @@
 	enemy_types: The list of enemies that should be spawned
 	enemy_paths: The level paths of the spawned enemies. The length of this list should be equal to the length of enemy_set.
 	time_until_next_spawn: The number of seconds until the next enemy spawn should occurs
-	repeat_count: The amount of that enemy that this EnemySpawningData should be referenced
+	spawn_count: The amount of that enemy that this EnemySpawningData should be referenced
 		- This is so you don't need to define multiple EnemySpawn for a simple pattern of the same enemy
 	repeat_delay: The amount of seconds that should be waited in repeating this data
 */
-function EnemySpawningData(_enemy_types, _enemy_paths, _time_until_next_spawn, _repeat_count, _repeat_delay) constructor {
+function EnemySpawningData(_enemy_types, _enemy_paths, _time_until_next_spawn, _spawn_count, _repeat_delay) constructor {
 	enemy_types = _enemy_types;
 	enemy_paths = _enemy_paths
 	//Might as well do conversions here. Might change this in the future
 	time_until_next_spawn = seconds_to_roomspeed_frames(_time_until_next_spawn)
-	repeat_count = _repeat_count;
+	spawn_count = _spawn_count;
 	//Might as well do conversions here. Might change this in the future
 	repeat_delay = seconds_to_roomspeed_frames(_repeat_delay)
 }
@@ -42,7 +42,7 @@ function Round(_round_number, _spawn_list, _timer_count) constructor {
 	timer_count = _timer_count;
 	//Variables to keep track of position in the list
 	spawn_list_idx_ptr = 0;
-	spawn_list_repeat_count = 0;
+	spawn_list_spawned_count = 0;
 	spawn_timer = 0;
 	
 	//The enemies that this round has spawned. Used to keep track of when the round is over.
@@ -103,10 +103,10 @@ function Round(_round_number, _spawn_list, _timer_count) constructor {
 			//show_debug_message("Enemy spawned");
 		}
 		
-		spawn_list_repeat_count++;
+		spawn_list_spawned_count++;
 		//All of the enemies in the current enemy spawn have been created. Move on to the next one in the list 
-		if(_current_spawn_data.repeat_count < spawn_list_repeat_count) {
-			spawn_list_repeat_count = 0;
+		if(_current_spawn_data.spawn_count <= spawn_list_spawned_count) {
+			spawn_list_spawned_count = 0;
 			spawn_list_idx_ptr++;
 			timer_count = _current_spawn_data.time_until_next_spawn;
 		}
@@ -173,20 +173,6 @@ function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constru
 		}
 	}
 	
-	//This is suprisingly similar to the enemy destroy callback. I guess that makes sense. Both involve clearing out an instance that's no longer needed, and then checking a condition to see if a thing is completed.
-	//TODO: Make this static in a similar way to the enemy defeated callback.
-	/*
-	on_round_finish_callback = function(_round_ptr) {
-		var _round_index = array_get_index(rounds_currently_running, _round_ptr);
-		if(_round_index == -1) {
-			throw("Round " + string(_round_ptr) + " attempted to be removed from " + string(self) + ", where it isn't present."); //This should never happen in normal execution
-		}
-		array_delete(rounds_currently_running, _round_index, 1);
-		global.player_money += _round_ptr.reward_count; //TODO: When you create a money manager, update this.
-		if(array_length(rounds_currently_running) == 0 && array_length(extra_enemies) == 0 && current_round >= array_length(spawn_data)) { //All rounds have been spawned and defeated. The game has been completed.
-			controller_obj.game_state_manager.win_game();
-		}
-	};*/
 	
 	static spawn_extra_enemy = function(_enemy_type, _path_data, _round_number) {
 		var _round = all_rounds[_round_number - 1];
