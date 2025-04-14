@@ -9,8 +9,8 @@ direction_facing = DIRECTION_RIGHT;
 image_xscale = direction_facing;
 
 default_movement_speed = 3; //In pixels per game step (frame I think)
-if(!variable_instance_exists(self.id, "movement_path")) { //If the enemy wasn't given a movement path upon creation, just have it stay still. Shouldn't occur during normal gameplay.
-	movement_path = pth_dummypath;
+if(!variable_instance_exists(self.id, "path_data")) { //If the enemy wasn't given a movement path upon creation, just have it stay still. Shouldn't occur during normal gameplay.
+	path_data = global.DATA_LEVEL_PATH_DUMMYPATH;
 }
 
 //attack_state = ENEMY_ATTACKING_STATE.NOT_ATTACKING;
@@ -31,4 +31,4 @@ entities_in_range = ds_list_create();
 //targets_in_range = ds_list_create();
 entity_attack_cooldown_queue = new EntityCooldownList();
 
-path_start(movement_path, default_movement_speed, path_action_stop, false);
+path_start(path_data.default_path, default_movement_speed, path_action_stop, false);

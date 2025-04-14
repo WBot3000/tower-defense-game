@@ -20,19 +20,7 @@ switch (attack_state) {
 			range.get_entities_in_range(base_unit, units_in_range, true);
 			range.get_entities_in_range(base_target, targets_in_range, true);
 			var _entity_to_attack = enemy_target_close(units_in_range, targets_in_range);
-			/*
-			//Prioritize enemies over targets, and do NOT attempt to attack recovering enemies
-			for(var i = 0; i < ds_list_size(enemies_in_range); i++) {
-					if(enemies_in_range[| i].health_state == UNIT_STATE.ACTIVE) {
-						_entity_to_attack = enemies_in_range[| i];
-						break;
-					}
-			}
-			//If there are no enemies nearby but target(s), attack the closest target
-			if(_entity_to_attack == noone && !ds_list_empty(targets_in_range)) {
-				_entity_to_attack = targets_in_range[| 0];
-			}
-			*/
+
 			if(_entity_to_attack != noone) {
 				path_speed = 0;
 				deal_damage(_entity_to_attack, melee_damage);

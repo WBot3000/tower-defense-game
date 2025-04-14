@@ -56,8 +56,8 @@ enum ENEMY_ATTACKING_STATE {
 }
 
 function get_enemy_path_direction(_enemy) {
-	var _enemy_current_x = path_get_x(_enemy.movement_path, _enemy.path_position);
-	var _enemy_previous_x = path_get_x(_enemy.movement_path, _enemy.path_positionprevious);
+	var _enemy_current_x = path_get_x(_enemy.path_data.default_path, _enemy.path_position);
+	var _enemy_previous_x = path_get_x(_enemy.path_data.default_path, _enemy.path_positionprevious);
 	
 	if(_enemy_current_x > _enemy_previous_x) {
 		return DIRECTION_RIGHT;

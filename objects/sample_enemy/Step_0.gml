@@ -59,6 +59,7 @@ switch (attack_state) {
 		ds_list_clear(units_in_range);
 		
 		//Damage any targets around you
+		/*
 		if(movement_path != pth_dummypath && path_position == 1) {
 			attack_timer++;
 			range.get_entities_in_range(base_target, targets_in_range, true);
@@ -69,6 +70,6 @@ switch (attack_state) {
 				}
 			}
 			ds_list_clear(targets_in_range);
-		}
+		}*/
         break;
 }

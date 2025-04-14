@@ -20,19 +20,7 @@ switch (attack_state) {
 			range.get_entities_in_range(base_unit, units_in_range, true);
 			range.get_entities_in_range(base_target, targets_in_range, true);
 			focused_entity = enemy_target_close(units_in_range, targets_in_range);
-			/*
-			//Prioritize enemies over targets, and do NOT attempt to attack recovering enemies
-			for(var i = 0; i < ds_list_size(enemies_in_range); i++) {
-					if(enemies_in_range[| i].health_state == UNIT_STATE.ACTIVE) {
-						focused_entity = enemies_in_range[| i];
-						break;
-					}
-			}
-			//If there are no enemies nearby but target(s), attack the closest target
-			if(focused_entity == noone && !ds_list_empty(targets_in_range)) {
-				focused_entity = targets_in_range[| 0];
-			}
-			*/
+
 			if(focused_entity != noone) {
 				path_speed = 0;
 				

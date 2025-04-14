@@ -17,12 +17,15 @@
 	Data Variables:
 	spawn_x: The x-coordinate of where enemies should spawn from
 	spawn_y: The y-coordinate of where enemies should spawn from
-	default_path: The path that enemies without a specific path defined for them will use when spawned 
+	default_path: The path that enemies without a specific path defined for them will use when spawned
+	percentage_per_tile: The percentage of the path one tile should take up. Used for path calculations.
 */
 function PathData(_spawn_x, _spawn_y, _default_path) constructor {
 	spawn_x = _spawn_x;
 	spawn_y = _spawn_y;
 	default_path = _default_path;
+	
+	percentage_per_tile = TILE_SIZE / path_get_length(_default_path); //Cached for convenience
 	
 	static toString = function() { //For debug purposes
 		return "Spawn Coordinates: (" + string(spawn_x) + ", " + string(spawn_y) + ")\nDefault Path: " + string(default_path)
@@ -71,6 +74,8 @@ function LevelData(_basic_level_data = {
 #region Data Definitions
 
 #region Path Data
+global.DATA_LEVEL_PATH_DUMMYPATH = new PathData(0, 0, pth_dummypath);
+
 global.DATA_LEVEL_PATH_SAMPLELEVEL1_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*8, pth_spawn1_SampleLevel1);
 
 global.DATA_LEVEL_PATH_SAMPLELEVEL2_1 = new PathData(TILE_SIZE*-1, TILE_SIZE*6, pth_spawn1_SampleLevel2);
@@ -90,7 +95,7 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 		level_portrait: spr_level_portrait_SampleLevel1,
 		card_color: [148/255, 224/255, 168/255],
 	},
-	[
+	[/*
 		[
 			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
 		],
@@ -105,7 +110,7 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 3, 1),
 			new EnemySpawningData([sword_beetle], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 3, 1),
 			new EnemySpawningData([gun_beetle], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 3, 5),
-		],
+		],*/
 		[
 			new EnemySpawningData([king_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 0, 1)
 		],
@@ -121,13 +126,13 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL2 = new LevelData(
 	},
 	[
 		[
-			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_1], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_1], ENEMY_SPAWN_END, 1, 5)
 		],
 		[
-			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_2], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_2], ENEMY_SPAWN_END, 1, 5)
 		],
 		[
-			new EnemySpawningData([chompy_worm, chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_1, global.DATA_LEVEL_PATH_SAMPLELEVEL2_2], ENEMY_SPAWN_END, 10, 5)
+			new EnemySpawningData([chompy_worm, chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL2_1, global.DATA_LEVEL_PATH_SAMPLELEVEL2_2], ENEMY_SPAWN_END, 1, 5)
 		]
 	]
 );

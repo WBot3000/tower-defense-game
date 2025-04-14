@@ -6,10 +6,6 @@ max_health = 30;
 current_health = 30;
 
 default_movement_speed = 1; //Not sure what unit this is, but I'm converting it using seconds_to_roomspeed_frames for some reason (despite seconds not being a unit of speed)
-/*
-if(!variable_instance_exists(self.id, "movement_path")) { //If the enemy wasn't given a movement path upon creation, just have it stay still. Shouldn't occur during normal gameplay.
-	movement_path = pth_dummypath;
-}*/
 
 attack_state = ENEMY_ATTACKING_STATE.NOT_ATTACKING;
 
@@ -30,5 +26,3 @@ state_timer = 0;
 move_x = 0;
 move_y = 0;
 focused_entity = noone;
-
-//path_start(movement_path, default_movement_speed, path_action_stop, false);

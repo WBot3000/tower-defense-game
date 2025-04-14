@@ -14,7 +14,7 @@ defense_factor = 1;
 direction_facing = DIRECTION_LEFT;
 
 //Variables for managing unit's attack
-range = new CircularRange(self.id, x + sprite_width/2, y + sprite_height/2, tilesize_to_pixels(3));
+range = new CircularRange(self.id, get_bbox_center_x(self), get_bbox_center_y(self), tilesize_to_pixels(3));
 enemies_in_range = ds_list_create();
 targeting_tracker = 
 	new TargetingTracker([

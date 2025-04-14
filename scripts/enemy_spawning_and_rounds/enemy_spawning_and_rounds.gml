@@ -32,14 +32,14 @@ function EnemySpawningData(_enemy_types, _enemy_paths, _time_until_next_spawn, _
 #region Round (Class)
 /*
 	Contains all of the code for actually spawning enemies. Every time a round starts, one of these is created.
+	round_number: The number of this round (Round 1 = 1, Round 2 = 2, etc.)
 	spawn_list: A list of EnemySpawningData that contains all of the enemies that'll be spawned within the round.
 	timer_count: The amount of frames in between the last spawn and the next. The initial value is the amount of time before anything is spawned.
-	on_round_finish_callback: The callback function that's called when the round is finished. Used so that the round manager knows when it can get rid of the round.
 */
-function Round(_spawn_list, _timer_count, _on_round_finish_callback) constructor {
+function Round(_round_number, _spawn_list, _timer_count) constructor {
+	round_number = _round_number;
 	spawn_list = _spawn_list
 	timer_count = _timer_count;
-	on_round_finish_callback = _on_round_finish_callback;
 	//Variables to keep track of position in the list
 	spawn_list_idx_ptr = 0;
 	spawn_list_repeat_count = 0;
@@ -50,39 +50,34 @@ function Round(_spawn_list, _timer_count, _on_round_finish_callback) constructor
 	
 	reward_count = 100; //The amount of money earned upon completion of a round (add this?)
 
-	
 
 	//Create the enemy pointed to in the spawn list, and add it's id to the currently_spawned_enemies list to keep track of round progress
-	static spawn_enemy = function(_enemy_type, _path) {
-		var _new_enemy = instance_create_layer(_path.spawn_x, _path.spawn_y, ENEMY_LAYER, _enemy_type, 
+	//Returns the spawned enemy in the event we need to do anything else to it
+	static spawn_enemy = function(_enemy_type, _path_data) {
+		var _new_enemy = instance_create_layer(_path_data.spawn_x, _path_data.spawn_y, ENEMY_LAYER, _enemy_type, 
 			{
-				movement_path: _path.default_path,
-				spawn_fn: spawn_enemy, //Needed for enemies that spawn other enemies
-				destroy_callback: enemy_destroy_callback
+				path_data: _path_data,
+				round_spawned_in: round_number,
 			});
 		array_push(currently_spawned_enemies, _new_enemy);
+		return _new_enemy;
 	};
 	
 	/*
 		Used for removing enemies from the spawn queue.
 		Also used to detect when a round is over (if we've reached the end of the spawn list, and the queue is empty, then congratulations, you've beaten the round.
 		Returns true if the last enemy was destroyed
-		
-		TODO: Consider making this static, taking in the round pointer, and passing the round the enemy belongs to to the enemy itself. Might be a micro-optimization though.
-		
-		TODO: Instead of passing a callback to each enemy, give each enemy a "round tag" that corresponds to which round it was spawned in.
-		- Then, when the enemy is destroyed, fetch the game manager, use that to fetch the round manager, and call this as a static function
 	*/
-	enemy_destroy_callback = function(_enemy_id) {
+	static remove_enemy_from_spawned_list = function(_enemy_id) {
 		var _enemy_index = array_get_index(currently_spawned_enemies, _enemy_id);
 		if(_enemy_index == -1) {
 			throw("Enemy " + string(_enemy_id) + " attempted to be removed from " + string(id) + ", where it isn't present."); //This should never happen in normal execution
 		}
 		array_delete(currently_spawned_enemies, _enemy_index, 1);
 		if(array_length(currently_spawned_enemies) == 0 && spawn_list_idx_ptr >= array_length(spawn_list)) { //All enemies have been spawned and defeated. The round has been completed.
-			//Call ANOTHER callback function to remove this round from the round queue (RoundManager)
-			on_round_finish_callback(self);
+			return true;
 		}
+		return false;
 	};
 	
 	/*
@@ -103,8 +98,8 @@ function Round(_spawn_list, _timer_count, _on_round_finish_callback) constructor
 		var _current_spawn_data = spawn_list[spawn_list_idx_ptr];
 		for (var i = 0; i < array_length(_current_spawn_data.enemy_types); ++i) { //Spawn each enemy in the spawn data
 			var _enemy_type = _current_spawn_data.enemy_types[i];
-			var _path = _current_spawn_data.enemy_paths[i];
-		    spawn_enemy(_enemy_type, _path);
+			var _path_data = _current_spawn_data.enemy_paths[i];
+		    spawn_enemy(_enemy_type, _path_data);
 			//show_debug_message("Enemy spawned");
 		}
 		
@@ -134,6 +129,10 @@ function Round(_spawn_list, _timer_count, _on_round_finish_callback) constructor
 	current_round: The most recent round spawned
 	max_round: The final round of the game
 	spawn_data: 2D array containing all of the enemies that should be spawned in this game
+	extra_enemies: A list of extra enemies that have been spawned outside of the round structure. Mainly used for enemies spawning other enemies.
+	
+	all_rounds: Consists of an array that contains all of the round data for the level
+	rounds_currently_running: Consists of an array of the rounds that are currently in progress
 */
 function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constructor {
 	controller_obj = _controller_obj;
@@ -143,19 +142,40 @@ function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constru
 	
 	spawn_data = _spawn_data
 	
+	all_rounds = [];
 	rounds_currently_running = [];
 	
 	static start_round = function() {
 		if(current_round >= max_round) { //Don't exceed max round;
 			exit;
 		}
-		var _new_round_data = new Round(spawn_data[current_round], 0, on_round_finish_callback);
-		array_push(rounds_currently_running, _new_round_data);
 		current_round++;
+		var _new_round_data = new Round(current_round, spawn_data[current_round - 1], 0);
+		array_push(all_rounds, _new_round_data);
+		array_push(rounds_currently_running, _new_round_data);
 	};
+	
+	
+	static remove_enemy = function(_enemy_id, _round_number) {
+		var _round = all_rounds[_round_number - 1] //Index will be less than the round number
+		var _round_completed = _round.remove_enemy_from_spawned_list(_enemy_id);
+		
+		if(_round_completed) {
+			var _round_index = array_get_index(rounds_currently_running, _round);
+			if(_round_index == -1) {
+				throw("Round " + string(_round) + " attempted to be removed from " + string(self) + ", where it isn't present."); //This should never happen in normal execution
+			}
+			array_delete(rounds_currently_running, _round_index, 1);
+			global.player_money += _round.reward_count; //TODO: When/if you create a money manager, update this.
+			if(array_length(rounds_currently_running) == 0 && current_round >= array_length(spawn_data)) { //All rounds have been spawned and defeated. The game has been completed.
+				controller_obj.game_state_manager.win_game();
+			}
+		}
+	}
 	
 	//This is suprisingly similar to the enemy destroy callback. I guess that makes sense. Both involve clearing out an instance that's no longer needed, and then checking a condition to see if a thing is completed.
 	//TODO: Make this static in a similar way to the enemy defeated callback.
+	/*
 	on_round_finish_callback = function(_round_ptr) {
 		var _round_index = array_get_index(rounds_currently_running, _round_ptr);
 		if(_round_index == -1) {
@@ -163,10 +183,21 @@ function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constru
 		}
 		array_delete(rounds_currently_running, _round_index, 1);
 		global.player_money += _round_ptr.reward_count; //TODO: When you create a money manager, update this.
-		if(array_length(rounds_currently_running) == 0 && current_round >= array_length(spawn_data)) { //All rounds have been spawned and defeated. The game has been completed.
+		if(array_length(rounds_currently_running) == 0 && array_length(extra_enemies) == 0 && current_round >= array_length(spawn_data)) { //All rounds have been spawned and defeated. The game has been completed.
 			controller_obj.game_state_manager.win_game();
 		}
-	};
+	};*/
+	
+	static spawn_extra_enemy = function(_enemy_type, _path_data, _round_number) {
+		var _round = all_rounds[_round_number - 1];
+		//If a round has already been declared as "beaten", no new enemies from that round should be spawned. Don't want "zombie rounds".
+		var _round_is_running = array_get_index(rounds_currently_running, _round) == -1 ? false : true;
+		if(!_round_is_running) { 
+			return noone;
+		}
+		
+		return _round.spawn_enemy(_enemy_type, _path_data);
+	}
 	
 	static on_step = function(_curr_game_state) {
 		if(_curr_game_state == GAME_STATE.RUNNING) {
