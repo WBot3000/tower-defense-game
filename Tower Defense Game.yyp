@@ -267,6 +267,7 @@
     {"id":{"name":"spr_upgrade_purchase_disabled","path":"sprites/spr_upgrade_purchase_disabled/spr_upgrade_purchase_disabled.yy",},},
     {"id":{"name":"spr_victory","path":"sprites/spr_victory/spr_victory.yy",},},
     {"id":{"name":"spr_void_tile","path":"sprites/spr_void_tile/spr_void_tile.yy",},},
+    {"id":{"name":"spr_worm_hole_opening","path":"sprites/spr_worm_hole_opening/spr_worm_hole_opening.yy",},},
     {"id":{"name":"spr_worm_hole","path":"sprites/spr_worm_hole/spr_worm_hole.yy",},},
     {"id":{"name":"ts_grass_tiles","path":"tilesets/ts_grass_tiles/ts_grass_tiles.yy",},},
   ],

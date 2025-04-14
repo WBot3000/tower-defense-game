@@ -5,6 +5,8 @@ if(existence_timer > existence_time_limit) {
 	exit;
 }
 
+animation_controller.on_step();
+
 //TODO: Add enemy spawning
 if(worm_spawn_timer > frames_per_worm_spawn) {
 	var _worm = round_manager.spawn_extra_enemy(chompy_worm, enemy_path_data, round_spawned_in);
