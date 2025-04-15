@@ -45,8 +45,7 @@ switch (attack_state) {
 		break;
 	case ENEMY_ATTACKING_STATE.IN_ATTACK:
 		if(state_timer >= frames_per_attack) {
-			if(instance_exists(focused_entity) && //Make sure instance exists, and make sure it's a valid attack target
-				(object_is_ancestor(focused_entity.object_index, base_target) || (object_is_ancestor(focused_entity.object_index, base_unit) && focused_entity.health_state == UNIT_STATE.ACTIVE))) {
+			if(can_be_attacked(focused_entity)) {
 				var _vector_x = (focused_entity.bbox_left + focused_entity.bbox_right)/2 - (self.bbox_left + self.bbox_right)/2;
 				var _vector_y = (focused_entity.bbox_top + focused_entity.bbox_bottom)/2 - (self.bbox_top + self.bbox_bottom)/2;
 				var _vector_len = sqrt(sqr(_vector_x) + sqr(_vector_y));
@@ -68,19 +67,6 @@ switch (attack_state) {
 				range.get_entities_in_range(base_target, targets_in_range, true);
 				focused_entity = enemy_target_close(units_in_range, targets_in_range);
 				
-				/*
-				//Prioritize enemies over targets, and do NOT attempt to attack recovering enemies
-				for(var i = 0; i < ds_list_size(enemies_in_range); i++) {
-						if(enemies_in_range[| i].health_state == UNIT_STATE.ACTIVE) {
-							focused_entity = enemies_in_range[| i];
-							break;
-						}
-				}
-				//If there are no enemies nearby but target(s), attack the closest target
-				if(focused_entity == noone && !ds_list_empty(targets_in_range)) {
-					focused_entity = targets_in_range[| 0];
-				}
-				*/
 				if(focused_entity != noone) {
 					var _vector_x = (focused_entity.bbox_left + focused_entity.bbox_right)/2 - (self.bbox_left + self.bbox_right)/2;
 					var _vector_y = (focused_entity.bbox_top + focused_entity.bbox_bottom)/2 - (self.bbox_top + self.bbox_bottom)/2;

@@ -1,6 +1,6 @@
 /// @description Move along the path and occasionally bite a unit
 
-//TODO: Figure out how to write the AI in an efficient manner
+//TODO: Figure out how to write the AI in a more efficient manner?
 
 //Check to see if the enemy needs to be destroyed
 if(current_health <= 0) {
@@ -20,10 +20,12 @@ range.get_entities_in_range(base_unit, entities_in_range, true);
 range.get_entities_in_range(base_target, entities_in_range, true);
 for(var i = 0; i < ds_list_size(entities_in_range); i++) {
 	var _entity = entities_in_range[| i];
-	var _entity_just_added = entity_attack_cooldown_queue.add_entity(_entity, frames_per_attack);
-	if(_entity_just_added) {
-		deal_damage(entities_in_range[| i], melee_damage);
-		draw_damage_effect(entities_in_range[| i], spr_slash);
+	if(can_be_attacked(_entity)) {
+		var _entity_just_added = entity_attack_cooldown_queue.add_entity(_entity, frames_per_attack);
+		if(_entity_just_added) {
+			deal_damage(entities_in_range[| i], melee_damage);
+			draw_damage_effect(entities_in_range[| i], spr_slash);
+		}
 	}
 }
 ds_list_clear(entities_in_range);

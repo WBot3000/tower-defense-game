@@ -1,11 +1,27 @@
 /*
 This file contains the PurchaseManager, responsible for showing and handling which unit is selected for purchase
 */
+
+#region can_purchase_unit (Function)
+//Used for determining if a unit can be placed on a certain tile
+//TODO: Will need to account for player money once it's no longer a global variable
+function can_purchase_unit(_tile, _purchase_data) {
+	//Make sure tile can accept any units, and the unit is on the tile's approved list if it has one.
+	return _tile.placeable && _tile.placed_unit == noone && 
+		global.player_money >= _purchase_data.price && 
+		(array_length(_tile.valid_units) == 0 || array_contains(_tile.valid_units, _purchase_data.unit));
+}
+#endregion
+
+#region sell_unit (Function)
+#endregion
+
 #region PurchaseManager (Class)
 /*
-	TODO: Description
+	Manager that keeps track of the currently selected purchasing data.
 	
 	Argument Variables:
+	No argument variables
 	
 	Data Variables:
 	currently_selected_purchase: The purchase data needed to register a purchase

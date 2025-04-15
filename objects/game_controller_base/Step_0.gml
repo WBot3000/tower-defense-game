@@ -24,10 +24,7 @@ if(_q_pressed) {
 //Check to see if the music should be changed based on events in the game
 music_manager.on_step();
 
-//TODO: Update this to make it more efficient. Doesn't run "every tick" as described before, but should be in some sort of "pause_menu.on_click" function
-//I'm just very tired right now.
-//Honestly organize this entire section in general.
-//NOTE: This is only here because of the return if the game state isn't RUNNING. Will rework this once I rework that (and probably make this a responsibility of the UI like all of the other on-click stuff)
+
 if(game_state_manager.state == GAME_STATE.PAUSED && _mouse_left_released) {
 	game_ui.pause_menu.on_click();
 }
@@ -77,7 +74,6 @@ if(_mouse_left_released) {
 }
 
 
-//TODO: Should probably get rid of the placed unit tile ownership stuff. Just leaves more teardown work for something that can just be done with math instead. (Applies to selling with the sell button too.)
 if(_mouse_right_released) {
 	if(purchase_manager.currently_selected_purchase != undefined) {
 		purchase_manager.deselect_purchase();

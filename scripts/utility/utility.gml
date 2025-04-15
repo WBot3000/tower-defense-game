@@ -70,12 +70,3 @@ function get_entity_facing_direction(_entity, _x_coord) {
 #endregion
 
 
-#region can_purchase_unit (Function)
-//Used for determining if a unit can be placed on a certain tile
-//TODO: Will probably move to a different file eventually
-//TODO: Will need to account for player money once it's no longer a global variable
-function can_purchase_unit(tile, purchase_data) {
-	//Make sure tile can accept any units, and the unit is on the tile's approved list if it has one.
-	return tile.placeable && tile.placed_unit == noone && global.player_money >= purchase_data.price && (array_length(tile.valid_units) == 0 || array_contains(tile.valid_units, purchase_data.unit));
-}
-#endregion

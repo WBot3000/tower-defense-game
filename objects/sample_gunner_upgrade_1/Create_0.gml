@@ -21,7 +21,7 @@ if(!variable_instance_exists(self.id, "recovery_rate")) {
 }
 
 if(!variable_instance_exists(self.id, "radius")) { 
-	radius = 2.5; //TODO: Maybe make name clearer
+	radius = 2.5;
 }
 
 if(!variable_instance_exists(self.id, "range")) { 

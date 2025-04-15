@@ -35,8 +35,7 @@ switch (attack_state) {
 		break;
 	case ENEMY_ATTACKING_STATE.IN_ATTACK:
 		if(state_timer >= num_frames_paused) {
-			if(instance_exists(focused_entity) && //Make sure instance exists, and make sure it's a valid attack target
-				(object_is_ancestor(focused_entity.object_index, base_target) || (object_is_ancestor(focused_entity.object_index, base_unit) && focused_entity.health_state == UNIT_STATE.ACTIVE))) {
+			if(can_be_attacked(focused_entity)) {
 				deal_damage(focused_entity, melee_damage);
 				draw_damage_effect(focused_entity, spr_slash);
 				state_timer = 0;

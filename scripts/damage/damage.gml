@@ -2,7 +2,21 @@
 	damage.gml
 	
 	This file contains the damage function, used for dealing damage to enemies and units.
+	It also contains the function for checking to see if an entity can actually be attacked in the first place.
 */
+
+/*
+	Determine if a specified entity is a valid attack target
+*/
+function can_be_attacked(_entity_to_be_attacked) {
+	if(!instance_exists(_entity_to_be_attacked)) { //Can't attack an entity that no longer exists.
+		return false;
+	}
+	if(!object_is_ancestor(_entity_to_be_attacked, base_unit)) { //All entities that aren't units can always be attacked
+		return true;
+	}
+	return _entity_to_be_attacked.health_state == UNIT_STATE.ACTIVE; //Don't attack knocked out units
+}
 
 /*
 	Given an entity to damage, and a base damage value, calculate the amount of damage an attack should do.
@@ -18,16 +32,3 @@ function deal_damage(_entity_to_damage, _damage_amount){
 		_game_state_manager.lose_game();
 	}
 }
-
-/*
-	Function used for when an enemy deals damage to a target object.
-	If the enemy reduces the target's HP to zero, the game should be considered lost.
-*/
-/*
-function damage_target(_target_to_damage, _damage_amount) {
-	_target_to_damage.current_health = max(_target_to_damage.current_health -_damage_amount, 0); //Prevents targets from having negative health;
-	if(_target_to_damage.current_health == 0) { //Lose game
-		var _game_state_manager = get_game_state_manager();
-		_game_state_manager.lose_game();
-	}
-}*/

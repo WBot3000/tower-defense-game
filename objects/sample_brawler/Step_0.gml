@@ -1,6 +1,5 @@
 /// @description Look for enemies, and then punch them
 //Manage animation state
-//TODO: Need to figure out how to set unit to standing direction from punching direction, not just to standing downward.
 
 //Handle animation playing
 animation_controller.on_step();
@@ -46,7 +45,7 @@ if(punch_timer >= _frames_per_punch && ds_list_size(enemies_in_range) > 0) { //M
 	//If the enemy is further in the y-direction, face up or down. If the enemy is further in the x-direction, face left or right.
 	//var _dir = abs(_vector_y) > abs(_vector_x) ? _y_dir : _x_dir
 	
-	//TODO: Punching animation
+
 	switch (_x_dir) {
 	    case DIRECTION_LEFT:
 			animation_controller.set_animation(spr_sample_brawler_left_punch, 1, spr_sample_brawler_left);

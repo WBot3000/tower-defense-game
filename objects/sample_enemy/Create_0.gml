@@ -5,7 +5,7 @@ name = "Sample Enemy"
 max_health = 30;
 current_health = 30;
 
-default_movement_speed = 0.025; //TODO: What unit is this?
+default_movement_speed = 0.025; //In pixels per frame for paths
 if(!variable_instance_exists(self.id, "path_data")) { //If the enemy wasn't given a movement path upon creation, just have it stay still. Shouldn't occur during normal gameplay.
 	path_data = global.DATA_LEVEL_PATH_DUMMYPATH;
 }

@@ -16,7 +16,6 @@ attack_timer = min(attack_timer + 1, _frames_per_attack); //Done to prevent over
 
 //path_speed = 0;
 
-//TODO: Enemy damage is absolutely broken. Needs to get fixed.
 switch (attack_state) {
     case ENEMY_ATTACKING_STATE.IN_ATTACK:
         //If the instance you were previously targeting gets knocked out or stops existing, then you'll need to choose a new unit to target
@@ -46,7 +45,6 @@ switch (attack_state) {
 		//Because units don't disappear when their health goes to zero, we first need to make sure that the enemy is a state in which it can be attacked.
 		for(var i = 0; i < ds_list_size(units_in_range); ++i) {
 			var _target = units_in_range[| i];
-			//TODO: Check to see if enemy is attackable, then set it as enemy to attack, set path speed to zero, and break the loop
 			if(_target.health_state == UNIT_STATE.ACTIVE) {
 				unit_currently_attacking = _target;
 				show_debug_message("cat");

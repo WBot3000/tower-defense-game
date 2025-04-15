@@ -249,18 +249,17 @@ function QuitGameButton(_x_pos, _y_pos) :
 #macro QUIT_BUTTON_Y TILE_SIZE*4.5
 
 /*
-	In charge of drawing UI elements to the screen
+	In charge of drawing UI elements on the start menu.
 	
 	Argument Variables:
 	_purchase_data: The purchase data needed for the purchase menu
 	(All other argument variables correspond with non-underscored data variables)
 	
 	Data Variables:
-	controller_obj: The controller object this manager is created for.
+	start_button: Button for starting the game (takes you to the Level Select screen)
+	quit_button: Quits the game, closing the application.
 	
 	TODO: Finish this comment
-	TODO: Should I make a parent UI object for different UI types (GameUI, StartMenuUI, etc.)
-		- Would simplify a decent amount of code.
 */
 function StartMenuUI() : UIManager() constructor {		
 	//Buttons
@@ -414,7 +413,14 @@ function RoundStartButton(_x_pos, _y_pos) :
 
 #region ExitPauseMenuButton (Class)
 /*
-	TODO: Write this and other comments
+	The button that closes the pause menu and resumes the game.
+	
+	Argument Variables:
+	All correspond to Data Variables.
+	
+	Data Variables:
+	x_pos: The x-coordinate of the top-left of the header.
+	y_pos: The y-coordinate of the top-left of the header.
 */
 function ExitPauseMenuButton(_x_pos, _y_pos) : 
 	Button(_x_pos, _y_pos, spr_close_button, spr_close_button, spr_close_button) constructor {
@@ -607,7 +613,15 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 
 #region PreviousPagePurchaseMenuButton (Class)
 /*
-	TODO: Comment
+	Button for going to the purchase menu's previous page.
+	
+	Argument Variables:
+	All correspond to data variables.
+	
+	Data Variables:
+	x_pos: X coordinate of the button's top left corner in relation to the purchase menu
+	y_pos: Y coordinate of the button's top left corner in relation to the purchase menu
+	purchase_menu: The purchase menu struct the button is a part of.
 */
 function PreviousPagePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
 	Button(_x_pos, _y_pos, spr_page_left_default, spr_page_left_disabled) constructor {
@@ -631,7 +645,15 @@ function PreviousPagePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
 
 #region NextPagePurchaseMenuButton (Class)
 /*
-	TODO: Comment
+	Button for going to the purchase menu's next page.
+	
+	Argument Variables:
+	All correspond to data variables.
+	
+	Data Variables:
+	x_pos: X coordinate of the button's top left corner in relation to the purchase menu
+	y_pos: Y coordinate of the button's top left corner in relation to the purchase menu
+	purchase_menu: The purchase menu struct the button is a part of.
 */
 function NextPagePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
 	Button(_x_pos, _y_pos, spr_page_right_default, spr_page_right_disabled) constructor {
@@ -876,8 +898,6 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 #endregion
 
 
-
-
 #endregion
 
 
@@ -907,7 +927,6 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 	static draw_parent = draw;
 	
 	static draw = function(_x_offset, _y_offset) {
-		//TODO: Figure out how to get the inheritance actually working properly
 		var _draw_x_pos = x_pos + _x_offset;
 		var _draw_y_pos = y_pos + _y_offset;
 		
@@ -962,7 +981,7 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 	Data Variables:
 	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
 	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
-	//unit: The unit whose stats are being displayed
+	stat_level: The level of the stat being displayed
 */
 function draw_stat_level(_x_pos, _y_pos, _stat_level) {
 	draw_set_halign(fa_right);
@@ -1050,14 +1069,14 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _sele
 	}
 	
 
-	//static draw_parent = method(self, draw); //TODO: For some reason, the bind method was causing all of the button backgrounds to appear in the first section. Need to figure out why.
+	static draw_parent = draw;
 	
 	//_x_offset and _y_offset are the origins of the menu
 	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
 	static draw = function(_x_offset, _y_offset, _button_highlight_enabled = true) {
 		var _draw_x_pos = x_pos + _x_offset;
 		var _draw_y_pos = y_pos + _y_offset;
-		
+		/*
 		if(unit_upgrade_data == undefined) {
 			draw_sprite(button_sprite_disabled, 0, _draw_x_pos, _draw_y_pos);
 			return; //Nothing else to draw
@@ -1073,14 +1092,15 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _sele
 		else {
 			_spr = button_sprite_default;
 		}
-		draw_sprite(_spr, 0, _draw_x_pos, _draw_y_pos);
-		draw_sprite(object_get_sprite(unit_upgrade_data.upgrade_to), 0, _draw_x_pos + 8, _draw_y_pos + 4);
+		draw_sprite(_spr, 0, _draw_x_pos, _draw_y_pos);*/
+		draw_parent(_x_offset, _y_offset, _button_highlight_enabled);
+		draw_sprite(object_get_sprite(unit_upgrade_data.upgrade_to), 0, _draw_x_pos + 8 + TILE_SIZE/2, _draw_y_pos + 4 + TILE_SIZE);
 		draw_set_halign(fa_right);
 		draw_text(_draw_x_pos + sprite_get_width(button_sprite_default) - 8, _draw_y_pos + 72, string(unit_upgrade_data.price));
 		draw_set_halign(fa_left);
 	}
 	
-	static on_click = function() { //TODO: Need to finish??? Not actually sure.
+	static on_click = function() {
 		if(unit_upgrade_data != undefined) {
 			global.player_money -= unit_upgrade_data.price;
 			with(selected_unit) {	
@@ -1181,7 +1201,11 @@ function SellButton(_unit_info_card, _x_pos, _y_pos, _selected_unit = noone) :
 	selected_unit: The field unit most recently clicked on or purchased.
 	x_pos: Horizontal coordinate of the menu's top-right corner when the menu is open.
 	y_pos_open: Vertical coordinate of the menu's top-left corner when the menu is open.
-	//TODO: Add stat icons and the like
+	stat_upgrade_buttons: Contains all the buttons for stat upgrades
+	unit_upgrade_button_(1,2,3): Buttons for unit upgrades
+	targeting_indicator: Targeting indicator that displays the targeting type the unit is currently using
+	sell_button: Button for selling the unit in the unit info card.
+	toggle_button: Button for opening and closing the unit info card.
 */
 //#macro TOGGLE_INFO_CARD_BUTTON_X ((camera_get_view_width(view_camera[0]) - sprite_get_width(spr_pointer_arrow_up)) / 2)
 //#macro TOGGLE_INFO_CARD_BUTTON_Y (camera_get_view_height(view_camera[0]) - (TILE_SIZE*0.5))
@@ -1348,9 +1372,6 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	}
 	
 	
-	//TODO: This works differently from the unit purchase menu
-	// In that menu, the selection returns a unit type, this one actually performs the purchase
-	// Determine which method is better and do it.
 	//TODO: Make this code nicer. To many else ifs
 	static on_click = function() {
 		var _selected_button = stat_upgrade_buttons.get_button_clicked(0, y_pos_current); //Checks all the stat upgrade buttons
@@ -1492,7 +1513,15 @@ function GameInfoDisplay(_controller_obj) constructor {
 
 #region EndResultsHeader (Class)
 /*
-	TODO: Comment
+	Draws the "Victory" or "Game Over" on the End Results card
+	
+	Argument Variables:
+	All correspond to Data Variables.
+	
+	Data Variables:
+	x_pos: The x-coordinate of the top-left of the header.
+	y_pos: The y-coordinate of the top-left of the header.
+	header_sprite: Either the "Victory" sprite or the "Game Over" sprite.
 */
 function EndResultsHeader(_x_pos, _y_pos) constructor {
 	x_pos = _x_pos;
@@ -1514,7 +1543,14 @@ function EndResultsHeader(_x_pos, _y_pos) constructor {
 
 #region RestartLevelButton (Class)
 /*
-	TODO: Comment
+	The button that restarts the level.
+	
+	Argument Variables:
+	All correspond to Data Variables.
+	
+	Data Variables:
+	x_pos: The x-coordinate of the top-left of the header.
+	y_pos: The y-coordinate of the top-left of the header.
 */
 function RestartLevelButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_restart_button) constructor {
@@ -1529,7 +1565,14 @@ function RestartLevelButton(_x_pos, _y_pos) :
 
 #region BackToLevelSelectButton (Class)
 /*
-	TODO: Comment
+	The button that takes the player back to the Level Select screen.
+	
+	Argument Variables:
+	All correspond to Data Variables.
+	
+	Data Variables:
+	x_pos: The x-coordinate of the top-left of the header.
+	y_pos: The y-coordinate of the top-left of the header.
 	
 	TODO: Technically has the same functionality as the one on the title screen, just looks different.
 	Should I even be defining all of these buttons like this, or should I just pass parameters into the base button function?

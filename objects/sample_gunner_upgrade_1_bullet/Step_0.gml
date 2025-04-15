@@ -8,7 +8,6 @@ if(x < DIST_OFF_SCREEN * -1 || x > room_width + DIST_OFF_SCREEN || y < DIST_OFF_
 }*/
 //If old target doesn't exist, select a new one
 if(target == noone || !instance_exists(target)) {
-	//TODO: Should probably select a new instance based on targeting. Currently, just target the closest enemy
 	target = instance_nearest(x, y, base_enemy);
 	
 }
@@ -21,7 +20,6 @@ if(x >= 0 && x <= room_width && y >= 0 && y <= room_height) { //Only need to do 
 	if(collision_line(x, y, _end_x, _end_y, target, false, true)) {
 		//Damage the enemy
 		deal_damage(target, bullet_damage);
-		//TODO: Create explosion hitbox
 		//Destroy the missile
 		instance_destroy()
 		exit;

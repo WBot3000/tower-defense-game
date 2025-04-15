@@ -7,7 +7,7 @@ current_health = 100;
 health_state = UNIT_STATE.ACTIVE;
 recovery_rate = 10; //In health points per second
 
-radius = 2.5; //TODO: Maybe make name clearer
+radius = 2.5;
 range = new CircularRange(id, x + sprite_width/2, y + sprite_height/2, tilesize_to_pixels(radius));
 
 shooting_speed = 8;
