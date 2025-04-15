@@ -95,7 +95,7 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 		level_portrait: spr_level_portrait_SampleLevel1,
 		card_color: [148/255, 224/255, 168/255],
 	},
-	[/*
+	[
 		[
 			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 10, 5)
 		],
@@ -110,7 +110,7 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 			new EnemySpawningData([chompy_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 3, 1),
 			new EnemySpawningData([sword_beetle], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], 5, 3, 1),
 			new EnemySpawningData([gun_beetle], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 3, 5),
-		],*/
+		],
 		[
 			new EnemySpawningData([king_worm], [global.DATA_LEVEL_PATH_SAMPLELEVEL1_1], ENEMY_SPAWN_END, 0, 1)
 		],

@@ -3,7 +3,7 @@
 name = "Chompy Worm"
 
 max_health = 1000;
-current_health = 500;
+current_health = 1000;
 
 direction_facing = DIRECTION_RIGHT;
 image_xscale = direction_facing;

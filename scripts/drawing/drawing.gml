@@ -2,6 +2,7 @@
 	drawing.gml
 	
 	This file contains functions for drawing things to the screen that don't logically fit in any other file or class.
+	Most of this is done in "Draw" events, though the visual effects have their own objects becauseu
 */
 
 
@@ -66,6 +67,15 @@ function draw_health_bar_target(x, y, _current_health, _max_health){
 		//Additions to y are also due to sprite borders (maybe make these seem less arbitrary)
 		draw_rectangle_color(_health_bar_left_bound, y - 12, _health_bar_at, y - 5, c_teal, c_teal, c_teal, c_teal, false);
 	}
+}
+#endregion
+
+
+#region Visual Effect Enums
+//Enums for fading out visual effects
+enum VISUAL_EFFECT_STATUS {
+	STILL,
+	FADING_OUT
 }
 #endregion
 
