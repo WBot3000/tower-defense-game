@@ -7,5 +7,7 @@ existence_timer = 0;
 
 round_manager = get_round_manager();
 
+worm_hole_state = SLIDING_MENU_STATE.OPENING //Lol I'm using the sliding menu state here, might change this later.
+
 animation_controller = new AnimationController(self, spr_worm_hole_opening, spr_worm_hole);
 animation_controller.set_animation(spr_worm_hole_opening);
