@@ -94,6 +94,7 @@ function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled 
 
 
 #region PillBar (Class)
+//TODO: This might just get deleted. It's just a worse version of the slider.
 /*
 	Argument Variables:
 	_starting_segment: Which segment should the pill bar initially be highlighted up to when it is created. Should correspond with a "default option"
@@ -147,6 +148,72 @@ function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segment
 			_pill_x_pos += (PILL_WIDTH + PILL_GAP);
 		}
 		return current_segment;
+	}
+}
+#endregion
+
+
+#region Slider (Class)
+/*
+	Describes a slider class. Allows you to select from a certain range (with the leftmost position being the lowest, and the rightmost position being the highest)
+	
+	Argument Variables:
+	_default_value: The value that the slider should be initialized with.
+	All correlate with Data Variables
+	
+	Data Variables:
+	x_pos_left: Where the left of the slider resides.
+	x_pos_right: Coordinate where the right of the slider resides.
+	y_pos: Vertical position of the slider.
+	min_value: The value selected when the slider is set to the leftmost position.
+	max_value: The value selected when the slider is set to the rightmost position.
+	current_value: The value the slider is currently set to.
+*/
+function Slider(_x_pos_left, _x_pos_right, _y_pos,
+	_min_value = 0, _max_value = 100, _default_value = _max_value) constructor {
+	x_pos_left = _x_pos_left;
+	x_pos_right = _x_pos_right;
+	y_pos = _y_pos;
+	min_value = _min_value;
+	max_value = _max_value;
+	
+	current_value = _default_value;
+	//No need to re-calculate this each time we draw the slider
+	current_value_x_pos = map_value(current_value, min_value, max_value, x_pos_left, x_pos_right);
+	
+	//_x_offset and _y_offset are for sliders that are a part of menus. They allow you to define the coordinates in relation to the menu instead of to the entire screen.
+	static is_highlighted = function(_x_offset = 0, _y_offset = 0) {
+		var _absolute_x_pos_left = x_pos_left + _x_offset;
+		var _absolute_x_pos_right = x_pos_right + _x_offset;
+		var _absolute_y_pos = y_pos + _y_offset
+		
+		//TODO: Passable view_camera index? And maybe rename these variables? Not sure.
+		var _view_x = device_mouse_x_to_gui(0);
+		var _view_y = device_mouse_y_to_gui(0);
+		return (_view_x >= _absolute_x_pos_left && _view_x <= _absolute_x_pos_right
+			&& _view_y >= _absolute_y_pos - 8 && _view_y <= _absolute_y_pos + 8); //TODO: Change 8 to relate to the size of the circle slide thingy.
+	}
+	
+	
+	static draw = function() {
+		draw_line_width_color(x_pos_left, y_pos, x_pos_right, y_pos, 4, c_white, c_white);
+		draw_sprite(spr_sample_gunner_bullet, 0, current_value_x_pos, y_pos);
+	}
+	
+	
+	static move_slider = function(_new_x_pos) {
+		if(_new_x_pos <= x_pos_left) {
+			current_value = min_value;
+			current_value_x_pos = x_pos_left;
+		}
+		else if(_new_x_pos >= x_pos_right) {
+			current_value = max_value;
+			current_value_x_pos = x_pos_right;
+		}
+		else {
+			current_value = map_value(_new_x_pos, x_pos_left, x_pos_right, min_value, max_value);
+			current_value_x_pos = _new_x_pos;
+		}
 	}
 }
 #endregion
@@ -217,6 +284,27 @@ function LevelSelectButton(_x_pos, _y_pos) :
 #endregion
 
 
+#region OptionsButton (Class)
+/*
+	Defines a button that can be clicked to take you to an options menu
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
+	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
+*/
+function OptionsButton(_x_pos, _y_pos) :
+	Button(_x_pos, _y_pos, spr_options_button) constructor {
+		
+		static on_click = function() {
+			//room_goto(LevelSelectScreen);
+		}
+}
+#endregion
+
+
 #region QuitGameButton (Class)
 /*
 	Defines a button that can be clicked to exit the game
@@ -245,8 +333,11 @@ function QuitGameButton(_x_pos, _y_pos) :
 #macro PLAY_BUTTON_X ((camera_get_view_width(view_camera[0]) - sprite_get_width(spr_play_game_button)) / 2)
 #macro PLAY_BUTTON_Y TILE_SIZE*2
 
-#macro QUIT_BUTTON_X ((camera_get_view_width(view_camera[0]) - sprite_get_width(spr_play_game_button)) / 2)
-#macro QUIT_BUTTON_Y TILE_SIZE*4.5
+#macro OPTIONS_BUTTON_X ((camera_get_view_width(view_camera[0]) - sprite_get_width(spr_options_button)) / 2)
+#macro OPTIONS_BUTTON_Y TILE_SIZE*4
+
+#macro QUIT_BUTTON_X ((camera_get_view_width(view_camera[0]) - sprite_get_width(spr_quit_game_button)) / 2)
+#macro QUIT_BUTTON_Y TILE_SIZE*6
 
 /*
 	In charge of drawing UI elements on the start menu.
@@ -266,10 +357,13 @@ function StartMenuUI() : UIManager() constructor {
 	start_button = new LevelSelectButton(PLAY_BUTTON_X, PLAY_BUTTON_Y);
 	start_button.activate();
 	
+	options_button = new OptionsButton(OPTIONS_BUTTON_X, OPTIONS_BUTTON_Y);
+	options_button.activate();
+	
 	quit_button = new QuitGameButton(QUIT_BUTTON_X, QUIT_BUTTON_Y);
 	quit_button.activate();
 	
-	ui_elements = [start_button, quit_button];
+	ui_elements = [start_button, options_button, quit_button];
 	
 	
 	static draw_parent = draw;
@@ -475,15 +569,7 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage) constructor 
 	close_button = new ExitPauseMenuButton(x2 - 40, y1 + 8);
 	close_button.activate();
 	
-	//TODO: Might want to move pill bar stuff into it's own class
-	/*
-		Gross math equation that basically says
-		- From the center of the pause menu [(_x1 + _x2) / 2]
-		- Move the pill bar [-]
-		- Half of it's length to the left [(NUM_VOLUME_PILLS * (PILL_WIDTH + PILL_GAP - 1)) / 2]
-	*/
-	var _volume_options_x = ((x1 + x2) / 2) - ((NUM_VOLUME_PILLS * (PILL_WIDTH + PILL_GAP - 1)) / 2);
-	volume_options = new PillBar(_volume_options_x, y1 + 96, NUM_VOLUME_PILLS, NUM_VOLUME_PILLS);
+	volume_slider = new Slider(x1 + 16, x2 - 16, y1 + 128, 0, 100, 100);
 	
 	//Used for determining whether or not to render
 	active = false;
@@ -512,14 +598,14 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage) constructor 
 		if(close_button.is_highlighted()) {
 			close_button.on_click();
 		}
-		else {
-			//TODO: Can probably merge first two lines in pill bar
-			//TODO: Sometimes, the pill bar glitches out, not sure why. To be honest, I'm probably just gonna replace it with a slider
-			var _selected_pill = volume_options.on_click();
-			volume_options.current_segment = _selected_pill;
+		//TODO: This only updates when the mouse button is released, when really it should update whenever the user attempts to move it.
+		//Find a good way to make this run (maybe an on_step sort of thing?
+		else if(volume_slider.is_highlighted()) {
+			volume_slider.move_slider(device_mouse_x_to_gui(0));
 			var _music_manager = get_music_manager();
 			if(_music_manager != undefined) {
-				_music_manager.set_volume(volume_options.current_segment / volume_options.num_segments);
+				//Turns volume value into a number from 0-1
+				_music_manager.set_volume(volume_slider.current_value / volume_slider.max_value);
 			}
 		}
 	}
@@ -531,7 +617,8 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage) constructor 
 		draw_text_color((x1 + x2) / 2, y1 + 32, "PAUSED", c_white, c_white, c_white, c_white, 1);
 		close_button.draw();
 		draw_text_color((x1 + x2) / 2, y1 + 64, "Music Volume", c_white, c_white, c_white, c_white, 1);
-		volume_options.draw();
+		draw_text_color((x1 + x2) / 2, y1 + 96, volume_slider.current_value, c_white, c_white, c_white, c_white, 1);
+		volume_slider.draw();
 		draw_set_halign(fa_left);
 	}
 	
@@ -1076,28 +1163,14 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _sele
 	static draw = function(_x_offset, _y_offset, _button_highlight_enabled = true) {
 		var _draw_x_pos = x_pos + _x_offset;
 		var _draw_y_pos = y_pos + _y_offset;
-		/*
-		if(unit_upgrade_data == undefined) {
-			draw_sprite(button_sprite_disabled, 0, _draw_x_pos, _draw_y_pos);
-			return; //Nothing else to draw
-		}
 		
-		var _spr;
-		if(!is_enabled()) {
-			_spr = button_sprite_disabled;
-		}
-		else if(_button_highlight_enabled && is_highlighted(_x_offset, _y_offset)) {
-			_spr = button_sprite_highlighted;
-		}
-		else {
-			_spr = button_sprite_default;
-		}
-		draw_sprite(_spr, 0, _draw_x_pos, _draw_y_pos);*/
 		draw_parent(_x_offset, _y_offset, _button_highlight_enabled);
-		draw_sprite(object_get_sprite(unit_upgrade_data.upgrade_to), 0, _draw_x_pos + 8 + TILE_SIZE/2, _draw_y_pos + 4 + TILE_SIZE);
-		draw_set_halign(fa_right);
-		draw_text(_draw_x_pos + sprite_get_width(button_sprite_default) - 8, _draw_y_pos + 72, string(unit_upgrade_data.price));
-		draw_set_halign(fa_left);
+		if(unit_upgrade_data != undefined) {
+			draw_sprite(object_get_sprite(unit_upgrade_data.upgrade_to), 0, _draw_x_pos + 8 + TILE_SIZE/2, _draw_y_pos + 4 + TILE_SIZE);
+			draw_set_halign(fa_right);
+			draw_text(_draw_x_pos + sprite_get_width(button_sprite_default) - 8, _draw_y_pos + 72, string(unit_upgrade_data.price));
+			draw_set_halign(fa_left);
+		}
 	}
 	
 	static on_click = function() {

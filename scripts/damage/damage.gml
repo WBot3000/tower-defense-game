@@ -9,7 +9,7 @@
 	Determine if a specified entity is a valid attack target
 */
 function can_be_attacked(_entity_to_be_attacked) {
-	if(!instance_exists(_entity_to_be_attacked)) { //Can't attack an entity that no longer exists.
+	if(_entity_to_be_attacked == noone || !instance_exists(_entity_to_be_attacked)) { //Can't attack an entity that no longer exists.
 		return false;
 	}
 	if(!object_is_ancestor(_entity_to_be_attacked, base_unit)) { //All entities that aren't units can always be attacked
