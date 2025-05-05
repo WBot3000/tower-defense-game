@@ -6,6 +6,11 @@
 
 	TODO: Sort out the hierarchy of activation so we don't get any weird behavior with UI elements that are invisible but can still be interacted with (ex. sliders)
 	And write this down!
+	
+	Hierarchy of Activation:
+	By default, UI components are considered NOT activated. This is because it's less clutter to simply activate the components you need, as opposed to having to de-activate all the things you don't.
+	Top-level UI components (StartMenuUI, LevelSelectUI, GameUI) are set to be active in their constructors, as there is no reason to de-activate these (they activate/de-activate all their own components)
+	A UIParent will not perform any actions while non-active, including performing checks on all of its children, essentially rendering them inactive as well, even if the children aren't marked explicitly as inactive.
 */
 
 #region Basic UI Components
@@ -907,7 +912,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) :
 	
 	
 	static is_highlighted = function() {
-		return (/*mouse_x - _view_x*/ device_mouse_x_to_gui(0) >= x_pos_current && y_pos >= /*mouse_y - _view_y*/ device_mouse_y_to_gui(0)) || 
+		return (device_mouse_x_to_gui(0) >= x_pos_current && y_pos >= device_mouse_y_to_gui(0)) || 
 			toggle_button.is_highlighted(x_pos_current, 0); 
 	}
 	
@@ -938,14 +943,20 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) :
 	
 	
 	static toggle_open = function() {
-		audio_play_sound(SFX_Menu_Open, 1, false, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100);
-		state = SLIDING_MENU_STATE.OPENING;
+		var _game_state_manager = get_game_state_manager();
+		if(_game_state_manager && _game_state_manager.state != GAME_STATE.PAUSED) { //Don't do any toggling if the game is paused
+			audio_play_sound(SFX_Menu_Open, 1, false, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100);
+			state = SLIDING_MENU_STATE.OPENING;
+		}
 	}
 	
 	
 	static toggle_closed = function() {
-		audio_play_sound(SFX_Menu_Close, 1, false, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100)
-		state = SLIDING_MENU_STATE.CLOSING;
+		var _game_state_manager = get_game_state_manager();
+		if(_game_state_manager && _game_state_manager.state != GAME_STATE.PAUSED) {
+			audio_play_sound(SFX_Menu_Close, 1, false, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100)
+			state = SLIDING_MENU_STATE.CLOSING;
+		}
 	}
 	
 	
@@ -1445,14 +1456,20 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) : UIComponent() construct
 	
 	
 	static toggle_open = function() {
-		audio_play_sound(SFX_Menu_Open, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100, false);
-		state = SLIDING_MENU_STATE.OPENING;
+		var _game_state_manager = get_game_state_manager();
+		if(_game_state_manager && _game_state_manager.state != GAME_STATE.PAUSED) { //Don't do any toggling if the game is paused
+			audio_play_sound(SFX_Menu_Open, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100, false);
+			state = SLIDING_MENU_STATE.OPENING;
+		}
 	}
 	
 	
 	static toggle_closed = function() {
-		audio_play_sound(SFX_Menu_Close, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100, false);
-		state = SLIDING_MENU_STATE.CLOSING;
+		var _game_state_manager = get_game_state_manager();
+		if(_game_state_manager && _game_state_manager.state != GAME_STATE.PAUSED) { //Don't do any toggling if the game is paused
+			audio_play_sound(SFX_Menu_Close, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100, false);
+			state = SLIDING_MENU_STATE.CLOSING;
+		}
 	}
 	
 	

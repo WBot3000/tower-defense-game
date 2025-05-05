@@ -152,20 +152,6 @@ function get_camera_controller(_controller_obj = undefined) {
 #endregion
 
 
-#region get_music_manager (Function)
-//NOTE: You can also pass a controller object if you have one so that you don't have to fetch it. Should save a tiny bit of time.
-function get_music_manager(_controller_obj = undefined) {
-	if(_controller_obj == undefined) {
-		_controller_obj = get_game_controller();
-	}
-	if(_controller_obj == noone || !variable_instance_exists(_controller_obj, "music_manager")) {
-		return undefined;
-	}
-	return _controller_obj.music_manager;
-}
-#endregion
-
-
 #region get_game_ui (Function)
 //Even though this doesn't have manager in the name, basically acts like one.
 //NOTE: You can also pass a controller object if you have one so that you don't have to fetch it. Should save a tiny bit of time.
