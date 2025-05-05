@@ -13,7 +13,7 @@ function OptionsManager() constructor{
 	
 	//Audio Settings
 	music_volume = 100;
-	sfx_volume = 100;
+	sound_effects_volume = 100;
 	
 	//Visual Settings
 	is_fullscreen = false;

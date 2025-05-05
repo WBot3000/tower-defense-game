@@ -1,6 +1,6 @@
 {
   "$GMSound":"",
-  "%Name":"Music_PreRound",
+  "%Name":"Music_Title_Theme",
   "audioGroupId":{
     "name":"audiogroup_default",
     "path":"audiogroups/audiogroup_default",
@@ -9,8 +9,8 @@
   "bitRate":128,
   "compression":0,
   "conversionMode":0,
-  "duration":44.17306,
-  "name":"Music_PreRound",
+  "duration":88.05878,
+  "name":"Music_Title_Theme",
   "parent":{
     "name":"Placeholders",
     "path":"folders/Sounds/Placeholders.yy",
@@ -19,7 +19,7 @@
   "resourceType":"GMSound",
   "resourceVersion":"2.0",
   "sampleRate":44100,
-  "soundFile":"Music_PreRound.mp3",
+  "soundFile":"Music_Title_Theme.mp3",
   "type":0,
   "volume":1.0,
 }

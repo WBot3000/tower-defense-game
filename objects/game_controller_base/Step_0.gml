@@ -22,8 +22,8 @@ if(_q_pressed) {
 }
 
 //Check to see if the music should be changed based on events in the game
-music_manager.on_step();
-
+//music_manager.on_step();
+global.BACKGROUND_MUSIC_MANAGER.on_step();
 
 if(game_state_manager.state == GAME_STATE.PAUSED && _mouse_left_released) {
 	game_ui.pause_menu.on_click();
@@ -36,11 +36,14 @@ round_manager.on_step(game_state_manager.state);
 //Perform any necessary camera movement based on user_input
 camera_controller.move_camera(game_state_manager.state);
 
+//Perform any per-frame UI changes
+game_ui.on_step();
+
 
 if(_mouse_left_released) {
 	//Check for certain areas clicked
 	var gui_elem = game_ui.gui_element_highlighted();
-	
+	//show_debug_message(gui_elem)
 	if(gui_elem != undefined) {
 		gui_elem.on_click();
 	}
@@ -56,8 +59,8 @@ if(_mouse_left_released) {
 		}
 		
 		//Attempt to make a new purchase
-		//Can't purchase anything if nothing is selected (or if you're on the GUI)
-		if(purchase_manager.currently_selected_purchase != undefined && game_ui.gui_element_highlighted() == undefined) {
+		//Can't purchase anything if nothing is selected (or if you're on the GUI, but we already know we aren't, since if you're here, gui_elem == undefined)
+		if(purchase_manager.currently_selected_purchase != undefined) {
 			var _tile_at_mouse = instance_position(mouse_x, mouse_y, placeable_tile);
 			if(_tile_at_mouse != noone) {
 				with(_tile_at_mouse) {

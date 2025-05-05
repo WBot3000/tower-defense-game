@@ -30,7 +30,8 @@ purchase_manager = new PurchaseManager();
 
 camera_controller = new CameraController();
 
-music_manager = new MusicManager(Music_PreRound);
+//music_manager = new MusicManager(Music_PreRound);
+global.BACKGROUND_MUSIC_MANAGER.set_music(Music_PreRound);
 #endregion
 
 

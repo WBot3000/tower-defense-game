@@ -12,7 +12,7 @@ function can_be_attacked(_entity_to_be_attacked) {
 	if(_entity_to_be_attacked == noone || !instance_exists(_entity_to_be_attacked)) { //Can't attack an entity that no longer exists.
 		return false;
 	}
-	if(!object_is_ancestor(_entity_to_be_attacked, base_unit)) { //All entities that aren't units can always be attacked
+	if(!object_is_ancestor(_entity_to_be_attacked.object_index, base_unit)) { //All entities that aren't units can always be attacked
 		return true;
 	}
 	return _entity_to_be_attacked.health_state == UNIT_STATE.ACTIVE; //Don't attack knocked out units

@@ -26,12 +26,12 @@
 	
 	TODO: Currently, this assumes that all music should loop. Should add support for non-looping music.
 */
-function MusicManager(_initial_music, _initial_volume = 1) constructor {
+function MusicManager(_initial_music/*, _initial_volume = global.GAME_CONFIG_SETTINGS.music_volume*/) constructor {
 	current_music = _initial_music;
 	current_music_ref = -1;
-	volume = _initial_volume
+	//volume = _initial_volume
 	if(_initial_music != undefined) {
-		current_music_ref = audio_play_sound(_initial_music, MAX_AUDIO_PRIORITY, true, volume);
+		current_music_ref = audio_play_sound(_initial_music, MAX_AUDIO_PRIORITY, true, /*volume*/ global.GAME_CONFIG_SETTINGS.music_volume / 100);
 	}
 	
 	fading_out = false;
@@ -45,10 +45,10 @@ function MusicManager(_initial_music, _initial_volume = 1) constructor {
 	}
 	
 	
-	static set_volume = function(_new_volume) {
-		volume = _new_volume;
+	static adjust_volume = function(/*_new_volume*/) {
+		//volume = _new_volume;
 		if(current_music_ref != -1) {
-			audio_sound_gain(current_music_ref, volume, 0);
+			audio_sound_gain(current_music_ref, /*volume*/ global.GAME_CONFIG_SETTINGS.music_volume / 100, 0);
 		}
 	}
 	
@@ -70,7 +70,7 @@ function MusicManager(_initial_music, _initial_volume = 1) constructor {
 			fading_start = -1;
 			if(next_music != undefined) {
 				current_music = next_music;
-				current_music_ref = audio_play_sound(next_music, MAX_AUDIO_PRIORITY, true, volume);
+				current_music_ref = audio_play_sound(next_music, MAX_AUDIO_PRIORITY, true, /*volume*/global.GAME_CONFIG_SETTINGS.music_volume / 100);
 				next_music = undefined;
 			}
 			else {
@@ -80,3 +80,5 @@ function MusicManager(_initial_music, _initial_volume = 1) constructor {
 	}
 }
 #endregion
+
+global.BACKGROUND_MUSIC_MANAGER = new MusicManager();

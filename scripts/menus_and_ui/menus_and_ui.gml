@@ -4,10 +4,37 @@
 	This file contains macros, structs, and functions for creating the various menus and UI elements in the game.
 	Certain menus have different options based on different contexts. These let you control these options easily.
 
-	TODO: Maybe make an Activatable object that handles all instances that can be activated and de-activated?
+	TODO: Sort out the hierarchy of activation so we don't get any weird behavior with UI elements that are invisible but can still be interacted with (ex. sliders)
+	And write this down!
 */
 
 #region Basic UI Components
+
+#region UIComponent (Class)
+/*
+	A base component for all other UI components.
+	
+	Defines activatability and functions that all UI components should have.
+*/
+function UIComponent() constructor {
+	active = false;
+	
+	//Basically just a wrapper for activating the button
+	static activate = function() {
+		active = true;
+	}
+	
+	//Basically just a wrapper for deactivating the button
+	static deactivate = function() {
+		active = false;
+	}
+	
+	static draw = function() {}
+	static on_step = function() {}
+	static on_click = function() {}
+}
+#endregion
+
 
 #region Button (Class)
 /*
@@ -28,31 +55,20 @@
 	
 	NOTE 1: "Enabled" refers to whether or not the button can be clicked to perform an action. "Active" refers to whether or not the button is rendered at all.
 */
-function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled = _button_sprite_default, _button_sprite_highlighted = _button_sprite_default) constructor {
+function Button(_x_pos, _y_pos, 
+	_button_sprite_default, _button_sprite_disabled = _button_sprite_default, _button_sprite_highlighted = _button_sprite_default) :
+	UIComponent() constructor {
 	x_pos = _x_pos;
 	y_pos = _y_pos;
 	button_sprite_default = _button_sprite_default;
 	button_sprite_disabled = _button_sprite_disabled;
 	button_sprite_highlighted = _button_sprite_highlighted;
-	
-	active = false;
-	
-	
+
 	//Determines whether or not a button should be clickable or not.
 	//Basically always overridden, mainly just here for completion's sake;
 	//NOTE: Shouldn't accept any parameters.
 	static is_enabled = function() {
 		return true;
-	}
-	
-	//Basically just a wrapper for activating the button
-	static activate = function() {
-		active = true;
-	}
-	
-	//Basically just a wrapper for deactivating the button
-	static deactivate = function() {
-		active = false;
 	}
 	
 	
@@ -93,66 +109,6 @@ function Button(_x_pos, _y_pos, _button_sprite_default, _button_sprite_disabled 
 #endregion
 
 
-#region PillBar (Class)
-//TODO: This might just get deleted. It's just a worse version of the slider.
-/*
-	Argument Variables:
-	_starting_segment: Which segment should the pill bar initially be highlighted up to when it is created. Should correspond with a "default option"
-	(All other argument variables correspond with non-underscored data variables)
-	
-	Used for creating "pill bars", segmented sliders that can be used to select a range of values
-	x_pos: X-coordinate of the top left of the bar.
-	y_pos: Y-coordinate of the top left of the bar.
-	num_segments: The number of segments this pill bar should have.
-	current_segment: The modifier that the pill bar is set to. Values can be from 0 to num_segments.
-*/
-#macro PILL_WIDTH sprite_get_width(spr_pill_button_light)
-#macro PILL_HEIGHT sprite_get_height(spr_pill_button_light)
-#macro PILL_GAP sprite_get_width(spr_pill_button_light) / 4
-
-function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segments) constructor {
-	x_pos = _x_pos;
-	y_pos = _y_pos;
-	num_segments = _num_segments;
-	current_segment = _starting_segment;
-	
-	static draw = function() {
-		var pill_x_pos = x_pos;
-		for(var i = 0; i < num_segments; ++i) {
-			if(i < current_segment) {
-				draw_sprite(spr_pill_button_light, 0, pill_x_pos, y_pos);
-			}
-			else {
-				draw_sprite(spr_pill_button_dark, 0, pill_x_pos, y_pos);
-			}
-			pill_x_pos += (PILL_WIDTH + PILL_GAP);
-		}
-	}
-	
-	
-	//Returns the segment that the menu should be set to.
-	static on_click = function() {
-		var _pill_x_pos = x_pos;
-		var _click_x = device_mouse_x_to_gui(0);
-		var _click_y = device_mouse_y_to_gui(0);
-		for (var i = 0; i < num_segments; ++i) {
-		    if((_click_x >= _pill_x_pos) && (_click_x <= _pill_x_pos + PILL_WIDTH)
-				&& (_click_y >= y_pos) && (_click_y <= y_pos + PILL_HEIGHT)) {
-					if(i + 1 == current_segment) { //If you click on the current rightmost segment, "un-select it"
-						current_segment = i;	
-					}
-					else {
-						current_segment = i+1;
-					}
-			}
-			_pill_x_pos += (PILL_WIDTH + PILL_GAP);
-		}
-		return current_segment;
-	}
-}
-#endregion
-
-
 #region Slider (Class)
 /*
 	Describes a slider class. Allows you to select from a certain range (with the leftmost position being the lowest, and the rightmost position being the highest)
@@ -165,15 +121,17 @@ function PillBar(_x_pos, _y_pos, _num_segments, _starting_segment = _num_segment
 	x_pos_left: Where the left of the slider resides.
 	x_pos_right: Coordinate where the right of the slider resides.
 	y_pos: Vertical position of the slider.
+	label: A string that indicates what the slider does.
 	min_value: The value selected when the slider is set to the leftmost position.
 	max_value: The value selected when the slider is set to the rightmost position.
 	current_value: The value the slider is currently set to.
 */
-function Slider(_x_pos_left, _x_pos_right, _y_pos,
-	_min_value = 0, _max_value = 100, _default_value = _max_value) constructor {
+function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
+	_min_value = 0, _max_value = 100, _default_value = _max_value) : UIComponent() constructor {
 	x_pos_left = _x_pos_left;
 	x_pos_right = _x_pos_right;
 	y_pos = _y_pos;
+	label = _label
 	min_value = _min_value;
 	max_value = _max_value;
 	
@@ -191,13 +149,16 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos,
 		var _view_x = device_mouse_x_to_gui(0);
 		var _view_y = device_mouse_y_to_gui(0);
 		return (_view_x >= _absolute_x_pos_left && _view_x <= _absolute_x_pos_right
-			&& _view_y >= _absolute_y_pos - 8 && _view_y <= _absolute_y_pos + 8); //TODO: Change 8 to relate to the size of the circle slide thingy.
+			&& _view_y >= _absolute_y_pos - 16 && _view_y <= _absolute_y_pos + 16); //TODO: Change 8 to relate to the size of the slider circle sprite.
 	}
 	
 	
 	static draw = function() {
-		draw_line_width_color(x_pos_left, y_pos, x_pos_right, y_pos, 4, c_white, c_white);
-		draw_sprite(spr_sample_gunner_bullet, 0, current_value_x_pos, y_pos);
+		if(active) {
+			draw_text_color(x_pos_left, y_pos - 32, label + ": " + string( floor(current_value)), c_white, c_white, c_white, c_white, 1);
+			draw_line_width_color(x_pos_left, y_pos, x_pos_right, y_pos, 4, c_white, c_white);
+			draw_sprite(spr_slider_circle, 0, current_value_x_pos, y_pos);
+		}
 	}
 	
 	
@@ -215,30 +176,46 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos,
 			current_value_x_pos = _new_x_pos;
 		}
 	}
+	
+	
+	static on_step = function() {
+		if(is_highlighted() && mouse_check_button(mb_left)) {
+			move_slider(device_mouse_x_to_gui(0));
+		}
+	}
+	
+	
+	static on_click = function() {
+		if(is_highlighted() && mouse_check_button_released(mb_left)) {
+			move_slider(device_mouse_x_to_gui(0));
+		}
+	}
 }
 #endregion
 
 
-#region UIManager (Class)
+#region UIParent (Class)
 /*
-	Parent class for all of the various UI managers in the game.
+	Used for managing multiple UI components for a single interface
 	
 	Argument Variables:
 	
 	Data Variables:
-	ui_elements: A list of all of the UI elements contained within this UIManager
+	ui_elements: A list of all of the UI elements contained within this UIParent
 		- The elements should be arranged from back (drawn last) to front (drawn first).
 		- If none of your UI elements overlap, the order won't make a difference, but if they do, elements in front will be selected "first"
 */
-//TODO: I can honestly use a component like this for all UI components, not just the top level ones, makes iterating through sub-elements easier.
-function UIManager() constructor {
-	//Getting viewport dimensions	(TODO: Not sure if I need to keep this, or if I can just fetch these from the appropriate functions when I need to.
+function UIParent() : UIComponent() constructor {
+	//Getting viewport dimensions	(TODO: Not sure if I should keep this, or if I can just fetch these from the appropriate functions when I need to.)
 	view_w =  camera_get_view_width(view_camera[0]);
 	view_h = camera_get_view_height(view_camera[0]);
 	
 	ui_elements = [];
 	
 	static gui_element_highlighted = function() {
+		if(!active) {
+			return undefined;
+		}
 		//Array is searched from end to beginning so that elements drawn in the front are checked before elements drawn in the back
 		for(var i = array_length(ui_elements) - 1; i >= 0; i--) {
 			if(ui_elements[i].active && ui_elements[i].is_highlighted()) {
@@ -248,13 +225,90 @@ function UIManager() constructor {
 		return undefined;
 	}
 	
+	//This is meant for things like sliders that can take continuous input (via holding down the mouse)
+	//TODO: Need to figure out a way for front objects to take precedence over behind objects, but also allow objects to do other per-frame stuff uninterrupted.
+	//Maybe an "on_step_interruptible"? and "on_step_uninterruptible"? I'll think of this once it becomes an actual problem.
+	static on_step = function() {
+		if(!active) {
+			return;
+		}
+		for(var i = array_length(ui_elements) - 1; i >= 0; i--) {
+				ui_elements[i].on_step();
+		}
+	}
+	
+	//Returns true if there's an element, and false if there isn't. Allows you to perform actions based on whether you've actually clicked something or not.
+	//The reason this is a seperate function from "gui_element_highlighted" is in the event you want to get the element the mouse is on, but don't necessarily want to click on it.
+	static on_click = function() {
+		var _elem = gui_element_highlighted();
+		if(_elem != undefined) {
+			_elem.on_click();
+			return true;
+		}
+		return false;
+	}
+	
+	
 	static draw = function() {
+		if(!active) {
+			return undefined;
+		}
 		for(var i = 0; i < array_length(ui_elements); i++) {
 			if(ui_elements[i].active) {
 				ui_elements[i].draw();
 			}
 		}
 	}
+}
+#endregion
+
+
+#region PopupMenu (Class)
+/*
+	Defines a menu that appears over the main screen (as opposed to being a dediicated room/page)
+	
+	Argument Variables:
+	_menu_width_percentage: The percentage of the screen's width this menu should take up
+	_menu_height_percentage: The percentage of the screen's height this menu should take up
+	All other argument variables correlate to data variables.
+	
+	Data Variables:
+	x1: Left boundary
+	y1: Upper boundary
+	x2: Right boundary
+	y2: Lower boundary
+*/
+enum POPUP_MENU_STATE {
+	MENU_OPEN,
+	MENU_CLOSED
+}
+
+function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UIParent() constructor {
+	x1 = (view_w/2) - (_menu_width_percentage/2 * view_w); //From middle point, go to the left by the percentage amount
+	y1 = (view_h/2) - (_menu_height_percentage/2 * view_h); //From middle point, go up by the percentage amount
+	x2 = (view_w/2) + (_menu_width_percentage/2 * view_w); //From middle point, go to the right by the percentage amount
+	y2 = (view_h/2) + (_menu_height_percentage/2 * view_h); //From middle point, go down by the percentage amount
+	
+	title = _title;
+	
+	//TODO: Determine how to do menu options
+	
+	static draw_parent = draw;
+	
+	static draw = function() {
+		draw_rectangle_color(x1, y1, x2, y2, c_black, c_black, c_black, c_black, false);
+		draw_set_halign(fa_center);
+		draw_text_color((x1 + x2) / 2, y1 + 32, title, c_white, c_white, c_white, c_white, 1);
+		draw_set_halign(fa_left);
+		draw_parent();
+	}
+	
+	static is_highlighted = function() {
+		var _mouse_x_gui = device_mouse_x_to_gui(0);
+		var _mouse_y_gui = device_mouse_y_to_gui(0);
+		return _mouse_x_gui >= x1 && _mouse_x_gui <= x2 && _mouse_y_gui >= y1 && _mouse_y_gui <= y2;
+	}
+	
 }
 #endregion
 
@@ -352,7 +406,7 @@ function QuitGameButton(_x_pos, _y_pos) :
 	
 	TODO: Finish this comment
 */
-function StartMenuUI() : UIManager() constructor {		
+function StartMenuUI() : UIParent() constructor {		
 	//Buttons
 	start_button = new LevelSelectButton(PLAY_BUTTON_X, PLAY_BUTTON_Y);
 	start_button.activate();
@@ -364,6 +418,8 @@ function StartMenuUI() : UIManager() constructor {
 	quit_button.activate();
 	
 	ui_elements = [start_button, options_button, quit_button];
+	
+	active = true //We can just do this here instead of calling activate/deactivate, since this UI should always be active
 	
 	
 	static draw_parent = draw;
@@ -422,7 +478,7 @@ function LevelCard(_x_pos, _y_pos, _level_data) :
 /*
 	Handles the UI for the Level Selection Menu
 */
-function LevelSelectUI() : UIManager() constructor {
+function LevelSelectUI() : UIParent() constructor {
 	//Buttons (NOTE: Positions don't use enums since these are more than likely temporary)
 	button_samplelevel1 = new LevelCard(TILE_SIZE * 0.5, TILE_SIZE, global.DATA_LEVEL_MAIN_SAMPLELEVEL1);
 	button_samplelevel1.activate();
@@ -434,6 +490,8 @@ function LevelSelectUI() : UIManager() constructor {
 	button_samplelevel3.activate();
 	
 	ui_elements = [button_samplelevel1, button_samplelevel2, button_samplelevel3];
+	
+	active = true //We can just do this here instead of calling activate/deactivate, since this UI should always be active
 }
 #endregion
 
@@ -491,10 +549,13 @@ function RoundStartButton(_x_pos, _y_pos) :
 	
 	static on_click = function() {
 		if(is_enabled()) {
+			/*
 			var _music_manager = get_music_manager(); //TODO: Cache this too? Main issue with caching is outdated references, but that really shouldn't be an issue here
 			if(_music_manager != undefined && _music_manager.current_music == Music_PreRound) {
 				_music_manager.fade_out_current_music(seconds_to_milliseconds(QUICK_MUSIC_FADING_TIME), Music_Round);
 			}
+			*/
+			global.BACKGROUND_MUSIC_MANAGER.fade_out_current_music(seconds_to_milliseconds(QUICK_MUSIC_FADING_TIME), Music_Round);
 			//Round manager MUST exist if is_enabled returns true, so we don't have to check again in here.
 			cached_round_manager.start_round();
 		}
@@ -529,6 +590,54 @@ function ExitPauseMenuButton(_x_pos, _y_pos) :
 #endregion
 
 
+#region MusicVolumeSlider (Class)
+function MusicVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x_pos_left, _x_pos_right, _y_pos, "Music Volume") constructor {
+	static on_step_parent = on_step;
+	static on_step = function() {
+		on_step_parent();
+		global.GAME_CONFIG_SETTINGS.music_volume = current_value
+		global.BACKGROUND_MUSIC_MANAGER.adjust_volume();
+		/*
+		var _music_manager = get_music_manager();
+		if(_music_manager != undefined) {
+			//Change in-game music volume to match the setting changed
+			_music_manager.adjust_volume();
+		}*/
+	}
+	
+	static on_click_parent = on_click;
+	static on_click = function() {
+		on_click_parent();
+		global.GAME_CONFIG_SETTINGS.music_volume = current_value
+		global.BACKGROUND_MUSIC_MANAGER.adjust_volume();
+		/*
+		var _music_manager = get_music_manager();
+		if(_music_manager != undefined) {
+			//Change in-game music volume to match the setting changed
+			_music_manager.adjust_volume();
+		}*/
+	}
+}
+#endregion
+
+
+#region SoundEffectsVolumeSlider (Class)
+function SoundEffectsVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x_pos_left, _x_pos_right, _y_pos, "Sound Effects Volume") constructor {
+	static on_step_parent = on_step;
+	static on_step = function() {
+		on_step_parent();
+		global.GAME_CONFIG_SETTINGS.sound_effects_volume = current_value
+	}
+	
+	static on_click_parent = on_click;
+	static on_click = function() {
+		on_click_parent();
+		global.GAME_CONFIG_SETTINGS.sound_effects_volume = current_value
+	}
+}
+#endregion
+
+
 #region PauseMenu (Class)
 /*
 	Defines all of the data for the Pause Menu
@@ -540,12 +649,6 @@ function ExitPauseMenuButton(_x_pos, _y_pos) :
 	
 	Data Variables:
 	pause_background: Sprite used to show all the enemies while the game is paused.
-	x1: Left boundary
-	y1: Upper boundary
-	x2: Right boundary
-	y2: Lower boundary
-	music_manager: The manager of the game's music
-	volume_options: The pill bar that controls the volume of the game's music
 */
 
 //Enums for paused menu open state
@@ -554,73 +657,20 @@ enum PAUSE_MENU_STATE {
 	PAUSE_CLOSED
 }
 
-#macro NUM_VOLUME_PILLS 10
-function PauseMenu(_menu_width_percentage, _menu_height_percentage) constructor {
+
+function PauseMenu(_menu_width_percentage, _menu_height_percentage) : PopupMenu(_menu_width_percentage, _menu_height_percentage, "PAUSED") constructor {
 	pause_background = -1;
-	
-	var _view_w = camera_get_view_width(view_camera[0]);
-	var _view_h = camera_get_view_height(view_camera[0]);
-	
-	x1 = (_view_w/2) - (_menu_width_percentage/2 * _view_w); //From middle point, go to the left by the percentage amount
-	y1 = (_view_h/2) - (_menu_height_percentage/2 * _view_h); //From middle point, go up by the percentage amount
-	x2 = (_view_w/2) + (_menu_width_percentage/2 * _view_w); //From middle point, go to the right by the percentage amount
-	y2 = (_view_h/2) + (_menu_height_percentage/2 * _view_h); //From middle point, go down by the percentage amount
 	
 	close_button = new ExitPauseMenuButton(x2 - 40, y1 + 8);
 	close_button.activate();
 	
-	volume_slider = new Slider(x1 + 16, x2 - 16, y1 + 128, 0, 100, 100);
+	music_volume_slider = new MusicVolumeSlider(x1 + 16, x2 - 16, y1 + 128);
+	music_volume_slider.activate();
 	
-	//Used for determining whether or not to render
-	active = false;
+	sound_effects_volume_slider = new SoundEffectsVolumeSlider(x1 + 16, x2 - 16, y1 + 192);
+	sound_effects_volume_slider.activate();
 	
-	
-	//Basically just a wrapper for activating the button
-	static activate = function() {
-		active = true;
-	}
-	
-	
-	//Basically just a wrapper for deactivating the button
-	static deactivate = function() {
-		active = false;
-	}
-	
-	
-	static is_highlighted = function() {
-		var _mouse_x_gui = device_mouse_x_to_gui(0);
-		var _mouse_y_gui = device_mouse_y_to_gui(0);
-		return _mouse_x_gui >= x1 && _mouse_x_gui <= x2 && _mouse_y_gui >= y1 && _mouse_y_gui <= y2;
-	}
-	
-	
-	static on_click = function() {
-		if(close_button.is_highlighted()) {
-			close_button.on_click();
-		}
-		//TODO: This only updates when the mouse button is released, when really it should update whenever the user attempts to move it.
-		//Find a good way to make this run (maybe an on_step sort of thing?
-		else if(volume_slider.is_highlighted()) {
-			volume_slider.move_slider(device_mouse_x_to_gui(0));
-			var _music_manager = get_music_manager();
-			if(_music_manager != undefined) {
-				//Turns volume value into a number from 0-1
-				_music_manager.set_volume(volume_slider.current_value / volume_slider.max_value);
-			}
-		}
-	}
-	
-	
-	static draw = function() {
-		draw_rectangle_color(x1, y1, x2, y2, c_black, c_black, c_black, c_black, false);
-		draw_set_halign(fa_center);
-		draw_text_color((x1 + x2) / 2, y1 + 32, "PAUSED", c_white, c_white, c_white, c_white, 1);
-		close_button.draw();
-		draw_text_color((x1 + x2) / 2, y1 + 64, "Music Volume", c_white, c_white, c_white, c_white, 1);
-		draw_text_color((x1 + x2) / 2, y1 + 96, volume_slider.current_value, c_white, c_white, c_white, c_white, 1);
-		volume_slider.draw();
-		draw_set_halign(fa_left);
-	}
+	ui_elements = [close_button, music_volume_slider, sound_effects_volume_slider];
 	
 	
 	static clean_up = function() {
@@ -815,7 +865,7 @@ function TogglePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
 //NOTE: I don't think this is used right now
 #macro PURCHASE_MENU_SCREEN_PERCENTAGE (2/7)
 
-function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) constructor {
+function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) : UIComponent() constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the side is opened or closed
 	menu_width_percentage = _menu_width_percentage;
 	
@@ -856,28 +906,8 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 	toggle_button = new TogglePurchaseMenuButton(-32, (y_pos - sprite_get_width(spr_pointer_arrow_left))/2, self);
 	
 	
-	active = false;
-	
-	
-	//Basically just a wrapper for activating the button
-	static activate = function() {
-		active = true;
-	}
-	
-	
-	//Basically just a wrapper for deactivating the button
-	static deactivate = function() {
-		active = false;
-	}
-	
-	
 	static is_highlighted = function() {
-		//mouse_x is based on room position, not camera position, so need to correct selection
-		//TODO: Passable view_camera index?
-		var _view_x = camera_get_view_x(view_camera[0]);
-		var _view_y = camera_get_view_y(view_camera[0]);
-
-		return (mouse_x - _view_x >= x_pos_current && y_pos >= mouse_y - _view_y) || 
+		return (/*mouse_x - _view_x*/ device_mouse_x_to_gui(0) >= x_pos_current && y_pos >= /*mouse_y - _view_y*/ device_mouse_y_to_gui(0)) || 
 			toggle_button.is_highlighted(x_pos_current, 0); 
 	}
 	
@@ -904,18 +934,17 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) c
 		for(var i = current_page * PURCHASE_MENU_BPPAGE; i < (current_page+1) * PURCHASE_MENU_BPPAGE && i < array_length(purchase_buttons); ++i) {
 			purchase_buttons[i].draw(x_pos_current, 0, _game_state_manager != undefined && _game_state_manager.state == GAME_STATE.RUNNING);
 		}
-		//shader_reset();
 	}
 	
 	
 	static toggle_open = function() {
-		audio_play_sound(SFX_Menu_Open, 1, false); //TODO: Add volume control
+		audio_play_sound(SFX_Menu_Open, 1, false, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100);
 		state = SLIDING_MENU_STATE.OPENING;
 	}
 	
 	
 	static toggle_closed = function() {
-		audio_play_sound(SFX_Menu_Close, 1, false) //TODO: Add volume control
+		audio_play_sound(SFX_Menu_Close, 1, false, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100)
 		state = SLIDING_MENU_STATE.CLOSING;
 	}
 	
@@ -1260,6 +1289,39 @@ function SellButton(_unit_info_card, _x_pos, _y_pos, _selected_unit = noone) :
 #endregion
 
 
+#region ToggleInfoCardButton (Class)
+/*
+	Defines a button to toggle the Unit Info Card between opened and closed.
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
+	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
+	unit_info_card: Reference to the Unit Info Card this button belongs to.
+*/
+function ToggleInfoCardButton(_x_pos, _y_pos, _unit_info_card) :
+	Button(_x_pos, _y_pos, spr_pointer_arrow_up) constructor {
+	unit_info_card = _unit_info_card;
+	
+	static on_click = function() {
+		switch (unit_info_card.state) {
+		    case SLIDING_MENU_STATE.OPEN:
+		        unit_info_card.toggle_closed();
+		        break;
+			case SLIDING_MENU_STATE.CLOSED:
+				unit_info_card.toggle_open();
+		        break;
+		    default:
+		        break;
+		}
+	}
+		
+}
+#endregion
+
+
 #region UnitInfoCard (Class)
 #macro UNIT_INFO_CARD_SCREEN_PERCENTAGE (1/4)
 /*
@@ -1283,7 +1345,7 @@ function SellButton(_unit_info_card, _x_pos, _y_pos, _selected_unit = noone) :
 //#macro TOGGLE_INFO_CARD_BUTTON_X ((camera_get_view_width(view_camera[0]) - sprite_get_width(spr_pointer_arrow_up)) / 2)
 //#macro TOGGLE_INFO_CARD_BUTTON_Y (camera_get_view_height(view_camera[0]) - (TILE_SIZE*0.5))
 
-function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
+function UnitInfoCard(_menu_height_percentage, _x_pos) : UIComponent() constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the bottom is opened or closed
 	selected_unit = noone;
 	
@@ -1292,8 +1354,6 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	y_pos_open = (1-_menu_height_percentage) * _view_h;
 	y_pos_current = _view_h; //Window should start out closed
 	x_pos = _x_pos;
-	
-	active = false;
 	
 	//Stat Upgrade Info
 	stat_upgrade_buttons = new StatUpgradeDisplay(TILE_SIZE * 4.5, TILE_SIZE/2);
@@ -1312,18 +1372,6 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	//Menu Toggle Button
 	toggle_button = new ToggleInfoCardButton((_view_w - sprite_get_width(spr_pointer_arrow_up))/2, 
 		-32, self);
-	
-	
-	//Basically just a wrapper for activating the button
-	static activate = function() {
-		active = true;
-	}
-	
-	
-	//Basically just a wrapper for deactivating the button
-	static deactivate = function() {
-		active = false;
-	}
 	
 	
 	//Called when the selected unit is changed
@@ -1397,13 +1445,13 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 	
 	
 	static toggle_open = function() {
-		audio_play_sound(SFX_Menu_Open, 1, false); //TODO: Add volume control
+		audio_play_sound(SFX_Menu_Open, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100, false);
 		state = SLIDING_MENU_STATE.OPENING;
 	}
 	
 	
 	static toggle_closed = function() {
-		audio_play_sound(SFX_Menu_Close, 1, false) //TODO: Add volume control
+		audio_play_sound(SFX_Menu_Close, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100, false);
 		state = SLIDING_MENU_STATE.CLOSING;
 	}
 	
@@ -1479,39 +1527,6 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) constructor {
 }
 #endregion
 
-
-#region ToggleInfoCardButton (Class)
-/*
-	Defines a button to toggle the Unit Info Card between opened and closed.
-	
-	Argument Variables:
-	(All argument variables correspond with non-underscored data variables)
-	
-	Data Variables:
-	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
-	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
-	unit_info_card: Reference to the Unit Info Card this button belongs to.
-*/
-function ToggleInfoCardButton(_x_pos, _y_pos, _unit_info_card) :
-	Button(_x_pos, _y_pos, spr_pointer_arrow_up) constructor {
-	unit_info_card = _unit_info_card;
-	
-	static on_click = function() {
-		switch (unit_info_card.state) {
-		    case SLIDING_MENU_STATE.OPEN:
-		        unit_info_card.toggle_closed();
-		        break;
-			case SLIDING_MENU_STATE.CLOSED:
-				unit_info_card.toggle_open();
-		        break;
-		    default:
-		        break;
-		}
-	}
-		
-}
-#endregion
-
 #endregion
 
 
@@ -1527,22 +1542,8 @@ function ToggleInfoCardButton(_x_pos, _y_pos, _unit_info_card) :
 #macro GAME_INFO_DISPLAY_WIDTH TILE_SIZE*3
 #macro GAME_INFO_DISPLAY_HEIGHT TILE_SIZE*1.5
 
-function GameInfoDisplay(_controller_obj) constructor {
+function GameInfoDisplay(_controller_obj) : UIComponent() constructor {
 	controller_obj = _controller_obj;
-	
-	active = false;
-	
-	
-	//Basically just a wrapper for activating the button
-	static activate = function() {
-		active = true;
-	}
-	
-	
-	//Basically just a wrapper for deactivating the button
-	static deactivate = function() {
-		active = false;
-	}
 	
 	
 	static is_highlighted = function() {		
@@ -1596,7 +1597,7 @@ function GameInfoDisplay(_controller_obj) constructor {
 	y_pos: The y-coordinate of the top-left of the header.
 	header_sprite: Either the "Victory" sprite or the "Game Over" sprite.
 */
-function EndResultsHeader(_x_pos, _y_pos) constructor {
+function EndResultsHeader(_x_pos, _y_pos) : UIComponent() constructor {
 	x_pos = _x_pos;
 	y_pos = _y_pos;
 	header_sprite = spr_game_over;
@@ -1665,7 +1666,7 @@ function BackToLevelSelectionButton(_x_pos, _y_pos) :
 /*
 	TODO: Comment
 */
-function EndResultsCard(_menu_width_percentage, _menu_height_percentage) constructor {
+function EndResultsCard(_menu_width_percentage, _menu_height_percentage) : UIComponent() constructor {
 	
 	var _view_w = camera_get_view_width(view_camera[0]);
 	var _view_h = camera_get_view_height(view_camera[0]);
@@ -1675,21 +1676,11 @@ function EndResultsCard(_menu_width_percentage, _menu_height_percentage) constru
 	x2 = (_view_w/2) + (_menu_width_percentage/2 * _view_w); //From middle point, go to the right by the percentage amount
 	y2 = (_view_h/2) + (_menu_height_percentage/2 * _view_h); //From middle point, go down by the percentage amount
 	
-	active = false;
 	
 	header = new EndResultsHeader((_view_w - sprite_get_width(spr_game_over)) / 2, 64);
 	
 	restart_level_button = new RestartLevelButton(x1 + 256, 256);
 	back_to_level_select_button = new BackToLevelSelectionButton(x2 - sprite_get_width(spr_back_to_menu_button) - 256, 256);
-	
-	static activate = function() {
-		active = true;
-	}
-	
-	
-	static deactivate = function() {
-		active = false;
-	}
 	
 	
 	static draw = function() {
@@ -1745,7 +1736,7 @@ function EndResultsCard(_menu_width_percentage, _menu_height_percentage) constru
 	
 	TODO: Finish this comment
 */
-function GameUI(_controller_obj, _purchase_data) : UIManager() constructor {
+function GameUI(_controller_obj, _purchase_data) : UIParent() constructor {
 	//Manager Info
 	//controller_obj = _controller_obj;
 	
@@ -1769,6 +1760,8 @@ function GameUI(_controller_obj, _purchase_data) : UIManager() constructor {
 	ui_elements = [game_info_display,
 		pause_button, round_start_button,
 		purchase_menu, unit_info_card, pause_menu, end_results_card];
+		
+	active = true //We can just do this here instead of calling activate/deactivate, since this UI should always be active
 	
 	
 	static set_gui_running = function() {
