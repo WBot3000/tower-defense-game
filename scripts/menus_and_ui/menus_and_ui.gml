@@ -109,8 +109,72 @@ function Button(_x_pos, _y_pos,
 		}
 		draw_sprite(_spr, 0, _draw_x_pos, _draw_y_pos);
 	}
+}
+#endregion
+
+
+#region ToggleSwitch (Class)
+/*
+	Defines a switch that can be clicked to switch between two different "states".
 	
-	static on_click = function(){};
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
+	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
+	label:
+	is_toggled: Whether or not the button 
+	
+	TODO: I haven't done control variables in a while. Should I still do these, or nah?
+	Control Variables:
+	active: Whether or not the button should appear on screen and can be clicked on
+	
+	NOTE 1: "Enabled" refers to whether or not the button can be clicked to perform an action. "Active" refers to whether or not the button is rendered at all.
+*/
+function ToggleSwitch(_x_pos, _y_pos, _label = "Unnamed Toggle") : UIComponent() constructor {
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	label = _label;
+	is_toggled = false;
+
+		
+	//_x_offset and _y_offset are for toggles that are a part of menus. They allow you to define the coordinates in relation to the menu instead of to the entire screen.
+	static is_highlighted = function(_x_offset = 0, _y_offset = 0) {
+		var _absolute_x_pos = x_pos + _x_offset
+		var _absolute_y_pos = y_pos + _y_offset
+		
+		//TODO: Passable view_camera index? And maybe rename these variables? Not sure.
+		var _view_x = device_mouse_x_to_gui(0);
+		var _view_y = device_mouse_y_to_gui(0);
+		return (_view_x >= _absolute_x_pos && _view_x <= _absolute_x_pos + sprite_get_width(spr_toggle_switch_not_selected)
+			&& _view_y >= _absolute_y_pos && _view_y <= _absolute_y_pos + sprite_get_height(spr_toggle_switch_not_selected));
+	}
+	
+	
+	static draw = function(_x_offset = 0, _y_offset = 0) {
+		var _draw_x_pos = x_pos + _x_offset;
+		var _draw_y_pos = y_pos + _y_offset;
+		draw_set_halign(fa_right);
+		draw_text_color(_draw_x_pos - 8, _draw_y_pos, label, c_white, c_white, c_white, c_white, 1);
+		draw_set_halign(fa_left);
+		draw_sprite((is_toggled ? spr_toggle_switch_selected : spr_toggle_switch_not_selected), 0, _draw_x_pos, _draw_y_pos);
+	}
+	
+	
+	static on_toggle = function(){};
+	static on_untoggle = function(){};
+	
+	
+	static on_click = function() {
+		if(is_toggled) {
+			on_untoggle(); //If the switch is toggled, when we click it, it should untoggle
+		}
+		else {
+			on_toggle();
+		}
+		is_toggled = !is_toggled;
+	};
 }
 #endregion
 
@@ -292,7 +356,6 @@ function UIParent(_x_pos = 0, _y_pos = 0) : UIComponent() constructor {
 	}
 }
 #endregion
-
 
 
 #region PopupMenu (Class)
@@ -655,6 +718,26 @@ function SoundEffectsVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x
 #endregion
 
 
+#region SetFullscreenToggle (Class)
+/*
+	Defines a switch that can be clicked to toggle the game to fullscreen or windowed
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
+	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
+*/
+function SetFullscreenToggle(_x_pos, _y_pos) :
+		ToggleSwitch(_x_pos, _y_pos, "Set Fullscreen") constructor {	
+	
+	static on_toggle = function() { window_set_fullscreen(true); }
+	static on_untoggle = function() { window_set_fullscreen(false); }
+}
+#endregion
+
+
 #region PauseMenu (Class)
 /*
 	Defines all of the data for the Pause Menu
@@ -668,10 +751,12 @@ function SoundEffectsVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x
 	pause_background: Sprite used to show all the enemies while the game is paused.
 */
 
-//Enums for paused menu open state
-enum PAUSE_MENU_STATE {
-	PAUSE_OPEN,
-	PAUSE_CLOSED
+//Enums for paused menu open state (will eventually turn into Options Menu)
+//TODO: Necessary?
+enum OPTIONS_MENU_STATE { 
+	AUDIO,
+	VISUAL,
+	CONTROLS
 }
 
 
@@ -687,7 +772,40 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage) : PopupMenu(
 	sound_effects_volume_slider = new SoundEffectsVolumeSlider(16, menu_width - 16, 192);
 	sound_effects_volume_slider.activate();
 	
-	ui_elements = [close_button, music_volume_slider, sound_effects_volume_slider];
+	fullscreen_toggle = new SetFullscreenToggle(160, 96);
+	
+	
+	ui_elements = [close_button, music_volume_slider, sound_effects_volume_slider, fullscreen_toggle];
+	
+	
+	static set_to_audio_options = function() {
+		music_volume_slider.activate();
+		sound_effects_volume_slider.activate();
+		
+		fullscreen_toggle.deactivate();
+	}
+	
+	
+	static set_to_visual_options = function() {
+		fullscreen_toggle.activate();
+		
+		music_volume_slider.deactivate();
+		sound_effects_volume_slider.deactivate();
+	}
+	
+	
+	//This is a DEBUG feature meant to test out switching between the audio and visual menus.
+	//This will be replaced with buttons once I feel like making them (I am once again sick of UI).
+	static on_step_parent = on_step;
+	static on_step = function(_x_offset, _y_offset) {
+		on_step_parent(_x_offset, _y_offset);
+		if(keyboard_check_pressed(ord("1"))) {
+			set_to_audio_options();
+		}
+		if(keyboard_check_pressed(ord("2"))) {
+			set_to_visual_options();
+		}
+	}
 	
 	
 	static clean_up = function() {
