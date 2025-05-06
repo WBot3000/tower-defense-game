@@ -31,7 +31,7 @@ function MusicManager(_initial_music/*, _initial_volume = global.GAME_CONFIG_SET
 	current_music_ref = -1;
 	//volume = _initial_volume
 	if(_initial_music != undefined) {
-		current_music_ref = audio_play_sound(_initial_music, MAX_AUDIO_PRIORITY, true, /*volume*/ global.GAME_CONFIG_SETTINGS.music_volume / 100);
+		current_music_ref = audio_play_sound(_initial_music, MAX_AUDIO_PRIORITY, true, global.GAME_CONFIG_SETTINGS.music_volume / 100);
 	}
 	
 	fading_out = false;
@@ -39,8 +39,14 @@ function MusicManager(_initial_music/*, _initial_volume = global.GAME_CONFIG_SET
 	fading_start = -1;
 	next_music = undefined;
 	
-	static set_music = function(_new_music) {
+	static set_music = function(_new_music, _restart_if_currently_playing = false) {
+		//If you're attempting to set the music to the track that's currently playing, just continue playing the current track
+		//(Unless you force a restart using "_restart_if_currently_playing", but that's usually not the case)
+		if(_new_music == current_music && !_restart_if_currently_playing) {
+			return;
+		}
 		audio_stop_sound(current_music_ref);
+		current_music = _new_music;
 		current_music_ref = audio_play_sound(_new_music, MAX_AUDIO_PRIORITY, true);
 	}
 	
@@ -48,7 +54,7 @@ function MusicManager(_initial_music/*, _initial_volume = global.GAME_CONFIG_SET
 	static adjust_volume = function(/*_new_volume*/) {
 		//volume = _new_volume;
 		if(current_music_ref != -1) {
-			audio_sound_gain(current_music_ref, /*volume*/ global.GAME_CONFIG_SETTINGS.music_volume / 100, 0);
+			audio_sound_gain(current_music_ref, global.GAME_CONFIG_SETTINGS.music_volume / 100, 0);
 		}
 	}
 	
@@ -70,7 +76,7 @@ function MusicManager(_initial_music/*, _initial_volume = global.GAME_CONFIG_SET
 			fading_start = -1;
 			if(next_music != undefined) {
 				current_music = next_music;
-				current_music_ref = audio_play_sound(next_music, MAX_AUDIO_PRIORITY, true, /*volume*/global.GAME_CONFIG_SETTINGS.music_volume / 100);
+				current_music_ref = audio_play_sound(next_music, MAX_AUDIO_PRIORITY, true, global.GAME_CONFIG_SETTINGS.music_volume / 100);
 				next_music = undefined;
 			}
 			else {
@@ -82,3 +88,8 @@ function MusicManager(_initial_music/*, _initial_volume = global.GAME_CONFIG_SET
 #endregion
 
 global.BACKGROUND_MUSIC_MANAGER = new MusicManager();
+
+//Don't need an entire manager for just sound effects. Just prioritize whatever was played most recently
+function play_sound_effect(sound_effect) {
+	audio_play_sound(sound_effect, 1, false, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100);
+}

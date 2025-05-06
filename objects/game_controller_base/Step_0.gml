@@ -1,6 +1,7 @@
 /// @description Run the camera controller, round manager and handle menu resizing selection
 
 #region Gathering User Inputs
+var _mouse_left_pressed = mouse_check_button_pressed(mb_left);
 var _mouse_left_released = mouse_check_button_released(mb_left);
 var _mouse_right_released = mouse_check_button_released(mb_right);
 
@@ -22,12 +23,7 @@ if(_q_pressed) {
 }
 
 //Check to see if the music should be changed based on events in the game
-//music_manager.on_step();
 global.BACKGROUND_MUSIC_MANAGER.on_step();
-
-if(game_state_manager.state == GAME_STATE.PAUSED && _mouse_left_released) {
-	game_ui.pause_menu.on_click();
-}
 
 
 //"Advance" the round spawning timer
@@ -36,10 +32,37 @@ round_manager.on_step(game_state_manager.state);
 //Perform any necessary camera movement based on user_input
 camera_controller.move_camera(game_state_manager.state);
 
-//Perform any per-frame UI changes
-game_ui.on_step();
+//Perform any per-frame UI changes, and check to see if you're highlighting a UI element at the moment.
+var _elem_highlighted = game_ui.on_step();
 
-
+//Not over a UI element, so you can take actions on the game field.
+if(_elem_highlighted == undefined && _mouse_left_released) {
+	//Attempt to click on an already placed unit
+	var _clicked_on_unit = instance_position(mouse_x, mouse_y, base_unit)
+	if(_clicked_on_unit != noone) {
+		game_ui.unit_info_card.on_selected_unit_change(_clicked_on_unit);
+		//Open the unit info card if it's not open already.
+		if(game_ui.unit_info_card.state != SLIDING_MENU_STATE.OPENING && game_ui.unit_info_card.state != SLIDING_MENU_STATE.OPEN) {
+			game_ui.unit_info_card.state = SLIDING_MENU_STATE.OPENING;
+		}
+	}
+		
+	//Attempt to make a new purchase
+	//Can't purchase anything if nothing is selected (or if you're on the GUI, but we already know we aren't, since if you're here, gui_elem == undefined)
+	if(purchase_manager.currently_selected_purchase != undefined) {
+		var _tile_at_mouse = instance_position(mouse_x, mouse_y, placeable_tile);
+		if(_tile_at_mouse != noone) {
+			with(_tile_at_mouse) {
+				var _purchase = other.purchase_manager.currently_selected_purchase;
+				if(can_purchase_unit(self.id, _purchase)) {
+					placed_unit = instance_create_layer(x + TILE_SIZE/2, y + TILE_SIZE, UNIT_LAYER, _purchase.unit);
+					global.player_money -= _purchase.price
+				}
+			}
+		}
+	}
+}
+/*
 if(_mouse_left_released) {
 	//Check for certain areas clicked
 	var gui_elem = game_ui.gui_element_highlighted();
@@ -74,7 +97,7 @@ if(_mouse_left_released) {
 		}
 		
 	}
-}
+}*/
 
 
 if(_mouse_right_released) {

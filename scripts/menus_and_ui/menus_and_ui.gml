@@ -4,8 +4,8 @@
 	This file contains macros, structs, and functions for creating the various menus and UI elements in the game.
 	Certain menus have different options based on different contexts. These let you control these options easily.
 
-	TODO: Sort out the hierarchy of activation so we don't get any weird behavior with UI elements that are invisible but can still be interacted with (ex. sliders)
-	And write this down!
+	TODO: Convert UnitInfoCard and UnitPurchaseMenu into UIParents. That, or define a common "Scrolling Menu" class that's a UIParent that they both inherit from.
+	TODO: Since those two menus heavily use offsets, add x and y offsets to the UIParent, that can then be passed to the draw functions.
 	
 	Hierarchy of Activation:
 	By default, UI components are considered NOT activated. This is because it's less clutter to simply activate the components you need, as opposed to having to de-activate all the things you don't.
@@ -36,6 +36,7 @@ function UIComponent() constructor {
 	
 	static draw = function() {}
 	static on_step = function() {}
+	static on_selected = function() {}
 	static on_click = function() {}
 }
 #endregion
@@ -122,7 +123,7 @@ function Button(_x_pos, _y_pos,
 	_default_value: The value that the slider should be initialized with.
 	All correlate with Data Variables
 	
-	Data Variables:
+	Data Variables: (NOTE: Coordinates relative to the parent object as usual. Use offsets to get the absolute positions as normal)
 	x_pos_left: Where the left of the slider resides.
 	x_pos_right: Coordinate where the right of the slider resides.
 	y_pos: Vertical position of the slider.
@@ -130,6 +131,8 @@ function Button(_x_pos, _y_pos,
 	min_value: The value selected when the slider is set to the leftmost position.
 	max_value: The value selected when the slider is set to the rightmost position.
 	current_value: The value the slider is currently set to.
+	current_value_x_pos: The slider's current value mapped to an x-coordinate on the slider line (where the circle resides)
+	is_selected: Whether or not this slider is the one the user selected. Allows you to continue sliding the slider after you've moved off of its hitbox.
 */
 function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 	_min_value = 0, _max_value = 100, _default_value = _max_value) : UIComponent() constructor {
@@ -144,25 +147,32 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 	//No need to re-calculate this each time we draw the slider
 	current_value_x_pos = map_value(current_value, min_value, max_value, x_pos_left, x_pos_right);
 	
+	is_selected = false;
+	
 	//_x_offset and _y_offset are for sliders that are a part of menus. They allow you to define the coordinates in relation to the menu instead of to the entire screen.
 	static is_highlighted = function(_x_offset = 0, _y_offset = 0) {
 		var _absolute_x_pos_left = x_pos_left + _x_offset;
 		var _absolute_x_pos_right = x_pos_right + _x_offset;
-		var _absolute_y_pos = y_pos + _y_offset
+		var _absolute_y_pos = y_pos + _y_offset;
 		
 		//TODO: Passable view_camera index? And maybe rename these variables? Not sure.
 		var _view_x = device_mouse_x_to_gui(0);
 		var _view_y = device_mouse_y_to_gui(0);
-		return (_view_x >= _absolute_x_pos_left && _view_x <= _absolute_x_pos_right
-			&& _view_y >= _absolute_y_pos - 16 && _view_y <= _absolute_y_pos + 16); //TODO: Change 8 to relate to the size of the slider circle sprite.
+		return (_view_x >= _absolute_x_pos_left - 16 && _view_x <= _absolute_x_pos_right + 16
+			&& _view_y >= _absolute_y_pos - 16 && _view_y <= _absolute_y_pos + 16); //TODO: Should probably change 16 to relate to the size of the slider circle sprite.
 	}
 	
 	
-	static draw = function() {
+	static draw = function(_x_offset = 0, _y_offset = 0) {
 		if(active) {
-			draw_text_color(x_pos_left, y_pos - 32, label + ": " + string( floor(current_value)), c_white, c_white, c_white, c_white, 1);
-			draw_line_width_color(x_pos_left, y_pos, x_pos_right, y_pos, 4, c_white, c_white);
-			draw_sprite(spr_slider_circle, 0, current_value_x_pos, y_pos);
+			var _draw_x_pos_left = x_pos_left + _x_offset;
+			var _draw_x_pos_right = x_pos_right + _x_offset;
+			var _draw_y_pos = y_pos + _y_offset;
+			var _draw_current_value_x_pos = current_value_x_pos + _x_offset
+			
+			draw_text_color(_draw_x_pos_left, _draw_y_pos - 32, label + ": " + string( floor(current_value)), c_white, c_white, c_white, c_white, 1);
+			draw_line_width_color(_draw_x_pos_left, _draw_y_pos, _draw_x_pos_right, _draw_y_pos, 4, c_white, c_white);
+			draw_sprite((is_selected ? spr_slider_circle_selected : spr_slider_circle_default), 0, _draw_current_value_x_pos, _draw_y_pos);
 		}
 	}
 	
@@ -182,18 +192,27 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 		}
 	}
 	
-	
-	static on_step = function() {
-		if(is_highlighted() && mouse_check_button(mb_left)) {
-			move_slider(device_mouse_x_to_gui(0));
+	//Logic for when the mouse is held down (and when it isn't, hence the "is_highlighted" check)
+	static on_step = function(_x_offset = 0, _y_offset = 0) {
+		if(is_selected && mouse_check_button(mb_left)) {
+			move_slider(device_mouse_x_to_gui(0) - _x_offset); //Convert absolute mouse position to relative menu position
+		}
+		if( mouse_check_button_released(mb_left)) { //Need to be able to release control of the slider even if the cursor currently isn't on it.
+			is_selected = false;
 		}
 	}
 	
+	//When the mouse is pressed
+	//TODO: Maybe change this to "on_pressed"?
+	static on_selected = function(_x_offset = 0, _y_offset = 0) {
+		is_selected = true;
+	}
 	
-	static on_click = function() {
-		if(is_highlighted() && mouse_check_button_released(mb_left)) {
-			move_slider(device_mouse_x_to_gui(0));
-		}
+	//When the mouse is released
+	//TODO: Maybe changet this (and all other "on_click" functions) to "on_released"?
+	static on_click = function(_x_offset = 0, _y_offset = 0) {
+		//move_slider(device_mouse_x_to_gui(0));
+		is_selected = false;
 	}
 }
 #endregion
@@ -204,13 +223,19 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 	Used for managing multiple UI components for a single interface
 	
 	Argument Variables:
+	All correspond to Data Variables.
 	
 	Data Variables:
+	x_pos: The x_coordinate of the UIParent's top-left position. This will be 0 if the parent is meant to cover the entire UI.
+	y_pos: The y_coordinate of the UIParent's top-left position. This will be 0 if the parent is meant to cover the entire UI.
 	ui_elements: A list of all of the UI elements contained within this UIParent
 		- The elements should be arranged from back (drawn last) to front (drawn first).
 		- If none of your UI elements overlap, the order won't make a difference, but if they do, elements in front will be selected "first"
 */
-function UIParent() : UIComponent() constructor {
+function UIParent(_x_pos = 0, _y_pos = 0) : UIComponent() constructor {
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	
 	//Getting viewport dimensions	(TODO: Not sure if I should keep this, or if I can just fetch these from the appropriate functions when I need to.)
 	view_w =  camera_get_view_width(view_camera[0]);
 	view_h = camera_get_view_height(view_camera[0]);
@@ -223,49 +248,51 @@ function UIParent() : UIComponent() constructor {
 		}
 		//Array is searched from end to beginning so that elements drawn in the front are checked before elements drawn in the back
 		for(var i = array_length(ui_elements) - 1; i >= 0; i--) {
-			if(ui_elements[i].active && ui_elements[i].is_highlighted()) {
+			if(ui_elements[i].active && ui_elements[i].is_highlighted(x_pos, y_pos)) {
 				return ui_elements[i];
 			}
 		}
 		return undefined;
 	}
 	
-	//This is meant for things like sliders that can take continuous input (via holding down the mouse)
-	//TODO: Need to figure out a way for front objects to take precedence over behind objects, but also allow objects to do other per-frame stuff uninterrupted.
-	//Maybe an "on_step_interruptible"? and "on_step_uninterruptible"? I'll think of this once it becomes an actual problem.
+	//This allows things like sliders that can take continuous input (via holding down the mouse)
+	//Returns the GUI element that's currently highlighted (in case you want to do anything else with it).
 	static on_step = function() {
 		if(!active) {
-			return;
+			return undefined;
 		}
 		for(var i = array_length(ui_elements) - 1; i >= 0; i--) {
-				ui_elements[i].on_step();
+				ui_elements[i].on_step(x_pos, y_pos);
 		}
-	}
-	
-	//Returns true if there's an element, and false if there isn't. Allows you to perform actions based on whether you've actually clicked something or not.
-	//The reason this is a seperate function from "gui_element_highlighted" is in the event you want to get the element the mouse is on, but don't necessarily want to click on it.
-	static on_click = function() {
-		var _elem = gui_element_highlighted();
-		if(_elem != undefined) {
-			_elem.on_click();
-			return true;
+		var _highlighted_elem = gui_element_highlighted();
+		if(_highlighted_elem != undefined) {
+			if(mouse_check_button_pressed(mb_left)) {
+				_highlighted_elem.on_selected(x_pos, y_pos);
+			}
+			if(mouse_check_button_released(mb_left)) {
+				//TODO: So I was able to fix the error with the sliders by just adding the release into the "on_step" event as well.
+				//However, I still think I should revise how these functions works. Feels pretty hack-ish, and I don't want this code to become messier than it already is.
+				//Especially if you have UIParents inside UIParents, that's gotta be funky with the on_step, THEN on_click
+				_highlighted_elem.on_click(x_pos, y_pos);
+			}
 		}
-		return false;
+		return _highlighted_elem
 	}
 	
 	
 	static draw = function() {
 		if(!active) {
-			return undefined;
+			return;
 		}
 		for(var i = 0; i < array_length(ui_elements); i++) {
 			if(ui_elements[i].active) {
-				ui_elements[i].draw();
+				ui_elements[i].draw(x_pos, y_pos);
 			}
 		}
 	}
 }
 #endregion
+
 
 
 #region PopupMenu (Class)
@@ -278,10 +305,11 @@ function UIParent() : UIComponent() constructor {
 	All other argument variables correlate to data variables.
 	
 	Data Variables:
-	x1: Left boundary
-	y1: Upper boundary
-	x2: Right boundary
-	y2: Lower boundary
+	x_pos: Left boundary
+	y_pos: Upper boundary
+	menu_width: Menu width
+	menu_height: Menu height
+	title: Large text that appears at the top of the menu
 */
 enum POPUP_MENU_STATE {
 	MENU_OPEN,
@@ -289,10 +317,12 @@ enum POPUP_MENU_STATE {
 }
 
 function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UIParent() constructor {
-	x1 = (view_w/2) - (_menu_width_percentage/2 * view_w); //From middle point, go to the left by the percentage amount
-	y1 = (view_h/2) - (_menu_height_percentage/2 * view_h); //From middle point, go up by the percentage amount
-	x2 = (view_w/2) + (_menu_width_percentage/2 * view_w); //From middle point, go to the right by the percentage amount
-	y2 = (view_h/2) + (_menu_height_percentage/2 * view_h); //From middle point, go down by the percentage amount
+	//TODO: Currently assumes all popup menus will start in the center of the screen. Should probably change this assumption.
+	x_pos = (view_w/2) - (_menu_width_percentage/2 * view_w); //From middle point, go to the left by the percentage amount
+	y_pos = (view_h/2) - (_menu_height_percentage/2 * view_h); //From middle point, go up by the percentage amount
+	
+	menu_width = view_w * _menu_width_percentage;
+	menu_height = view_h * _menu_height_percentage
 	
 	title = _title;
 	
@@ -300,18 +330,29 @@ function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UI
 	
 	static draw_parent = draw;
 	
-	static draw = function() {
-		draw_rectangle_color(x1, y1, x2, y2, c_black, c_black, c_black, c_black, false);
+	
+	static draw = function(_x_offset = 0, _y_offset = 0) {
+		var _draw_x1 = x_pos + _x_offset;
+		var _draw_y1 = y_pos + _y_offset;
+		var _draw_x2 = _draw_x1 + menu_width;
+		var _draw_y2 = _draw_y1 + menu_height;
+		
+		draw_rectangle_color(_draw_x1, _draw_y1, _draw_x2, _draw_y2, c_black, c_black, c_black, c_black, false);
 		draw_set_halign(fa_center);
-		draw_text_color((x1 + x2) / 2, y1 + 32, title, c_white, c_white, c_white, c_white, 1);
+		draw_text_color(_draw_x1 + menu_width/2, _draw_y1 + 32, title, c_white, c_white, c_white, c_white, 1);
 		draw_set_halign(fa_left);
-		draw_parent();
+		draw_parent(_draw_x1, _draw_y1);
 	}
 	
-	static is_highlighted = function() {
+	static is_highlighted = function(_x_offset, _y_offset) {
+		var _absolute_x1 = x_pos + _x_offset;
+		var _absolute_y1 = y_pos + _y_offset;
+		var _absolute_x2 = _absolute_x1 + menu_width;
+		var _absolute_y2 = _absolute_y1 + menu_height;
+		
 		var _mouse_x_gui = device_mouse_x_to_gui(0);
 		var _mouse_y_gui = device_mouse_y_to_gui(0);
-		return _mouse_x_gui >= x1 && _mouse_x_gui <= x2 && _mouse_y_gui >= y1 && _mouse_y_gui <= y2;
+		return _mouse_x_gui >= _absolute_x1 && _mouse_x_gui <= _absolute_x2 && _mouse_y_gui >= _absolute_y1 && _mouse_y_gui <= _absolute_y2;
 	}
 	
 }
@@ -554,13 +595,9 @@ function RoundStartButton(_x_pos, _y_pos) :
 	
 	static on_click = function() {
 		if(is_enabled()) {
-			/*
-			var _music_manager = get_music_manager(); //TODO: Cache this too? Main issue with caching is outdated references, but that really shouldn't be an issue here
-			if(_music_manager != undefined && _music_manager.current_music == Music_PreRound) {
-				_music_manager.fade_out_current_music(seconds_to_milliseconds(QUICK_MUSIC_FADING_TIME), Music_Round);
+			if(global.BACKGROUND_MUSIC_MANAGER.current_music == Music_PreRound) {
+				global.BACKGROUND_MUSIC_MANAGER.fade_out_current_music(seconds_to_milliseconds(QUICK_MUSIC_FADING_TIME), Music_Round);
 			}
-			*/
-			global.BACKGROUND_MUSIC_MANAGER.fade_out_current_music(seconds_to_milliseconds(QUICK_MUSIC_FADING_TIME), Music_Round);
 			//Round manager MUST exist if is_enabled returns true, so we don't have to check again in here.
 			cached_round_manager.start_round();
 		}
@@ -598,29 +635,10 @@ function ExitPauseMenuButton(_x_pos, _y_pos) :
 #region MusicVolumeSlider (Class)
 function MusicVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x_pos_left, _x_pos_right, _y_pos, "Music Volume") constructor {
 	static on_step_parent = on_step;
-	static on_step = function() {
-		on_step_parent();
+	static on_step = function(_x_offset, _y_offset) {
+		on_step_parent(_x_offset, _y_offset);
 		global.GAME_CONFIG_SETTINGS.music_volume = current_value
 		global.BACKGROUND_MUSIC_MANAGER.adjust_volume();
-		/*
-		var _music_manager = get_music_manager();
-		if(_music_manager != undefined) {
-			//Change in-game music volume to match the setting changed
-			_music_manager.adjust_volume();
-		}*/
-	}
-	
-	static on_click_parent = on_click;
-	static on_click = function() {
-		on_click_parent();
-		global.GAME_CONFIG_SETTINGS.music_volume = current_value
-		global.BACKGROUND_MUSIC_MANAGER.adjust_volume();
-		/*
-		var _music_manager = get_music_manager();
-		if(_music_manager != undefined) {
-			//Change in-game music volume to match the setting changed
-			_music_manager.adjust_volume();
-		}*/
 	}
 }
 #endregion
@@ -629,14 +647,8 @@ function MusicVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x_pos_le
 #region SoundEffectsVolumeSlider (Class)
 function SoundEffectsVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x_pos_left, _x_pos_right, _y_pos, "Sound Effects Volume") constructor {
 	static on_step_parent = on_step;
-	static on_step = function() {
-		on_step_parent();
-		global.GAME_CONFIG_SETTINGS.sound_effects_volume = current_value
-	}
-	
-	static on_click_parent = on_click;
-	static on_click = function() {
-		on_click_parent();
+	static on_step = function(_x_offset, _y_offset) {
+		on_step_parent(_x_offset, _y_offset);
 		global.GAME_CONFIG_SETTINGS.sound_effects_volume = current_value
 	}
 }
@@ -666,13 +678,13 @@ enum PAUSE_MENU_STATE {
 function PauseMenu(_menu_width_percentage, _menu_height_percentage) : PopupMenu(_menu_width_percentage, _menu_height_percentage, "PAUSED") constructor {
 	pause_background = -1;
 	
-	close_button = new ExitPauseMenuButton(x2 - 40, y1 + 8);
+	close_button = new ExitPauseMenuButton(menu_width - 40, 8);
 	close_button.activate();
 	
-	music_volume_slider = new MusicVolumeSlider(x1 + 16, x2 - 16, y1 + 128);
+	music_volume_slider = new MusicVolumeSlider(16, menu_width - 16, 128);
 	music_volume_slider.activate();
 	
-	sound_effects_volume_slider = new SoundEffectsVolumeSlider(x1 + 16, x2 - 16, y1 + 192);
+	sound_effects_volume_slider = new SoundEffectsVolumeSlider(16, menu_width - 16, 192);
 	sound_effects_volume_slider.activate();
 	
 	ui_elements = [close_button, music_volume_slider, sound_effects_volume_slider];
@@ -919,6 +931,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) :
 	
 	static draw = function() {
 		var _game_state_manager = get_game_state_manager();
+		var _button_highlight_enabled = (_game_state_manager != undefined && _game_state_manager.state == GAME_STATE.RUNNING);
 		var _view_w = camera_get_view_width(view_camera[0]);
 		
 		draw_rectangle_color(x_pos_current, 0, _view_w, y_pos, c_silver, c_silver, c_silver, c_silver, false);
@@ -937,7 +950,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) :
 		//(current_page+1) * PURCHASE_MENU_BPPAGE is the index of the first button on the NEXT page
 		//The i < array_length(purchase_buttons) exists so, on the last page, if there are less than PURCHASE_MENU_BPPAGE buttons, the loop will stop at the last one, instead of trying to access non-existent buttons
 		for(var i = current_page * PURCHASE_MENU_BPPAGE; i < (current_page+1) * PURCHASE_MENU_BPPAGE && i < array_length(purchase_buttons); ++i) {
-			purchase_buttons[i].draw(x_pos_current, 0, _game_state_manager != undefined && _game_state_manager.state == GAME_STATE.RUNNING);
+			purchase_buttons[i].draw(x_pos_current, 0, _button_highlight_enabled);
 		}
 	}
 	
@@ -945,7 +958,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) :
 	static toggle_open = function() {
 		var _game_state_manager = get_game_state_manager();
 		if(_game_state_manager && _game_state_manager.state != GAME_STATE.PAUSED) { //Don't do any toggling if the game is paused
-			audio_play_sound(SFX_Menu_Open, 1, false, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100);
+			play_sound_effect(SFX_Menu_Open);
 			state = SLIDING_MENU_STATE.OPENING;
 		}
 	}
@@ -954,7 +967,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) :
 	static toggle_closed = function() {
 		var _game_state_manager = get_game_state_manager();
 		if(_game_state_manager && _game_state_manager.state != GAME_STATE.PAUSED) {
-			audio_play_sound(SFX_Menu_Close, 1, false, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100)
+			play_sound_effect(SFX_Menu_Close);
 			state = SLIDING_MENU_STATE.CLOSING;
 		}
 	}
@@ -1458,7 +1471,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) : UIComponent() construct
 	static toggle_open = function() {
 		var _game_state_manager = get_game_state_manager();
 		if(_game_state_manager && _game_state_manager.state != GAME_STATE.PAUSED) { //Don't do any toggling if the game is paused
-			audio_play_sound(SFX_Menu_Open, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100, false);
+			play_sound_effect(SFX_Menu_Open);
 			state = SLIDING_MENU_STATE.OPENING;
 		}
 	}
@@ -1467,7 +1480,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) : UIComponent() construct
 	static toggle_closed = function() {
 		var _game_state_manager = get_game_state_manager();
 		if(_game_state_manager && _game_state_manager.state != GAME_STATE.PAUSED) { //Don't do any toggling if the game is paused
-			audio_play_sound(SFX_Menu_Close, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100, false);
+			play_sound_effect(SFX_Menu_Close);
 			state = SLIDING_MENU_STATE.CLOSING;
 		}
 	}
