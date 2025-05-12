@@ -11,7 +11,7 @@ if(!variable_instance_exists(self.id, "current_level_data")) {
 	Since these persist for the lifetime of the entire game, you need to make sure no funky side effects occur as a result.
 	Ideally, you want to use as few of these as possible, and put more stuff on the level-scoped managers down below.
 */
-global.player_money = 200;
+global.player_money = 500;
 
 #endregion
 
@@ -40,7 +40,7 @@ global.BACKGROUND_MUSIC_MANAGER.set_music(Music_PreRound);
 purchase_data = [
 	global.DATA_PURCHASE_DIRT,
 	global.DATA_PURCHASE_COBBLESTONE,
-	global.DATA_PURCHASE_SAMPLE_MORTAR,
+	global.DATA_PURCHASE_GOLD,
 	
 	global.DATA_PURCHASE_SAMPLE_GUNNER,
 	global.DATA_PURCHASE_SAMPLE_BRAWLER,

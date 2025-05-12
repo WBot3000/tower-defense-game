@@ -1,0 +1,41 @@
+/// @description Gotta write the algorithm for money spawning
+
+switch (health_state) {
+    case UNIT_STATE.ACTIVE:
+		if(current_health <= 0) {
+			health_state = UNIT_STATE.KNOCKED_OUT;
+			shot_timer = 0;
+		}
+		
+		if(cached_round_manager.is_spawning_enemies()) {
+			money_generation_timer++;
+			if(money_generation_timer >= frames_per_generation) {
+				global.player_money += money_generation_amount;
+				money_generation_timer = 0;
+				
+				part_particles_create(particle_system,
+					x + random_range(-TILE_SIZE/2 + 8, -TILE_SIZE/2 + 16),  y - random_range(16, 24),
+					particle_sparkle, 1);
+					
+				part_particles_create(particle_system,
+					x + random_range(TILE_SIZE/2 - 16, TILE_SIZE/2 - 8),  y - random_range(20, 28),
+					particle_sparkle, 1);
+					
+				part_particles_create(particle_system,
+					x + random_range(-4, 4),  y - random_range(32, 40),
+					particle_sparkle, 1);
+			}
+		}
+		
+        break;
+	case UNIT_STATE.KNOCKED_OUT:
+		var _amount_to_recover = recovery_rate / seconds_to_roomspeed_frames(1);
+		current_health = min(max_health, current_health + _amount_to_recover);
+		if(current_health >= max_health) {
+			//animation_controller.set_animation(spr_sample_gunner, LOOP_FOREVER);
+			health_state = UNIT_STATE.ACTIVE; 
+		}
+		break;
+    default:
+        break;
+}

@@ -358,6 +358,29 @@ function UIParent(_x_pos = 0, _y_pos = 0) : UIComponent() constructor {
 #endregion
 
 
+#region PopupMenuTab (Class)
+/*
+*/
+function PopupMenuTab(_x_pos, _y_pos, _tab_name) : 
+	Button(_x_pos, _y_pos, spr_menu_tab) constructor {
+	tab_name = _tab_name;
+	
+	static draw_parent = draw;
+	static draw = function(_x_offset = 0, _y_offset = 0) {
+		var _draw_x_pos = x_pos + _x_offset;
+		var _draw_y_pos = y_pos + _y_offset;
+		
+		draw_parent(_x_offset, _y_offset);
+		draw_set_halign(fa_center);
+		draw_set_valign(fa_center);
+		draw_text_color(_draw_x_pos + sprite_get_width(spr_menu_tab)/2 - 2, _draw_y_pos + sprite_get_height(spr_menu_tab)/2 + 2, tab_name, c_white, c_white, c_white, c_white, 1);
+		draw_set_halign(fa_left);
+		draw_set_valign(fa_top);
+	}
+}
+#endregion
+
+
 #region PopupMenu (Class)
 /*
 	Defines a menu that appears over the main screen (as opposed to being a dediicated room/page)
@@ -400,6 +423,7 @@ function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UI
 		var _draw_x2 = _draw_x1 + menu_width;
 		var _draw_y2 = _draw_y1 + menu_height;
 		
+		draw_rectangle_color(_draw_x1 - 4, _draw_y1 - 4, _draw_x2 + 4, _draw_y2 + 4, c_white, c_white, c_white, c_white, false) //For a nice border
 		draw_rectangle_color(_draw_x1, _draw_y1, _draw_x2, _draw_y2, c_black, c_black, c_black, c_black, false);
 		draw_set_halign(fa_center);
 		draw_text_color(_draw_x1 + menu_width/2, _draw_y1 + 32, title, c_white, c_white, c_white, c_white, 1);
@@ -407,7 +431,7 @@ function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UI
 		draw_parent(_draw_x1, _draw_y1);
 	}
 	
-	static is_highlighted = function(_x_offset, _y_offset) {
+	static is_highlighted = function(_x_offset, _y_offset) { //TODO: Incorporate border? Or nah
 		var _absolute_x1 = x_pos + _x_offset;
 		var _absolute_y1 = y_pos + _y_offset;
 		var _absolute_x2 = _absolute_x1 + menu_width;
@@ -420,6 +444,7 @@ function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UI
 	
 }
 #endregion
+
 
 #endregion
 
@@ -695,6 +720,30 @@ function ExitPauseMenuButton(_x_pos, _y_pos) :
 #endregion
 
 
+#region PauseMenuAudioTab (Class)
+function PauseMenuAudioTab(_x_pos, _y_pos, _pause_menu) :
+	PopupMenuTab(_x_pos, _y_pos, "Audio") constructor {
+		pause_menu = _pause_menu;
+		
+		static on_click = function() {
+			pause_menu.set_to_audio_options();
+		}
+}
+#endregion
+
+
+#region PauseMenuVisualsTab (Class)
+function PauseMenuVisualsTab(_x_pos, _y_pos, _pause_menu) :
+	PopupMenuTab(_x_pos, _y_pos, "Visuals") constructor {
+		pause_menu = _pause_menu;
+		
+		static on_click = function() {
+			pause_menu.set_to_visual_options();
+		}
+}
+#endregion
+
+
 #region MusicVolumeSlider (Class)
 function MusicVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x_pos_left, _x_pos_right, _y_pos, "Music Volume") constructor {
 	static on_step_parent = on_step;
@@ -732,6 +781,10 @@ function SoundEffectsVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x
 function SetFullscreenToggle(_x_pos, _y_pos) :
 		ToggleSwitch(_x_pos, _y_pos, "Set Fullscreen") constructor {	
 	
+	//When this toggle is created, we need to check if the game is already in full-screen mode.
+	//Otherwise, if this toggle is in full-screen mode when its created, it will do the reverse of what it's supposed to do (fullscreen when unchecked, windowed when checked)
+	is_toggled = window_get_fullscreen();
+	
 	static on_toggle = function() { window_set_fullscreen(true); }
 	static on_untoggle = function() { window_set_fullscreen(false); }
 }
@@ -766,6 +819,14 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage) : PopupMenu(
 	close_button = new ExitPauseMenuButton(menu_width - 40, 8);
 	close_button.activate();
 	
+	var _tab_width = sprite_get_width(spr_menu_tab);
+	var _tab_y = sprite_get_height(spr_menu_tab) * -1;
+	
+	audio_tab = new PauseMenuAudioTab(-4, _tab_y, self);
+	audio_tab.activate();
+	visuals_tab = new PauseMenuVisualsTab(_tab_width, _tab_y, self);
+	visuals_tab.activate();
+	
 	music_volume_slider = new MusicVolumeSlider(16, menu_width - 16, 128);
 	music_volume_slider.activate();
 	
@@ -775,7 +836,7 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage) : PopupMenu(
 	fullscreen_toggle = new SetFullscreenToggle(160, 96);
 	
 	
-	ui_elements = [close_button, music_volume_slider, sound_effects_volume_slider, fullscreen_toggle];
+	ui_elements = [close_button, audio_tab, visuals_tab, music_volume_slider, sound_effects_volume_slider, fullscreen_toggle];
 	
 	
 	static set_to_audio_options = function() {
@@ -1197,7 +1258,7 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 		
 		
 		draw_set_halign(fa_right);
-		draw_set_valign(fa_right);
+		draw_set_valign(fa_bottom);
 		if(stat_upgrade_data.current_level >= stat_upgrade_data.max_level) {
 			draw_text_color(_draw_x_pos + sprite_get_width(button_sprite_default)*0.9,
 				_draw_y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4, "MAX", 
@@ -1210,7 +1271,7 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 		}
 		
 		draw_set_halign(fa_left);
-		draw_set_valign(fa_left);
+		draw_set_valign(fa_top);
 	}
 	
 	static is_enabled = function() {
@@ -1243,14 +1304,14 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 */
 function draw_stat_level(_x_pos, _y_pos, _stat_level) {
 	draw_set_halign(fa_right);
-	draw_set_valign(fa_right);
+	draw_set_valign(fa_bottom);
 	//Draws the number to the right
 	draw_text_color(_x_pos + STAT_BUTTON_SIZE*0.9,
 		_y_pos + STAT_BUTTON_SIZE - 4,
 		_stat_level,
 		c_white, c_white, c_white, c_white, 1);
 	draw_set_halign(fa_left);
-	draw_set_valign(fa_left);
+	draw_set_valign(fa_top);
 }
 
 function StatUpgradeDisplay(_x_pos, _y_pos/*, _unit*/) constructor {
@@ -1813,6 +1874,7 @@ function BackToLevelSelectionButton(_x_pos, _y_pos) :
 #region EndResultsCard (Class)
 /*
 	TODO: Comment
+	TODO: Can turn this into a popup menu of sorts probably
 */
 function EndResultsCard(_menu_width_percentage, _menu_height_percentage) : UIComponent() constructor {
 	

@@ -33,6 +33,7 @@ global.DATA_PURCHASE_SAMPLE_MORTAR = new PurchaseData(sample_mortar, 200);
 
 global.DATA_PURCHASE_DIRT = new PurchaseData(dirt_construct, 100);
 global.DATA_PURCHASE_COBBLESTONE = new PurchaseData(cobblestone_construct, 150);
+global.DATA_PURCHASE_GOLD = new PurchaseData(gold_construct, 300);
 #endregion
 
 #endregion

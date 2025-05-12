@@ -185,6 +185,12 @@ function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constru
 		return _round.spawn_enemy(_enemy_type, _path_data);
 	}
 	
+	
+	static is_spawning_enemies = function() {
+		return array_length(rounds_currently_running) != 0;
+	}
+	
+	
 	static on_step = function(_curr_game_state) {
 		if(_curr_game_state == GAME_STATE.RUNNING) {
 			for(var i = 0; i < array_length(rounds_currently_running); i++) { //Run each round
