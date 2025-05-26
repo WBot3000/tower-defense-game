@@ -83,3 +83,7 @@ game_ui = new GameUI(self.id, purchase_data);
 */
 game_ui.set_gui_running();
 #endregion
+
+
+//NOTE: Delete this once testing
+gui_timer = 0;

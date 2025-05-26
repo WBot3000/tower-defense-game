@@ -4,6 +4,14 @@
 	This file contains functions for drawing things to the screen that don't logically fit in any other file or class.
 	Most of this is done in "Draw" events, though the visual effects have their own objects becauseu
 */
+#region draw_set_alignments
+//Just a wrapper around draw_set_halign and draw_set_valign so you can assign them both at once
+//Call this without any arguments to reset them back to the default
+function draw_set_alignments(_horizontal = fa_left, _vertical = fa_top) {
+	draw_set_halign(_horizontal);
+	draw_set_valign(_vertical);
+}
+#endregion
 
 
 #region draw_health_bar (Function)
@@ -126,5 +134,48 @@ function draw_highlight_info(_title = "No Title", _description = "No description
 					_description, c_white, c_white, c_white, c_white, 1);		
 	
 	draw_set_halign(fa_left);
+}
+#endregion
+
+
+#region initialize_digit_particle
+//TODO: Currently for increases in money, make this more general or add different functions (ex. if we want an effect for losing money too)
+function initialize_digit_particles(digit_particle_refs) {
+	var _digit_particle_sprites = [spr_digit_0, spr_digit_1, spr_digit_2, 
+		spr_digit_3, spr_digit_4, spr_digit_5, spr_digit_6, 
+		spr_digit_7, spr_digit_8, spr_digit_9, spr_digit_plus];
+	
+	for(var i = 0; i < array_length(digit_particle_refs); ++i) {
+		part_type_sprite(digit_particle_refs[i], _digit_particle_sprites[i], true, true, false);
+		part_type_size(digit_particle_refs[i], 1, 1, 0, 0);
+		part_type_color1(digit_particle_refs[i], c_lime);
+		part_type_alpha1(digit_particle_refs[i], 1);
+		part_type_speed(digit_particle_refs[i], 2, 2, 0, 0);
+		part_type_direction(digit_particle_refs[i], 90, 90, 0, 0);
+		part_type_orientation(digit_particle_refs[i], 270, 270, 0, 0, true);
+		part_type_blend(digit_particle_refs[i], 0);
+		part_type_life(digit_particle_refs[i], 30, 30);
+	}
+}
+#endregion
+
+
+#region draw_money_increase
+function draw_money_increase(value_increased, x_pos, y_pos) {
+	var digit_to_particle = [global.PARTICLE_DIGIT_0, global.PARTICLE_DIGIT_1, global.PARTICLE_DIGIT_2,
+	global.PARTICLE_DIGIT_3, global.PARTICLE_DIGIT_4, global.PARTICLE_DIGIT_5, global.PARTICLE_DIGIT_6,
+	global.PARTICLE_DIGIT_7, global.PARTICLE_DIGIT_8, global.PARTICLE_DIGIT_9];
+	var _value_increased_string = string(value_increased);
+	
+	
+	part_particles_create(global.PARTICLE_SYSTEM, x_pos, y_pos, global.PARTICLE_DIGIT_PLUS, 1);
+	show_debug_message(string_length(_value_increased_string));
+	for(var i = 1; i <= string_length(_value_increased_string); ++i) {
+		//string_char_at starts with index ONE for some bizzare reason and not ZERO like everything else
+		//At least it makes the digit offset calculations look nicer
+		var _digit = real(string_char_at(_value_increased_string, i)); //Converts the digit back into a number that can be used as an index
+		part_particles_create(global.PARTICLE_SYSTEM, x_pos + 12*i, y_pos + i*0.75, 
+			digit_to_particle[_digit], 1);
+	}
 }
 #endregion

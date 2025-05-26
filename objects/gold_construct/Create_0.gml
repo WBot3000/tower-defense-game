@@ -44,7 +44,7 @@ sell_price = global.DATA_PURCHASE_GOLD.price * SELL_PRICE_REDUCTION;
 
 //TODO: Animation controller?
 
-
+/*
 //Particle Stuff!
 particle_system = part_system_create_layer(PARTICLE_LAYER, false);
 particle_sparkle = part_type_create();
@@ -73,4 +73,4 @@ part_type_orientation(particle_sparkle,0,0,0,0,true);
 part_type_blend(particle_sparkle,0);
 
 // This is its lifespan in steps
-part_type_life(particle_sparkle,20,40);
+part_type_life(particle_sparkle,20,40);*/

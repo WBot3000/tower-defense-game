@@ -22,6 +22,11 @@ DATA_LEVEL_MAIN_[LEVELNAME]
 - Contains level-unique metadata, such as starting defense health, starting money, and spawn data
 
 
+Things Named Similarly:
 The different targeting types are also stored similarly to this. They use:
 TARGETING_[TARGETINGTYPE]
 I didn't prefix this with DATA like the rest for the time being, as this data also contains a function, and I'm not 100% sure if I want to consider components with functionality as part of this data scheme.
+
+Particles also use something like this, that being:
+PARTICLE_[PARTICLENAME]
+With the particle system itself being refered to as PARTICLE_SYSTEM. These aren't prefixed with DATA, as these are completely initialized particles, not just data.

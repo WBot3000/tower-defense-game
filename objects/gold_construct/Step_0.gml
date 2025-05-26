@@ -13,17 +13,17 @@ switch (health_state) {
 				global.player_money += money_generation_amount;
 				money_generation_timer = 0;
 				
-				part_particles_create(particle_system,
+				part_particles_create(global.PARTICLE_SYSTEM,
 					x + random_range(-TILE_SIZE/2 + 8, -TILE_SIZE/2 + 16),  y - random_range(16, 24),
-					particle_sparkle, 1);
+					global.PARTICLE_SPARKLE, 1);
 					
-				part_particles_create(particle_system,
+				part_particles_create(global.PARTICLE_SYSTEM,
 					x + random_range(TILE_SIZE/2 - 16, TILE_SIZE/2 - 8),  y - random_range(20, 28),
-					particle_sparkle, 1);
+					global.PARTICLE_SPARKLE, 1);
 					
-				part_particles_create(particle_system,
+				part_particles_create(global.PARTICLE_SYSTEM,
 					x + random_range(-4, 4),  y - random_range(32, 40),
-					particle_sparkle, 1);
+					global.PARTICLE_SPARKLE, 1);
 			}
 		}
 		

@@ -14,7 +14,7 @@
 
 
 #region Room Layer Macros
-#macro PARTICLE_LAYER "Potential_Additional_Graphics"
+#macro PARTICLE_LAYER "Particles"
 #macro TILE_LAYER "Placement_Tiles"
 #macro PROJECTILE_LAYER "Projectiles"
 #macro TARGET_LAYER "Targets"

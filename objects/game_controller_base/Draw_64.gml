@@ -1,2 +1,2 @@
-/// @description Prints out current round, how much money you have, and wall health on screen
+/// @description Prints out current round, and how much money you have
 game_ui.draw();

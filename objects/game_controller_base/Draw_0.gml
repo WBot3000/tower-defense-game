@@ -38,3 +38,9 @@ if(purchase_manager.currently_selected_purchase != undefined) {
 		_tile_at_mouse.x + TILE_SIZE/2, _tile_at_mouse.y + TILE_SIZE);
 	shader_reset();
 }
+
+/*
+if(gui_timer >= 120) {
+	draw_money_increase(1234567890, mouse_x + 64, mouse_y + 64);
+	gui_timer = 0;
+}*/

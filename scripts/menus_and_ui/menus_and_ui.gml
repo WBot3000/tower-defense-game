@@ -13,31 +13,159 @@
 	A UIParent will not perform any actions while non-active, including performing checks on all of its children, essentially rendering them inactive as well, even if the children aren't marked explicitly as inactive.
 */
 
-#region Basic UI Components
+#region Basic Components
 
 #region UIComponent (Class)
 /*
 	A base component for all other UI components.
 	
 	Defines activatability and functions that all UI components should have.
+	
+	Data Variables:
+		x_pos: The x_coordinate of the UIParent's top-left position. This will be 0 if the parent is meant to cover the entire UI.
+	y_pos: The y_coordinate of the UIParent's top-left position. This will be 0 if the parent is meant to cover the entire UI.
+	parent: The UI element that "owns" this element in the hierarchy.
 */
-function UIComponent() constructor {
+function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other) constructor {
 	active = false;
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	
+	parent = undefined;
+	absolute_x_pos = x_pos;
+	absolute_y_pos = y_pos;
+	update_absolute_positions = false; //Need to update these positions when the component's parent is moving
+	if(is_instanceof(_parent, UIComponent)) { //Prevents issues with the top-level UIComponent
+		parent = _parent;
+		absolute_x_pos += parent.absolute_x_pos;
+		absolute_y_pos += parent.absolute_y_pos;
+	}
 	
 	//Basically just a wrapper for activating the button
-	static activate = function() {
-		active = true;
-	}
+	static activate = function() { active = true; }
 	
 	//Basically just a wrapper for deactivating the button
-	static deactivate = function() {
-		active = false;
-	}
+	static deactivate = function() { active = false; }
+	
+	static is_highlighted = function() { return false; } //If no function is defined, assume the element can't be highlighted
 	
 	static draw = function() {}
 	static on_step = function() {}
 	static on_selected = function() {}
 	static on_click = function() {}
+	static clean_up = function() {}
+}
+#endregion
+
+
+#region Mover (Class)
+/*
+	Consists of a series of components that move between two points in unison.
+	Provides the ability to easily choreograph the movement of multiple components at once.
+	
+	NOTE: This is NOT a UIComponent, and it should not be treated as such. It purely exists to easily coordinate actions between otherwise unrelated UIComponents (ex. the pause button and purchase menu)
+	Do not attempt to draw this (there is nothing to draw) and do not put it in the "ui_elements" of a UIParent (it should go in "movers" instead so on_step events can run).
+	
+	Argument Variables:
+	All correspond to Data Variables
+	
+	Data Variables:
+	ui_elements: The UI elements to move
+*/
+function Mover(_ui_elements) constructor {
+	ui_elements = _ui_elements;
+	x_delta = 0;
+	y_delta = 0;
+	
+	static move_elements = function(_x_delta, _y_delta) {
+	}
+}
+#endregion
+
+
+#region UIParent (Class)
+/*
+	Used for managing multiple UI components for a single interface
+	
+	Argument Variables:
+	All correspond to Data Variables.
+	
+	Data Variables:
+	x_pos: The x_coordinate of the UIParent's top-left position. This will be 0 if the parent is meant to cover the entire UI.
+	y_pos: The y_coordinate of the UIParent's top-left position. This will be 0 if the parent is meant to cover the entire UI.
+	ui_elements: A list of all of the UI elements contained within this UIParent
+		- The elements should be arranged from back (drawn last) to front (drawn first).
+		- If none of your UI elements overlap, the order won't make a difference, but if they do, elements in front will be selected "first"
+*/
+function UIParent(_x_pos = 0, _y_pos = 0) : UIComponent(_x_pos, _y_pos) constructor {
+	//Getting viewport dimensions	(TODO: Not sure if I should keep this, or if I can just fetch these from the appropriate functions when I need to.)
+	view_w =  camera_get_view_width(view_camera[0]);
+	view_h = camera_get_view_height(view_camera[0]);
+	
+	ui_elements = [];
+	//movers = [];
+	
+	static gui_element_highlighted = function() {
+		if(!active) {
+			return undefined;
+		}
+		//Array is searched from end to beginning so that elements drawn in the front are checked before elements drawn in the back
+		for(var i = array_length(ui_elements) - 1; i >= 0; i--) {
+			if(ui_elements[i].active && ui_elements[i].is_highlighted(x_pos, y_pos)) {
+				return ui_elements[i];
+			}
+		}
+		return undefined;
+	}
+	
+	
+	static draw = function(_x_offset = 0, _y_offset = 0) {
+		if(!active) {
+			return;
+		}
+		for(var i = 0; i < array_length(ui_elements); i++) {
+			if(ui_elements[i].active) {
+				ui_elements[i].draw(x_pos + _x_offset, y_pos + _y_offset);
+			}
+		}
+	}
+	
+	
+	//This allows things like sliders that can take continuous input (via holding down the mouse)
+	//Returns the GUI element that's currently highlighted (in case you want to do anything else with it).
+	static on_step = function() {
+		if(!active) {
+			return undefined;
+		}
+		for(var i = array_length(ui_elements) - 1; i >= 0; i--) {
+				ui_elements[i].on_step(x_pos, y_pos);
+		}
+		/*
+		for(var i = array_length(ui_elements) - 1; i >= 0; i--) {		//NOTE: Was meant for Movers, but not sure if I'm gonna go with that system
+				ui_elements[i].on_step(x_pos, y_pos);
+		}*/
+		var _highlighted_elem = gui_element_highlighted();
+		if(_highlighted_elem != undefined) {
+			if(mouse_check_button_pressed(mb_left)) {
+				_highlighted_elem.on_selected(x_pos, y_pos);
+			}
+			if(mouse_check_button_released(mb_left)) {
+				//TODO: So I was able to fix the error with the sliders by just adding the release into the "on_step" event as well.
+				//However, I still think I should revise how these functions works. Feels pretty hack-ish, and I don't want this code to become messier than it already is.
+				//Especially if you have UIParents inside UIParents, that's gotta be funky with the on_step, THEN on_click
+				_highlighted_elem.on_click(x_pos, y_pos);
+			}
+		}
+		return _highlighted_elem
+	}
+	
+	
+	static clean_up = function() {
+		for(var i = 0; i < array_length(ui_elements); i++) {
+			ui_elements[i].clean_up();
+		}
+	}
+	
 }
 #endregion
 
@@ -282,82 +410,6 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 #endregion
 
 
-#region UIParent (Class)
-/*
-	Used for managing multiple UI components for a single interface
-	
-	Argument Variables:
-	All correspond to Data Variables.
-	
-	Data Variables:
-	x_pos: The x_coordinate of the UIParent's top-left position. This will be 0 if the parent is meant to cover the entire UI.
-	y_pos: The y_coordinate of the UIParent's top-left position. This will be 0 if the parent is meant to cover the entire UI.
-	ui_elements: A list of all of the UI elements contained within this UIParent
-		- The elements should be arranged from back (drawn last) to front (drawn first).
-		- If none of your UI elements overlap, the order won't make a difference, but if they do, elements in front will be selected "first"
-*/
-function UIParent(_x_pos = 0, _y_pos = 0) : UIComponent() constructor {
-	x_pos = _x_pos;
-	y_pos = _y_pos;
-	
-	//Getting viewport dimensions	(TODO: Not sure if I should keep this, or if I can just fetch these from the appropriate functions when I need to.)
-	view_w =  camera_get_view_width(view_camera[0]);
-	view_h = camera_get_view_height(view_camera[0]);
-	
-	ui_elements = [];
-	
-	static gui_element_highlighted = function() {
-		if(!active) {
-			return undefined;
-		}
-		//Array is searched from end to beginning so that elements drawn in the front are checked before elements drawn in the back
-		for(var i = array_length(ui_elements) - 1; i >= 0; i--) {
-			if(ui_elements[i].active && ui_elements[i].is_highlighted(x_pos, y_pos)) {
-				return ui_elements[i];
-			}
-		}
-		return undefined;
-	}
-	
-	//This allows things like sliders that can take continuous input (via holding down the mouse)
-	//Returns the GUI element that's currently highlighted (in case you want to do anything else with it).
-	static on_step = function() {
-		if(!active) {
-			return undefined;
-		}
-		for(var i = array_length(ui_elements) - 1; i >= 0; i--) {
-				ui_elements[i].on_step(x_pos, y_pos);
-		}
-		var _highlighted_elem = gui_element_highlighted();
-		if(_highlighted_elem != undefined) {
-			if(mouse_check_button_pressed(mb_left)) {
-				_highlighted_elem.on_selected(x_pos, y_pos);
-			}
-			if(mouse_check_button_released(mb_left)) {
-				//TODO: So I was able to fix the error with the sliders by just adding the release into the "on_step" event as well.
-				//However, I still think I should revise how these functions works. Feels pretty hack-ish, and I don't want this code to become messier than it already is.
-				//Especially if you have UIParents inside UIParents, that's gotta be funky with the on_step, THEN on_click
-				_highlighted_elem.on_click(x_pos, y_pos);
-			}
-		}
-		return _highlighted_elem
-	}
-	
-	
-	static draw = function() {
-		if(!active) {
-			return;
-		}
-		for(var i = 0; i < array_length(ui_elements); i++) {
-			if(ui_elements[i].active) {
-				ui_elements[i].draw(x_pos, y_pos);
-			}
-		}
-	}
-}
-#endregion
-
-
 #region PopupMenuTab (Class)
 /*
 */
@@ -371,11 +423,9 @@ function PopupMenuTab(_x_pos, _y_pos, _tab_name) :
 		var _draw_y_pos = y_pos + _y_offset;
 		
 		draw_parent(_x_offset, _y_offset);
-		draw_set_halign(fa_center);
-		draw_set_valign(fa_center);
+		draw_set_alignments(fa_center, fa_center);
 		draw_text_color(_draw_x_pos + sprite_get_width(spr_menu_tab)/2 - 2, _draw_y_pos + sprite_get_height(spr_menu_tab)/2 + 2, tab_name, c_white, c_white, c_white, c_white, 1);
-		draw_set_halign(fa_left);
-		draw_set_valign(fa_top);
+		draw_set_alignments();
 	}
 }
 #endregion
@@ -412,12 +462,9 @@ function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UI
 	
 	title = _title;
 	
-	//TODO: Determine how to do menu options
 	
 	static draw_parent = draw;
-	
-	
-	static draw = function(_x_offset = 0, _y_offset = 0) {
+	static draw = function(_x_offset = 0, _y_offset = 0) { //TODO: Trace x_offset and y_offset to see how this affects drawing
 		var _draw_x1 = x_pos + _x_offset;
 		var _draw_y1 = y_pos + _y_offset;
 		var _draw_x2 = _draw_x1 + menu_width;
@@ -428,7 +475,7 @@ function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UI
 		draw_set_halign(fa_center);
 		draw_text_color(_draw_x1 + menu_width/2, _draw_y1 + 32, title, c_white, c_white, c_white, c_white, 1);
 		draw_set_halign(fa_left);
-		draw_parent(_draw_x1, _draw_y1);
+		draw_parent();
 	}
 	
 	static is_highlighted = function(_x_offset, _y_offset) { //TODO: Incorporate border? Or nah
@@ -445,6 +492,7 @@ function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UI
 }
 #endregion
 
+//TODO: Create a sliding menu class that can be used for both sliding menus? Or too much work for little benefit?
 
 #endregion
 
@@ -855,20 +903,6 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage) : PopupMenu(
 	}
 	
 	
-	//This is a DEBUG feature meant to test out switching between the audio and visual menus.
-	//This will be replaced with buttons once I feel like making them (I am once again sick of UI).
-	static on_step_parent = on_step;
-	static on_step = function(_x_offset, _y_offset) {
-		on_step_parent(_x_offset, _y_offset);
-		if(keyboard_check_pressed(ord("1"))) {
-			set_to_audio_options();
-		}
-		if(keyboard_check_pressed(ord("2"))) {
-			set_to_visual_options();
-		}
-	}
-	
-	
 	static clean_up = function() {
 		if(pause_background != -1) {
 			sprite_delete(pause_background);
@@ -920,6 +954,8 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 	y_pos = _y_pos;
 	purchase_data = _purchase_data;
 	
+	cached_game_state_manager = get_game_state_manager();
+	
 	
 	static is_enabled = function() {
 		return global.player_money >= purchase_data.price;
@@ -934,11 +970,24 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 		var _draw_x_pos = x_pos + _x_offset;
 		var _draw_y_pos = y_pos + _y_offset;
 		
-		draw_parent(_x_offset, _y_offset);
+		
+		draw_parent(_x_offset, _y_offset, _button_highlight_enabled && cached_game_state_manager != undefined && cached_game_state_manager.state == GAME_STATE.RUNNING);
 		draw_sprite(object_get_sprite(purchase_data.unit), 0, _draw_x_pos + 8 + TILE_SIZE/2, _draw_y_pos + 4 + TILE_SIZE);
 		draw_set_halign(fa_right);
 		draw_text(_draw_x_pos + sprite_get_width(button_sprite_default) - 8, _draw_y_pos + 72, string(purchase_data.price));
 		draw_set_halign(fa_left);
+	}
+	
+	
+	//TODO: Uncomment this once the purchase menu is set up correctly.
+	static on_click = function() {
+		if(cached_game_state_manager == undefined || cached_game_state_manager.state != GAME_STATE.RUNNING) {
+			return; //You should only be able to select units while the game is running
+		}
+		var _purchase_manager = get_purchase_manager();
+		if(_purchase_manager != undefined) {
+			_purchase_manager.set_selected_purchase(purchase_data);
+		}
 	}
 }
 #endregion
@@ -954,21 +1003,25 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 	Data Variables:
 	x_pos: X coordinate of the button's top left corner in relation to the purchase menu
 	y_pos: Y coordinate of the button's top left corner in relation to the purchase menu
-	purchase_menu: The purchase menu struct the button is a part of.
 */
-function PreviousPagePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
+function PreviousPagePurchaseMenuButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_page_left_default, spr_page_left_disabled) constructor {
 	x_pos = _x_pos;
 	y_pos = _y_pos;
-	purchase_menu = _purchase_menu;
 	
 	static is_enabled = function() {
-		return purchase_menu.current_page > 0;
+		return parent.current_page > 0; //Parent is the Purchase Menu struct itself
 	}
 	
 	static on_click = function() {
 		if(is_enabled()) {
-			purchase_menu.current_page--;
+			for(var i = parent.current_page * PURCHASE_MENU_BPPAGE; i < (parent.current_page+1) * PURCHASE_MENU_BPPAGE && i < array_length(parent.purchase_buttons); ++i) {
+				parent.purchase_buttons[i].deactivate();
+			}
+			parent.current_page--;
+			for(var i = parent.current_page * PURCHASE_MENU_BPPAGE; i < (parent.current_page+1) * PURCHASE_MENU_BPPAGE && i < array_length(parent.purchase_buttons); ++i) {
+				parent.purchase_buttons[i].activate();
+			}
 		}
 	}
 	
@@ -986,21 +1039,25 @@ function PreviousPagePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
 	Data Variables:
 	x_pos: X coordinate of the button's top left corner in relation to the purchase menu
 	y_pos: Y coordinate of the button's top left corner in relation to the purchase menu
-	purchase_menu: The purchase menu struct the button is a part of.
 */
-function NextPagePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
+function NextPagePurchaseMenuButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_page_right_default, spr_page_right_disabled) constructor {
 	x_pos = _x_pos;
 	y_pos = _y_pos;
-	purchase_menu = _purchase_menu;
 	
 	static is_enabled = function() {
-		return array_length(purchase_menu.purchase_buttons) > (purchase_menu.current_page + 1) * PURCHASE_MENU_BPPAGE;
+		return array_length(parent.purchase_buttons) > (parent.current_page + 1) * PURCHASE_MENU_BPPAGE;
 	}
 	
 	static on_click = function() {
 		if(is_enabled()) {
-			purchase_menu.current_page++;
+			for(var i = parent.current_page * PURCHASE_MENU_BPPAGE; i < (parent.current_page+1) * PURCHASE_MENU_BPPAGE && i < array_length(parent.purchase_buttons); ++i) {
+				parent.purchase_buttons[i].deactivate();
+			}
+			parent.current_page++;
+			for(var i = parent.current_page * PURCHASE_MENU_BPPAGE; i < (parent.current_page+1) * PURCHASE_MENU_BPPAGE && i < array_length(parent.purchase_buttons); ++i) {
+				parent.purchase_buttons[i].activate();
+			}
 		}
 	}
 	
@@ -1020,17 +1077,16 @@ function NextPagePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
 	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
 	purchase_menu: Reference to the purchase menu that this button belongs to
 */
-function TogglePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
+function TogglePurchaseMenuButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_pointer_arrow_left) constructor {
-	purchase_menu = _purchase_menu;
 	
 	static on_click = function() {
-		switch (purchase_menu.state) {
+		switch (parent.state) {
 		    case SLIDING_MENU_STATE.OPEN:
-		        purchase_menu.toggle_closed();
+		        parent.toggle_closed();
 		        break;
 			case SLIDING_MENU_STATE.CLOSED:
-				purchase_menu.toggle_open();
+				parent.toggle_open();
 		        break;
 		    default:
 		        break;
@@ -1058,22 +1114,35 @@ function TogglePurchaseMenuButton(_x_pos, _y_pos, _purchase_menu) :
 	toggle_button: Button that toggles the menu state
 */
 //How much of the screen should the unit purchase menu take up while it is open
-//NOTE: I don't think this is used right now
 #macro PURCHASE_MENU_SCREEN_PERCENTAGE (2/7)
 
-function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) : UIComponent() constructor {
+function UnitPurchaseMenu(/*_menu_width_percentage, _y_pos, */_purchase_data_list) : UIParent() constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the side is opened or closed
-	menu_width_percentage = _menu_width_percentage;
+	//menu_width_percentage = _menu_width_percentage;
 	
-	var _view_w = camera_get_view_width(view_camera[0]);
-	x_pos_open = (1-menu_width_percentage) * _view_w;
-	x_pos_current = _view_w; //Window should start out closed
-	y_pos = _y_pos;
+	//var _view_w = camera_get_view_width(view_camera[0]);
+	x_pos_open = (1-PURCHASE_MENU_SCREEN_PERCENTAGE) * view_w;
+	x_pos = view_w; //Window should start out closed
+	y_pos = 0;
+	menu_width = view_w - x_pos_open;
+	menu_height = view_h*(1-UNIT_INFO_CARD_SCREEN_PERCENTAGE);
+	
+	
+	current_page = 0;
+	prev_page_button = new PreviousPagePurchaseMenuButton(64, menu_height - 40);
+	prev_page_button.activate();
+	next_page_button = new NextPagePurchaseMenuButton(menu_width - sprite_get_width(spr_page_right_default) - 64 , menu_height - 40);
+	next_page_button.activate();
+	
+	toggle_button = new TogglePurchaseMenuButton(-32, (menu_height - sprite_get_width(spr_pointer_arrow_left))/2);
+	toggle_button.activate();
+	
 
-	//Array that contains all of the button data.
+	//Array that contains all of the button data. Kept seperate from UI elements so they can be iterated independently from them.
+	//NOTE: You can technically just do the same thing with an offset, but I wanted to make purchase button iteration independent from all the other UI elements present in the menu.
 	purchase_buttons = [];
+	ui_elements = [prev_page_button, next_page_button, toggle_button];
 	
-	menu_width = _view_w - x_pos_open;
 	var _button_width = sprite_get_width(spr_unit_purchase_button_default);
 	var _button_height = sprite_get_height(spr_unit_purchase_button_default);
 
@@ -1081,9 +1150,18 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) :
 	var _button_x = _x_gap;
 	var _button_y = TILE_SIZE;
 	var _init_button_y = TILE_SIZE;
+	
+	var _activate_first_page = true; //For the first page of buttons, make sure to activate them.
 	//Create buttons
 	for(var i = 0; i < array_length(_purchase_data_list); ++i) {
-		array_push(purchase_buttons, new UnitPurchaseButton(_button_x, _button_y, _purchase_data_list[i]));
+		var _button = new UnitPurchaseButton(_button_x, _button_y, _purchase_data_list[i])
+		array_push(purchase_buttons, _button);
+		array_push(ui_elements, _button);
+		
+		if(_activate_first_page) {
+			_button.activate();
+		}
+		
 		_button_x += (_button_width + _x_gap);
 		
 		if(i % PURCHASE_MENU_BPROW == PURCHASE_MENU_BPROW - 1) { //Time to start a new row
@@ -1091,46 +1169,27 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) :
 			_button_y += _button_height + 4;
 			if(i % PURCHASE_MENU_BPPAGE == PURCHASE_MENU_BPPAGE - 1) { //Time to start a new page
 				_button_y = _init_button_y;
+				_activate_first_page = false; //Not on first page anymore, don't activate these buttons
 			}
 		}
 	}
 	
-	current_page = 0;
-	prev_page_button = new PreviousPagePurchaseMenuButton(64 ,y_pos - 40, self);
-	next_page_button = new NextPagePurchaseMenuButton(menu_width - sprite_get_width(spr_page_right_default) - 64 , y_pos - 40, self);
-	
-	toggle_button = new TogglePurchaseMenuButton(-32, (y_pos - sprite_get_width(spr_pointer_arrow_left))/2, self);
-	
 	
 	static is_highlighted = function() {
-		return (device_mouse_x_to_gui(0) >= x_pos_current && y_pos >= device_mouse_y_to_gui(0)) || 
-			toggle_button.is_highlighted(x_pos_current, 0); 
+		return (device_mouse_x_to_gui(0) >= x_pos && menu_height >= device_mouse_y_to_gui(0)) || 
+			toggle_button.is_highlighted(x_pos, 0); 
 	}
 	
 	
-	static draw = function() {
-		var _game_state_manager = get_game_state_manager();
-		var _button_highlight_enabled = (_game_state_manager != undefined && _game_state_manager.state == GAME_STATE.RUNNING);
-		var _view_w = camera_get_view_width(view_camera[0]);
+	static draw_parent = draw;
+	static draw = function() { //TODO: x_offset, y_offset?
+		draw_rectangle_color(x_pos, 0, view_w, menu_height, c_silver, c_silver, c_silver, c_silver, false);
 		
-		draw_rectangle_color(x_pos_current, 0, _view_w, y_pos, c_silver, c_silver, c_silver, c_silver, false);
-		toggle_button.draw(x_pos_current, 0);
-		prev_page_button.draw(x_pos_current, 0);
-		next_page_button.draw(x_pos_current, 0);
+		draw_set_alignments(fa_center, fa_center);
+		draw_text_color(x_pos + menu_width/2 , TILE_SIZE/2, "PURCHASE", c_black, c_black, c_black, c_black, 1);
+		draw_set_alignments();
 		
-		draw_set_halign(fa_center);
-		draw_set_valign(fa_center);
-		draw_text_color(x_pos_current + menu_width/2 , TILE_SIZE/2, "PURCHASE",
-			c_black, c_black, c_black, c_black, 1);
-		draw_set_halign(fa_left);
-		draw_set_valign(fa_top);
-		
-		//current_page * PURCHASE_MENU_BPPAGE is the index of the first button on the current page
-		//(current_page+1) * PURCHASE_MENU_BPPAGE is the index of the first button on the NEXT page
-		//The i < array_length(purchase_buttons) exists so, on the last page, if there are less than PURCHASE_MENU_BPPAGE buttons, the loop will stop at the last one, instead of trying to access non-existent buttons
-		for(var i = current_page * PURCHASE_MENU_BPPAGE; i < (current_page+1) * PURCHASE_MENU_BPPAGE && i < array_length(purchase_buttons); ++i) {
-			purchase_buttons[i].draw(x_pos_current, 0, _button_highlight_enabled);
-		}
+		draw_parent();
 	}
 	
 	
@@ -1156,7 +1215,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) :
 	//Shoud be called in a Step event.
 	//Returns the number of pixels the menu has moved, so that any other UI elements can be moved along with it.
 	static move_menu = function(_menu_toggle_pressed) {
-		var _x_pos_old = x_pos_current;
+		var _x_pos_old = x_pos;
 		switch (state) {
 			case SLIDING_MENU_STATE.CLOSED:
 				if(_menu_toggle_pressed) {
@@ -1164,14 +1223,14 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) :
 				}
 			    break;
 			case SLIDING_MENU_STATE.CLOSING:
-				x_pos_current = min(x_pos_current + SLIDING_MENU_MOVEMENT_SPEED, camera_get_view_width(view_camera[0]));
-				if(x_pos_current >= camera_get_view_width(view_camera[0])) {
+				x_pos = min(x_pos + SLIDING_MENU_MOVEMENT_SPEED, camera_get_view_width(view_camera[0]));
+				if(x_pos >= camera_get_view_width(view_camera[0])) {
 					state = SLIDING_MENU_STATE.CLOSED;
 				}
 				break;
 			case SLIDING_MENU_STATE.OPENING:
-				x_pos_current = max(x_pos_current - SLIDING_MENU_MOVEMENT_SPEED, x_pos_open);
-				if(x_pos_current <= x_pos_open) {
+				x_pos = max(x_pos - SLIDING_MENU_MOVEMENT_SPEED, x_pos_open);
+				if(x_pos <= x_pos_open) {
 					state = SLIDING_MENU_STATE.OPEN;
 				}
 				break;
@@ -1185,32 +1244,7 @@ function UnitPurchaseMenu(_menu_width_percentage, _y_pos, _purchase_data_list) :
 		}
 		
 		//Will be 0 if menu hasn't moved, positive if the menu is closing, and negative if the menu is opening
-		return x_pos_current - _x_pos_old;
-	}
-	
-	
-	static on_click = function() {
-		if(toggle_button.is_highlighted(x_pos_current, 0)) { //Not checking for if enabled, since it will always be enabled if this menu is enabled
-			toggle_button.on_click();
-			return;
-		}
-		if(prev_page_button.is_highlighted(x_pos_current, 0)) { //is_enabled check is in the on_click function
-			prev_page_button.on_click();
-			return;
-		}
-		if(next_page_button.is_highlighted(x_pos_current, 0)) { //is_enabled check is in the on_click function
-			next_page_button.on_click();
-			return;
-		}
-		
-		var _purchase_manager = get_purchase_manager();
-		if(_purchase_manager != undefined) {
-			for(var i = current_page * PURCHASE_MENU_BPPAGE; i < (current_page+1) * PURCHASE_MENU_BPPAGE && i < array_length(purchase_buttons); ++i) {
-				if(purchase_buttons[i].is_highlighted(x_pos_current, 0)) {
-					_purchase_manager.set_selected_purchase(purchase_buttons[i].purchase_data);
-				}
-			}
-		}
+		return x_pos - _x_pos_old;
 	}
 	
 }
@@ -1244,21 +1278,18 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 	stat_upgrade_data = _stat_upgrade_data;
 	
 	static draw_parent = draw;
-	
-	static draw = function(_x_offset, _y_offset) {
+	static draw = function(_x_offset = 0, _y_offset = 0) {
 		var _draw_x_pos = x_pos + _x_offset;
 		var _draw_y_pos = y_pos + _y_offset;
 		
 		if(stat_upgrade_data == undefined) {
 			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos, _draw_y_pos);
-			return; //No number for a stat that doesn't exist
+			return; //No drawing needed for a stat that doesn't exist
 		}
+
+		draw_parent(_draw_x_pos, _draw_y_pos);
 		
-		draw_parent(_x_offset, _y_offset);
-		
-		
-		draw_set_halign(fa_right);
-		draw_set_valign(fa_bottom);
+		draw_set_alignments(fa_right, fa_bottom);
 		if(stat_upgrade_data.current_level >= stat_upgrade_data.max_level) {
 			draw_text_color(_draw_x_pos + sprite_get_width(button_sprite_default)*0.9,
 				_draw_y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4, "MAX", 
@@ -1269,9 +1300,7 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 				_draw_y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4, stat_upgrade_data.current_price, 
 				c_white, c_white, c_white, c_white, 1);
 		}
-		
-		draw_set_halign(fa_left);
-		draw_set_valign(fa_top);
+		draw_set_alignments();
 	}
 	
 	static is_enabled = function() {
@@ -1293,37 +1322,62 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 
 #region StatUpgradeDisplay (Class)
 /*
-	Used to display all of the stat upgrade buttons 
+	Used to display a stat upgrade button alongside its graphic.
 	
 	Argument Variables:
 	
 	Data Variables:
 	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
 	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
+	stat_upgrade_data: Unit's upgrade data that should be displayed
+	(For draw_stat_level):
 	stat_level: The level of the stat being displayed
 */
 function draw_stat_level(_x_pos, _y_pos, _stat_level) {
-	draw_set_halign(fa_right);
-	draw_set_valign(fa_bottom);
+	draw_set_alignments(fa_right, fa_bottom);
 	//Draws the number to the right
 	draw_text_color(_x_pos + STAT_BUTTON_SIZE*0.9,
 		_y_pos + STAT_BUTTON_SIZE - 4,
 		_stat_level,
 		c_white, c_white, c_white, c_white, 1);
-	draw_set_halign(fa_left);
-	draw_set_valign(fa_top);
+	draw_set_alignments();
 }
 
-function StatUpgradeDisplay(_x_pos, _y_pos/*, _unit*/) constructor {
-	x_pos = _x_pos;
-	y_pos = _y_pos;
+function StatUpgradeDisplay(_x_pos, _y_pos) : UIParent(_x_pos, _y_pos) constructor {
+	stat_upgrade_data = undefined;
 	selected_unit = noone;
 	
-	buttons = [new StatUpgradeButton(x_pos, y_pos + STAT_BUTTON_SIZE), new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE, y_pos + STAT_BUTTON_SIZE),
-		new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE*2, y_pos + STAT_BUTTON_SIZE), new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE*3, y_pos + STAT_BUTTON_SIZE)];
+	stat_upgrade_button = new StatUpgradeButton(0, STAT_BUTTON_SIZE);
+	stat_upgrade_button.activate();
 	
+	ui_elements = [stat_upgrade_button];
+		
+	/*static is_highlighted = function(_x_offset, _y_offset) {
+		return false
+	}*/ //NOTE: Don't know if this actually matters, since the child elements will be highlighted instead
 	
+	static draw_parent = draw;
+	static draw = function(_x_offset = 0, _y_offset = 0) {
+		if(selected_unit == undefined) {
+			return; //Nothing to draw
+		}
+		var _draw_x_pos = x_pos + _x_offset;
+		var _draw_y_pos = y_pos + _y_offset;
+		if(stat_upgrade_data != undefined) { //Draw blank space if you need to 
+			draw_sprite(stat_upgrade_data.upgrade_spr, 0, 
+				_draw_x_pos, _draw_y_pos);
+			draw_stat_level(_draw_x_pos, _draw_y_pos, stat_upgrade_data.current_level)
+		}
+		else {
+			draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos, _draw_y_pos);
+		}
+		draw_parent(_x_offset, _y_offset);
+	}
+	/*
 	static draw = function(_x_offset, _y_offset) {
+		if(selected_unit == undefined) {
+			return;
+		}
 		var _draw_x_pos = x_pos + _x_offset;
 		var _draw_y_pos = y_pos + _y_offset;
 		for(var i = 0; i < array_length(buttons); i++) {
@@ -1337,26 +1391,112 @@ function StatUpgradeDisplay(_x_pos, _y_pos/*, _unit*/) constructor {
 			}
 			buttons[i].draw(_x_offset, _y_offset);
 		}
+	}*/
+	
+	
+	static on_selected_unit_change = function(_new_stat_data, _new_selected_unit) {
+		stat_upgrade_data = _new_stat_data;
+		stat_upgrade_button.stat_upgrade_data = _new_stat_data;
+		selected_unit = _new_selected_unit;
 	}
+	
+	/*
+	static get_button_clicked = function(_x_offset, _y_offset) {
+		for(var i = 0; i < array_length(ui_elements); i++) {
+			if(ui_elements[i].is_enabled() && ui_elements[i].is_highlighted(_x_offset, _y_offset)) {
+				return ui_elements[i];
+			}
+		}
+		return undefined;
+	}*/
+	
+}
+#endregion
+
+
+#region StatUpgradeDisplay1 (Class)
+/*
+	Used to display a stat upgrade button alongside its graphic.
+	
+	Argument Variables:
+	
+	Data Variables:
+	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
+	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
+	stat_level: The level of the stat being displayed
+*/
+function draw_stat_level1(_x_pos, _y_pos, _stat_level) {
+	draw_set_alignments(fa_right, fa_bottom);
+	//Draws the number to the right
+	draw_text_color(_x_pos + STAT_BUTTON_SIZE*0.9,
+		_y_pos + STAT_BUTTON_SIZE - 4,
+		_stat_level,
+		c_white, c_white, c_white, c_white, 1);
+	draw_set_alignments();
+}
+
+function StatUpgradeDisplay1(_x_pos, _y_pos) : UIParent(_x_pos, _y_pos) constructor {
+	selected_unit = noone;
+	
+	stat_upgrade_button_1 = new StatUpgradeButton(x_pos, y_pos + STAT_BUTTON_SIZE);
+	stat_upgrade_button_1.activate();
+	stat_upgrade_button_2 = new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE, y_pos + STAT_BUTTON_SIZE);
+	stat_upgrade_button_2.activate();
+	stat_upgrade_button_3 = new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE*2, y_pos + STAT_BUTTON_SIZE);
+	stat_upgrade_button_3.activate();
+	stat_upgrade_button_4 = new StatUpgradeButton(x_pos + STAT_BUTTON_SIZE*3, y_pos + STAT_BUTTON_SIZE);
+	stat_upgrade_button_4.activate();
+	
+	ui_elements = [stat_upgrade_button_1, stat_upgrade_button_2, stat_upgrade_button_3, stat_upgrade_button_4]
+	
+	
+	static is_highlighted = function(_x_offset, _y_offset) {return false} //NOTE: Don't know if this actually matters, since the child elements will be highlighted instead
+	
+	static draw_parent = draw;
+	static draw = function() {
+		if(selected_unit == undefined) {
+			return;
+		}
+		draw_parent();
+	}
+	/*
+	static draw = function(_x_offset, _y_offset) {
+		if(selected_unit == undefined) {
+			return;
+		}
+		var _draw_x_pos = x_pos + _x_offset;
+		var _draw_y_pos = y_pos + _y_offset;
+		for(var i = 0; i < array_length(buttons); i++) {
+			if(selected_unit.stat_upgrades[i] != undefined) {
+				draw_sprite(selected_unit.stat_upgrades[i].upgrade_spr, 0, 
+					_draw_x_pos + (STAT_BUTTON_SIZE * i), _draw_y_pos);
+				draw_stat_level(_draw_x_pos + (STAT_BUTTON_SIZE * i), _draw_y_pos, selected_unit.stat_upgrades[i].current_level)
+			}
+			else {
+				draw_sprite(spr_blank_stat_icon, 0, _draw_x_pos + (STAT_BUTTON_SIZE * i), _draw_y_pos);
+			}
+			buttons[i].draw(_x_offset, _y_offset);
+		}
+	}*/
 	
 	
 	static on_unit_changed = function(_new_unit) {
 		selected_unit = _new_unit;
 		var _new_upgrades = _new_unit == noone ? [undefined, undefined, undefined, undefined] : _new_unit.stat_upgrades;
-		for(var i = 0; i < array_length(buttons); i++) {
-			buttons[i].stat_upgrade_data = _new_upgrades[i];
+		for(var i = 0; i < array_length(ui_elements); i++) {
+			ui_elements[i].stat_upgrade_data = _new_upgrades[i];
 		}
 	}
 	
-	
+	/*
 	static get_button_clicked = function(_x_offset, _y_offset) {
-		for(var i = 0; i < array_length(buttons); i++) {
-			if(buttons[i].is_enabled() && buttons[i].is_highlighted(_x_offset, _y_offset)) {
-				return buttons[i];
+		for(var i = 0; i < array_length(ui_elements); i++) {
+			if(ui_elements[i].is_enabled() && ui_elements[i].is_highlighted(_x_offset, _y_offset)) {
+				return ui_elements[i];
 			}
 		}
 		return undefined;
-	}
+	}*/
 	
 }
 #endregion
@@ -1393,6 +1533,9 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _sele
 	//_x_offset and _y_offset are the origins of the menu
 	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
 	static draw = function(_x_offset, _y_offset, _button_highlight_enabled = true) {
+		if(selected_unit == noone) {
+			return; //Nothing to draw
+		}
 		var _draw_x_pos = x_pos + _x_offset;
 		var _draw_y_pos = y_pos + _y_offset;
 		
@@ -1421,10 +1564,21 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _sele
 /*
 	Indicator that shows what kind of targeting a unit is currently using.
 */
-function TargetingIndicator(_x_pos, _y_pos) constructor {
+#macro TARGETING_INDICATOR_WIDTH 96
+#macro TARGETING_INDICATOR_HEIGHT 24
+function TargetingIndicator(_x_pos, _y_pos) : UIComponent() constructor {
 	x_pos = _x_pos;
 	y_pos = _y_pos;
 	selected_unit = noone;
+	
+	static is_highlighted = function(_x_offset, _y_offset) {
+		var _mouse_x_gui = device_mouse_x_to_gui(0);
+		var _mouse_y_gui = device_mouse_y_to_gui(0);
+		
+		return (_mouse_x_gui >= x_pos + _x_offset && _mouse_x_gui <= x_pos + _x_offset + TARGETING_INDICATOR_WIDTH &&
+			_mouse_y_gui >= y_pos + _y_offset && _mouse_y_gui <= y_pos + _y_offset + TARGETING_INDICATOR_HEIGHT)
+	}
+	
 	
 	static draw = function(_x_offset, _y_offset) {
 		if(selected_unit == noone || array_length(selected_unit.targeting_tracker.potential_targeting_types) == 0) {
@@ -1434,7 +1588,8 @@ function TargetingIndicator(_x_pos, _y_pos) constructor {
 		var _draw_y_pos = y_pos + _y_offset;
 		var _targeting_type = selected_unit.targeting_tracker.get_current_targeting_type();
 		
-		draw_rectangle_color(_draw_x_pos, _draw_y_pos, _draw_x_pos + 96, _draw_y_pos + 24,
+		draw_rectangle_color(_draw_x_pos, _draw_y_pos, 
+			_draw_x_pos + TARGETING_INDICATOR_WIDTH, _draw_y_pos + TARGETING_INDICATOR_HEIGHT,
 			c_ltgray, c_ltgray, c_ltgray, c_ltgray, false)
 		draw_set_halign(fa_center);
 		draw_text(_draw_x_pos + 48, _draw_y_pos, _targeting_type.targeting_name);
@@ -1447,12 +1602,10 @@ function TargetingIndicator(_x_pos, _y_pos) constructor {
 #region SellButton (Class)
 /*
 	Button clicked to sell a unit for cash back
-	Currently takes in a reference to the parent unit info card, as that needs to get updated when a unit is sold.
-	TODO: Find a better way to do this (some sort of event listener pattern or whatever)
 */
-function SellButton(_unit_info_card, _x_pos, _y_pos, _selected_unit = noone) :
+function SellButton(_x_pos, _y_pos, _selected_unit = noone) :
 		Button(_x_pos, _y_pos, spr_sell_button_default, spr_sell_button_disabled, spr_sell_button_default) constructor {
-	unit_info_card = _unit_info_card;
+
 	selected_unit = _selected_unit;
 	
 	static is_enabled = function() {
@@ -1470,11 +1623,9 @@ function SellButton(_unit_info_card, _x_pos, _y_pos, _selected_unit = noone) :
 		var _draw_y_pos = y_pos + _y_offset;
 		
 		draw_sprite(button_sprite_default, 0, _draw_x_pos, _draw_y_pos);
-		draw_set_halign(fa_right);
-		draw_set_valign(fa_center);
+		draw_set_alignments(fa_right, fa_center);
 		draw_text(_draw_x_pos + sprite_get_width(button_sprite_default) - 8, _draw_y_pos + sprite_get_height(button_sprite_default)/2, string(selected_unit.sell_price));
-		draw_set_halign(fa_left);
-		draw_set_valign(fa_top);
+		draw_set_alignments();
 	}
 	
 	static on_click = function() {
@@ -1484,7 +1635,7 @@ function SellButton(_unit_info_card, _x_pos, _y_pos, _selected_unit = noone) :
 			_tile.placed_unit = noone;
 			global.player_money += selected_unit.sell_price;
 			instance_destroy(selected_unit);
-			unit_info_card.on_selected_unit_change(noone); //Don't want this menu referencing a unit that doesn't exist anymore
+			parent.on_selected_unit_change(noone); //Don't want this menu referencing a unit that doesn't exist anymore
 		}
 	}
 }
@@ -1502,19 +1653,17 @@ function SellButton(_unit_info_card, _x_pos, _y_pos, _selected_unit = noone) :
 	Data Variables:
 	x_pos: Horizontal coordinate of the button's top-left corner (relative to the menu's origin).
 	y_pos: Vertical coordinate of the button's top-left corner (relative to the menu's origin).
-	unit_info_card: Reference to the Unit Info Card this button belongs to.
 */
-function ToggleInfoCardButton(_x_pos, _y_pos, _unit_info_card) :
+function ToggleInfoCardButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_pointer_arrow_up) constructor {
-	unit_info_card = _unit_info_card;
 	
 	static on_click = function() {
-		switch (unit_info_card.state) {
+		switch (parent.state) {
 		    case SLIDING_MENU_STATE.OPEN:
-		        unit_info_card.toggle_closed();
+		        parent.toggle_closed();
 		        break;
 			case SLIDING_MENU_STATE.CLOSED:
-				unit_info_card.toggle_open();
+				parent.toggle_open();
 		        break;
 		    default:
 		        break;
@@ -1548,48 +1697,74 @@ function ToggleInfoCardButton(_x_pos, _y_pos, _unit_info_card) :
 //#macro TOGGLE_INFO_CARD_BUTTON_X ((camera_get_view_width(view_camera[0]) - sprite_get_width(spr_pointer_arrow_up)) / 2)
 //#macro TOGGLE_INFO_CARD_BUTTON_Y (camera_get_view_height(view_camera[0]) - (TILE_SIZE*0.5))
 
-function UnitInfoCard(_menu_height_percentage, _x_pos) : UIComponent() constructor {
+function UnitInfoCard(/*_menu_height_percentage, _x_pos*/) : UIParent() constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the bottom is opened or closed
 	selected_unit = noone;
+	cached_game_state_manager = get_game_state_manager();
 	
-	var _view_w = camera_get_view_width(view_camera[0]);
-	var _view_h = camera_get_view_height(view_camera[0]);
-	y_pos_open = (1-_menu_height_percentage) * _view_h;
-	y_pos_current = _view_h; //Window should start out closed
-	x_pos = _x_pos;
+	y_pos_open = (1-UNIT_INFO_CARD_SCREEN_PERCENTAGE) * view_h;
+	y_pos = view_h; //Window should start out closed
+	x_pos = 0;
 	
 	//Stat Upgrade Info
-	stat_upgrade_buttons = new StatUpgradeDisplay(TILE_SIZE * 4.5, TILE_SIZE/2);
+	/*
+	stat_upgrade_buttons = new StatUpgradeDisplay(TILE_SIZE * 2.25, TILE_SIZE/4);
+	stat_upgrade_buttons.activate();*/
+	stat_upgrade_button_1 = new StatUpgradeDisplay(TILE_SIZE*4.5, TILE_SIZE/2);
+	stat_upgrade_button_1.activate();
+	stat_upgrade_button_2 = new StatUpgradeDisplay(TILE_SIZE*5.25, TILE_SIZE/2);
+	stat_upgrade_button_2.activate();
+	stat_upgrade_button_3 = new StatUpgradeDisplay(TILE_SIZE*6, TILE_SIZE/2);
+	stat_upgrade_button_3.activate();
+	stat_upgrade_button_4 = new StatUpgradeDisplay(TILE_SIZE*6.75, TILE_SIZE/2);
+	stat_upgrade_button_4.activate();
+	//For iterating through the stat upgrade buttons
+	stat_upgrade_buttons = [stat_upgrade_button_1, stat_upgrade_button_2, stat_upgrade_button_3, stat_upgrade_button_4];
 	
 	//Unit Upgrade Info
 	unit_upgrade_button_1 = new UnitUpgradeButton(TILE_SIZE*8, TILE_SIZE/2, undefined, noone);
+	unit_upgrade_button_1.activate();
 	unit_upgrade_button_2 = new UnitUpgradeButton(TILE_SIZE*9.5, TILE_SIZE/2, undefined, noone);
+	unit_upgrade_button_2.activate();
 	unit_upgrade_button_3 = new UnitUpgradeButton(TILE_SIZE*11, TILE_SIZE/2, undefined, noone);
+	unit_upgrade_button_3.activate();
 	
 	//Targeting Indicator
 	targeting_indicator = new TargetingIndicator(TILE_SIZE*2.5, TILE_SIZE*1.5);
+	targeting_indicator.activate();
 	
 	//Sell Button
-	sell_button = new SellButton(self, TILE_SIZE*13, TILE_SIZE/4, noone);
+	sell_button = new SellButton(TILE_SIZE*13, TILE_SIZE/4, noone);
+	sell_button.activate();
 	
 	//Menu Toggle Button
-	toggle_button = new ToggleInfoCardButton((_view_w - sprite_get_width(spr_pointer_arrow_up))/2, 
-		-32, self);
+	toggle_button = new ToggleInfoCardButton((view_w - sprite_get_width(spr_pointer_arrow_up))/2,  -32);
+	toggle_button.activate();
 	
+	ui_elements = [stat_upgrade_button_1, stat_upgrade_button_2, stat_upgrade_button_3, stat_upgrade_button_4,
+		unit_upgrade_button_1, unit_upgrade_button_2, unit_upgrade_button_3,
+		targeting_indicator, sell_button, toggle_button];
 	
 	//Called when the selected unit is changed
 	static on_selected_unit_change = function(_new_selected_unit) {
 		selected_unit = _new_selected_unit;
-		stat_upgrade_buttons.on_unit_changed(selected_unit);
 		sell_button.selected_unit = selected_unit
 		targeting_indicator.selected_unit = selected_unit;
 		
 		if(_new_selected_unit != noone) {
+			stat_upgrade_button_1.on_selected_unit_change(selected_unit.stat_upgrades[0], selected_unit);
+			stat_upgrade_button_2.on_selected_unit_change(selected_unit.stat_upgrades[1], selected_unit);
+			stat_upgrade_button_3.on_selected_unit_change(selected_unit.stat_upgrades[2], selected_unit);
+			stat_upgrade_button_4.on_selected_unit_change(selected_unit.stat_upgrades[3], selected_unit);
 			unit_upgrade_button_1.on_selected_unit_change(selected_unit.unit_upgrade_1, selected_unit);
 			unit_upgrade_button_2.on_selected_unit_change(selected_unit.unit_upgrade_2, selected_unit);
 			unit_upgrade_button_3.on_selected_unit_change(selected_unit.unit_upgrade_3, selected_unit);
 		}
 		else {
+			stat_upgrade_button_1.on_selected_unit_change(undefined, noone);
+			stat_upgrade_button_2.on_selected_unit_change(undefined, noone);
+			stat_upgrade_button_3.on_selected_unit_change(undefined, noone);
+			stat_upgrade_button_4.on_selected_unit_change(undefined, noone);
 			unit_upgrade_button_1.on_selected_unit_change(undefined, noone);
 			unit_upgrade_button_2.on_selected_unit_change(undefined, noone);
 			unit_upgrade_button_3.on_selected_unit_change(undefined, noone);
@@ -1598,15 +1773,37 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) : UIComponent() construct
 
 	
 	static is_highlighted = function() {
-		//mouse_y is based on room position, not camera position, so need to correct selection
-		//TODO: Passable view_camera index?
-		var _view_y = camera_get_view_y(view_camera[0]);
 		//Need to include check for toggle button, since it peaks past the normal boundaries of the menu
-		return mouse_y - _view_y >= y_pos_current || toggle_button.is_highlighted(0, y_pos_current); 
+		return device_mouse_y_to_gui(0) >= y_pos || toggle_button.is_highlighted(0, y_pos); 
 	}
 	
 	
-	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
+	static draw_parent = draw;
+	static draw = function(_x_offset = 0, _y_offset = 0) {
+		var _draw_y_pos = y_pos + _y_offset;
+		
+		draw_rectangle_color(0, _draw_y_pos, view_w, view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
+		draw_parent(0, 0);
+		if(selected_unit != noone) {
+			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE, y_pos + 5*TILE_SIZE/4);
+		}
+		
+		//Draw any necessary highlights. This is done after all of the other drawing so that they'll always be on top.
+		for(var i = 0; i < array_length(stat_upgrade_buttons); i++) {
+			var _mouse_x_gui = device_mouse_x_to_gui(0);
+			var _mouse_y_gui = device_mouse_y_to_gui(0);
+			var _region_highlighted = _mouse_x_gui >= stat_upgrade_buttons[i].x_pos && _mouse_x_gui <= stat_upgrade_buttons[i].x_pos + STAT_BUTTON_SIZE &&
+				_mouse_y_gui >= stat_upgrade_buttons[i].y_pos && _mouse_y_gui <= stat_upgrade_buttons[i].y_pos + STAT_BUTTON_SIZE
+					
+			if(stat_upgrade_buttons[i].stat_upgrade_data != undefined && _region_highlighted) { //Need more than just standard highlight since this should include the icon along with the button
+				draw_highlight_info(stat_upgrade_buttons[i].stat_upgrade_data.title, 
+				stat_upgrade_buttons[i].stat_upgrade_data.description);
+				break; //Only need to draw one highlight
+			}
+		}
+		
+	}
+	/*
 	static draw = function() {
 		var _game_state_manager = get_game_state_manager();
 		var _button_highlight_enabled = (_game_state_manager != undefined && _game_state_manager.state == GAME_STATE.RUNNING);
@@ -1644,7 +1841,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) : UIComponent() construct
 				}
 			}
 		}
-	}
+	}*/
 	
 	
 	static toggle_open = function() {
@@ -1669,7 +1866,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) : UIComponent() construct
 	//Shoud be called in a Step event.
 	//Returns the number of pixels the menu has moved, so that any other UI elements can be moved along with it.
 	static move_menu = function(_menu_toggle_pressed) {
-		var _y_pos_old = y_pos_current;
+		var _y_pos_old = y_pos;
 		switch (state) {
 			case SLIDING_MENU_STATE.CLOSED:
 				if(_menu_toggle_pressed) {
@@ -1677,14 +1874,14 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) : UIComponent() construct
 				}
 			    break;
 			case SLIDING_MENU_STATE.CLOSING:
-				y_pos_current = min(y_pos_current + SLIDING_MENU_MOVEMENT_SPEED, camera_get_view_height(view_camera[0]))
-				if(y_pos_current >= camera_get_view_height(view_camera[0])) {
+				y_pos = min(y_pos + SLIDING_MENU_MOVEMENT_SPEED, view_h)
+				if(y_pos >= view_h) {
 					state = SLIDING_MENU_STATE.CLOSED;
 				}
 				break;
 			case SLIDING_MENU_STATE.OPENING:
-				y_pos_current = max(y_pos_current - SLIDING_MENU_MOVEMENT_SPEED, y_pos_open)
-				if(y_pos_current <= y_pos_open) {
+				y_pos = max(y_pos - SLIDING_MENU_MOVEMENT_SPEED, y_pos_open)
+				if(y_pos <= y_pos_open) {
 					state = SLIDING_MENU_STATE.OPEN;
 				}
 				break;
@@ -1698,11 +1895,12 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) : UIComponent() construct
 		}
 		
 		//Will be 0 if menu hasn't moved, positive if the menu is closing, and negative if the menu is opening
-		return y_pos_current - _y_pos_old;
+		return y_pos - _y_pos_old;
 	}
 	
 	
 	//TODO: Make this code nicer. To many else ifs
+	/*
 	static on_click = function() {
 		var _selected_button = stat_upgrade_buttons.get_button_clicked(0, y_pos_current); //Checks all the stat upgrade buttons
 		
@@ -1732,7 +1930,7 @@ function UnitInfoCard(_menu_height_percentage, _x_pos) : UIComponent() construct
 		if(_selected_button != undefined) {
 			_selected_button.on_click();
 		}
-	}
+	}*/
 }
 #endregion
 
@@ -1958,9 +2156,8 @@ function GameUI(_controller_obj, _purchase_data) : UIParent() constructor {
 	//Menus
 	pause_menu = new PauseMenu((1/2), (1/2));
 	//NOTE: In the older code, the height was just window_get_height(). See how this changes things.
-	purchase_menu = new UnitPurchaseMenu(PURCHASE_MENU_SCREEN_PERCENTAGE, 
-		view_h*(1-UNIT_INFO_CARD_SCREEN_PERCENTAGE), _purchase_data);
-	unit_info_card = new UnitInfoCard(UNIT_INFO_CARD_SCREEN_PERCENTAGE, view_w);
+	purchase_menu = new UnitPurchaseMenu(_purchase_data);
+	unit_info_card = new UnitInfoCard();
 	end_results_card = new EndResultsCard((3/4), (3/4));
 	
 	//Buttons

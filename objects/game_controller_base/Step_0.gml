@@ -62,42 +62,6 @@ if(_elem_highlighted == undefined && _mouse_left_released) {
 		}
 	}
 }
-/*
-if(_mouse_left_released) {
-	//Check for certain areas clicked
-	var gui_elem = game_ui.gui_element_highlighted();
-	//show_debug_message(gui_elem)
-	if(gui_elem != undefined) {
-		gui_elem.on_click();
-	}
-	else {
-		//Attempt to click on an already placed unit
-		var _clicked_on_unit = instance_position(mouse_x, mouse_y, base_unit)
-		if(_clicked_on_unit != noone) {
-			game_ui.unit_info_card.on_selected_unit_change(_clicked_on_unit);
-			//Open the unit info card if it's not open already.
-			if(game_ui.unit_info_card.state != SLIDING_MENU_STATE.OPENING && game_ui.unit_info_card.state != SLIDING_MENU_STATE.OPEN) {
-				game_ui.unit_info_card.state = SLIDING_MENU_STATE.OPENING;
-			}
-		}
-		
-		//Attempt to make a new purchase
-		//Can't purchase anything if nothing is selected (or if you're on the GUI, but we already know we aren't, since if you're here, gui_elem == undefined)
-		if(purchase_manager.currently_selected_purchase != undefined) {
-			var _tile_at_mouse = instance_position(mouse_x, mouse_y, placeable_tile);
-			if(_tile_at_mouse != noone) {
-				with(_tile_at_mouse) {
-					var _purchase = other.purchase_manager.currently_selected_purchase;
-					if(can_purchase_unit(self.id, _purchase)) {
-						placed_unit = instance_create_layer(x + TILE_SIZE/2, y + TILE_SIZE, UNIT_LAYER, _purchase.unit);
-						global.player_money -= _purchase.price
-					}
-				}
-			}
-		}
-		
-	}
-}*/
 
 
 if(_mouse_right_released) {
@@ -127,3 +91,8 @@ game_ui.pause_button.x_pos += _purchase_menu_move_distance; //Move the pause but
 //Handle different cases for opening and closing the Unit Info Card
 var _unit_card_move_distance = game_ui.unit_info_card.move_menu(_f_pressed);
 game_ui.round_start_button.y_pos += _unit_card_move_distance; //Move the round start button along with the unit info card
+
+
+
+//NOTE: Get rid of this after testing
+gui_timer++;
