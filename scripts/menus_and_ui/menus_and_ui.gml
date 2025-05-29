@@ -5,7 +5,7 @@
 	Certain menus have different options based on different contexts. These let you control these options easily.
 
 	TODO: Convert UnitInfoCard and UnitPurchaseMenu into UIParents. That, or define a common "Scrolling Menu" class that's a UIParent that they both inherit from.
-	TODO: Since those two menus heavily use offsets, add x and y offsets to the UIParent, that can then be passed to the draw functions.
+	TODO: Break this file up per section
 	
 	Hierarchy of Activation:
 	By default, UI components are considered NOT activated. This is because it's less clutter to simply activate the components you need, as opposed to having to de-activate all the things you don't.
@@ -425,6 +425,8 @@ enum POPUP_MENU_STATE {
 	MENU_CLOSED
 }
 
+#macro BORDER_PX 4
+
 function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UIParent() constructor {
 	//TODO: Currently assumes all popup menus will start in the center of the screen. Should probably change this assumption.
 	x_pos = (view_w/2) - (_menu_width_percentage/2 * view_w); //From middle point, go to the left by the percentage amount
@@ -447,7 +449,8 @@ function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UI
 		var _draw_x2 = absolute_x_pos + menu_width;
 		var _draw_y2 = absolute_y_pos + menu_height;
 		
-		draw_rectangle_color(absolute_x_pos - 4, absolute_y_pos - 4, _draw_x2 + 4, _draw_y2 + 4, c_white, c_white, c_white, c_white, false) //For a nice border
+		draw_rectangle_color(absolute_x_pos - BORDER_PX, absolute_y_pos - BORDER_PX, _draw_x2 + BORDER_PX, _draw_y2 + BORDER_PX, 
+			c_white, c_white, c_white, c_white, false) //For a nice border
 		draw_rectangle_color(absolute_x_pos, absolute_y_pos, _draw_x2, _draw_y2, c_black, c_black, c_black, c_black, false);
 		draw_set_halign(fa_center);
 		draw_text_color(absolute_x_pos + menu_width/2, absolute_y_pos + 32, title, c_white, c_white, c_white, c_white, 1);
@@ -461,7 +464,8 @@ function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UI
 		
 		var _mouse_x_gui = device_mouse_x_to_gui(0);
 		var _mouse_y_gui = device_mouse_y_to_gui(0);
-		return _mouse_x_gui >= absolute_x_pos && _mouse_x_gui <= _absolute_x2 && _mouse_y_gui >= absolute_y_pos && _mouse_y_gui <= _absolute_y2;
+		return _mouse_x_gui >= absolute_x_pos - BORDER_PX && _mouse_x_gui <= _absolute_x2 + BORDER_PX && 
+			_mouse_y_gui >= absolute_y_pos - BORDER_PX && _mouse_y_gui <= _absolute_y2 + BORDER_PX;
 	}
 	
 }
@@ -510,7 +514,7 @@ function OptionsButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_options_button) constructor {
 		
 		static on_click = function() {
-			//room_goto(LevelSelectScreen);
+			parent.options_menu.activate();
 		}
 }
 #endregion
@@ -574,7 +578,9 @@ function StartMenuUI() : UIParent() constructor {
 	quit_button = new QuitGameButton(QUIT_BUTTON_X, QUIT_BUTTON_Y);
 	quit_button.activate();
 	
-	ui_elements = [start_button, options_button, quit_button];
+	options_menu = new OptionsMenu((1/2), (1/2));
+	
+	ui_elements = [start_button, options_button, quit_button, options_menu];
 	
 	active = true //We can just do this here instead of calling activate/deactivate, since this UI should always be active
 	
@@ -717,11 +723,11 @@ function RoundStartButton(_x_pos, _y_pos) :
 #endregion
 
 
-#region Pause Menu Classes
+#region Options Menu Classes
 
-#region ExitPauseMenuButton (Class)
+#region ExitOptionsMenuButton (Class)
 /*
-	The button that closes the pause menu and resumes the game.
+	The button that closes the Options menu.
 	
 	Argument Variables:
 	All correspond to Data Variables.
@@ -730,10 +736,12 @@ function RoundStartButton(_x_pos, _y_pos) :
 	x_pos: The x-coordinate of the top-left of the header.
 	y_pos: The y-coordinate of the top-left of the header.
 */
-function ExitPauseMenuButton(_x_pos, _y_pos) : 
+function ExitOptionsMenuButton(_x_pos, _y_pos) : 
 	Button(_x_pos, _y_pos, spr_close_button, spr_close_button, spr_close_button) constructor {
 	
 	static on_click = function() {
+		parent.deactivate();
+		//TODO: Move this to the ACTUAL PauseMenuExitButton
 		var _game_state_manager = get_game_state_manager();
 		if(_game_state_manager != undefined) {
 			_game_state_manager.resume_game();
@@ -743,25 +751,34 @@ function ExitPauseMenuButton(_x_pos, _y_pos) :
 #endregion
 
 
-#region PauseMenuAudioTab (Class)
-function PauseMenuAudioTab(_x_pos, _y_pos, _pause_menu) :
+#region OptionsMenuAudioTab (Class)
+function OptionsMenuAudioTab(_x_pos, _y_pos) :
 	PopupMenuTab(_x_pos, _y_pos, "Audio") constructor {
-		pause_menu = _pause_menu;
-		
+
 		static on_click = function() {
-			pause_menu.set_to_audio_options();
+			parent.set_to_audio_options();
 		}
 }
 #endregion
 
 
-#region PauseMenuVisualsTab (Class)
-function PauseMenuVisualsTab(_x_pos, _y_pos, _pause_menu) :
+#region OptionsMenuVisualsTab (Class)
+function OptionsMenuVisualsTab(_x_pos, _y_pos) :
 	PopupMenuTab(_x_pos, _y_pos, "Visuals") constructor {
-		pause_menu = _pause_menu;
 		
 		static on_click = function() {
-			pause_menu.set_to_visual_options();
+			parent.set_to_visual_options();
+		}
+}
+#endregion
+
+
+#region OptionsMenuControlsTab (Class)
+function OptionsMenuControlsTab(_x_pos, _y_pos) :
+	PopupMenuTab(_x_pos, _y_pos, "Controls") constructor {
+		
+		static on_click = function() {
+			parent.set_to_control_options();
 		}
 }
 #endregion
@@ -814,9 +831,9 @@ function SetFullscreenToggle(_x_pos, _y_pos) :
 #endregion
 
 
-#region PauseMenu (Class)
+#region OptionsMenu (Class)
 /*
-	Defines all of the data for the Pause Menu
+	Defines all of the data for the Options Menu
 	
 	Argument Variables:
 	_menu_width_percentage: The percentage of the screen's width that the pause menu should take up.
@@ -827,28 +844,21 @@ function SetFullscreenToggle(_x_pos, _y_pos) :
 	pause_background: Sprite used to show all the enemies while the game is paused.
 */
 
-//Enums for paused menu open state (will eventually turn into Options Menu)
-//TODO: Necessary?
-enum OPTIONS_MENU_STATE { 
-	AUDIO,
-	VISUAL,
-	CONTROLS
-}
-
-
-function PauseMenu(_menu_width_percentage, _menu_height_percentage) : PopupMenu(_menu_width_percentage, _menu_height_percentage, "PAUSED") constructor {
+function OptionsMenu(_menu_width_percentage, _menu_height_percentage) : PopupMenu(_menu_width_percentage, _menu_height_percentage, "Options") constructor {
 	pause_background = -1;
 	
-	close_button = new ExitPauseMenuButton(menu_width - 40, 8);
+	close_button = new ExitOptionsMenuButton(menu_width - 40, 8);
 	close_button.activate();
 	
 	var _tab_width = sprite_get_width(spr_menu_tab);
 	var _tab_y = sprite_get_height(spr_menu_tab) * -1;
 	
-	audio_tab = new PauseMenuAudioTab(-4, _tab_y, self);
+	audio_tab = new OptionsMenuAudioTab(-4, _tab_y, self);
 	audio_tab.activate();
-	visuals_tab = new PauseMenuVisualsTab(_tab_width, _tab_y, self);
+	visuals_tab = new OptionsMenuVisualsTab(_tab_width, _tab_y, self);
 	visuals_tab.activate();
+	controls_tab = new OptionsMenuControlsTab(2*_tab_width, _tab_y, self);
+	controls_tab.activate();
 	
 	music_volume_slider = new MusicVolumeSlider(16, menu_width - 16, 128);
 	music_volume_slider.activate();
@@ -859,7 +869,7 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage) : PopupMenu(
 	fullscreen_toggle = new SetFullscreenToggle(160, 96);
 	
 	
-	ui_elements = [close_button, audio_tab, visuals_tab, music_volume_slider, sound_effects_volume_slider, fullscreen_toggle];
+	ui_elements = [close_button, audio_tab, visuals_tab, controls_tab, music_volume_slider, sound_effects_volume_slider, fullscreen_toggle];
 	
 	
 	static set_to_audio_options = function() {
@@ -869,12 +879,17 @@ function PauseMenu(_menu_width_percentage, _menu_height_percentage) : PopupMenu(
 		fullscreen_toggle.deactivate();
 	}
 	
-	
 	static set_to_visual_options = function() {
 		fullscreen_toggle.activate();
 		
 		music_volume_slider.deactivate();
 		sound_effects_volume_slider.deactivate();
+	}
+	
+	static set_to_control_options = function() {
+		music_volume_slider.deactivate();
+		sound_effects_volume_slider.deactivate();
+		fullscreen_toggle.deactivate();
 	}
 	
 	
@@ -1901,7 +1916,7 @@ function GameUI(_controller_obj, _purchase_data) : UIParent() constructor {
 	//NOTE: pause_background IS NOT a UI element, so don't treat it like one.
 	
 	//Menus
-	pause_menu = new PauseMenu((1/2), (1/2));
+	options_menu = new OptionsMenu((1/2), (1/2));
 	//NOTE: In the older code, the height was just window_get_height(). See how this changes things.
 	purchase_menu = new UnitPurchaseMenu(_purchase_data);
 	unit_info_card = new UnitInfoCard();
@@ -1913,7 +1928,7 @@ function GameUI(_controller_obj, _purchase_data) : UIParent() constructor {
 	
 	ui_elements = [game_info_display,
 		pause_button, round_start_button,
-		purchase_menu, unit_info_card, pause_menu, end_results_card];
+		purchase_menu, unit_info_card, options_menu, end_results_card];
 		
 	active = true //We can just do this here instead of calling activate/deactivate, since this UI should always be active
 	
@@ -1930,7 +1945,7 @@ function GameUI(_controller_obj, _purchase_data) : UIParent() constructor {
 		pause_button.activate();
 		round_start_button.activate();
 		
-		pause_menu.deactivate();
+		options_menu.deactivate();
 		end_results_card.deactivate();
 	}
 	
@@ -1945,7 +1960,7 @@ function GameUI(_controller_obj, _purchase_data) : UIParent() constructor {
 		game_info_display.activate();
 		purchase_menu.activate();
 		unit_info_card.activate();
-		pause_menu.activate();
+		options_menu.activate();
 		
 		pause_button.deactivate();
 		round_start_button.deactivate();
