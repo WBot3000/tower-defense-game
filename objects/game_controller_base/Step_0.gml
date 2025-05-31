@@ -85,14 +85,11 @@ if(game_state_manager.state != GAME_STATE.PAUSED &&
 
 
 //Handle different cases for opening and closing the Unit Selection menu
-var _purchase_menu_move_distance = game_ui.purchase_menu.move_menu(_e_pressed);
-game_ui.pause_button.move(_purchase_menu_move_distance, 0); //Move the pause button along with the purchase menu
+game_ui.purchase_menu.move_menu(_e_pressed);
+//var _purchase_menu_move_distance = game_ui.purchase_menu.move_menu(_e_pressed);
+//game_ui.pause_button.move(_purchase_menu_move_distance, 0); //Move the pause button along with the purchase menu
 
 //Handle different cases for opening and closing the Unit Info Card
-var _unit_card_move_distance = game_ui.unit_info_card.move_menu(_f_pressed);
-game_ui.round_start_button.move(0, _unit_card_move_distance); //Move the round start button along with the unit info card
-
-
-
-//NOTE: Get rid of this after testing
-gui_timer++;
+game_ui.unit_info_card.move_menu(_f_pressed);
+//var _unit_card_move_distance = game_ui.unit_info_card.move_menu(_f_pressed);
+//game_ui.round_start_button.move(0, _unit_card_move_distance); //Move the round start button along with the unit info card
