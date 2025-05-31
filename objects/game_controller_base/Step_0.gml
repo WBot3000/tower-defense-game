@@ -5,15 +5,15 @@ var _mouse_left_pressed = mouse_check_button_pressed(mb_left);
 var _mouse_left_released = mouse_check_button_released(mb_left);
 var _mouse_right_released = mouse_check_button_released(mb_right);
 
-var _q_pressed = keyboard_check_pressed(ord("Q"));
-var _e_pressed = keyboard_check_pressed(ord("E"));
-var _f_pressed = keyboard_check_pressed(ord("F"));
+//var _q_pressed = keyboard_check_pressed(ord("Q"));
+//var _e_pressed = keyboard_check_pressed(ord("E"));
+//var _f_pressed = keyboard_check_pressed(ord("F"));
 var _o_pressed = keyboard_check_pressed(ord("O"));
 var _p_pressed = keyboard_check_pressed(ord("P"));;
 #endregion
 
 //Check to see if the game should be paused or unpaused
-if(_q_pressed) {
+if(keyboard_check_pressed(ord(global.GAME_CONFIG_SETTINGS.controls.pause_game_key))) {
 	if(game_state_manager.state == GAME_STATE.RUNNING) {
 		game_state_manager.pause_game();
 	}
@@ -82,14 +82,3 @@ if(game_state_manager.state != GAME_STATE.PAUSED &&
 	_p_pressed && game_ui.unit_info_card.selected_unit != noone) {
 	game_ui.unit_info_card.selected_unit.targeting_tracker.use_next_targeting_type();
 }
-
-
-//Handle different cases for opening and closing the Unit Selection menu
-game_ui.purchase_menu.move_menu(_e_pressed);
-//var _purchase_menu_move_distance = game_ui.purchase_menu.move_menu(_e_pressed);
-//game_ui.pause_button.move(_purchase_menu_move_distance, 0); //Move the pause button along with the purchase menu
-
-//Handle different cases for opening and closing the Unit Info Card
-game_ui.unit_info_card.move_menu(_f_pressed);
-//var _unit_card_move_distance = game_ui.unit_info_card.move_menu(_f_pressed);
-//game_ui.round_start_button.move(0, _unit_card_move_distance); //Move the round start button along with the unit info card

@@ -214,8 +214,13 @@ function OptionsMenu(_menu_width_percentage, _menu_height_percentage) : PopupMen
 	
 	fullscreen_toggle = new SetFullscreenToggle(160, 96);
 	
+	pause_game_key_config = new KeyConfig(160, 96, "pause_game_key", "Pause Game");
+	open_shop_key_config = new KeyConfig(160, 128 + 16, "open_shop_key", "Open Shop");
+	open_unit_info_key_config = new KeyConfig(160, 161 + 32, "open_unit_info_key", "Show Unit Info");
 	
-	children = [close_button, audio_tab, visuals_tab, controls_tab, music_volume_slider, sound_effects_volume_slider, fullscreen_toggle];
+	
+	children = [close_button, audio_tab, visuals_tab, controls_tab, music_volume_slider, sound_effects_volume_slider, fullscreen_toggle,
+		pause_game_key_config, open_shop_key_config, open_unit_info_key_config];
 	
 	
 	static set_to_audio_options = function() {
@@ -223,6 +228,9 @@ function OptionsMenu(_menu_width_percentage, _menu_height_percentage) : PopupMen
 		sound_effects_volume_slider.activate();
 		
 		fullscreen_toggle.deactivate();
+		pause_game_key_config.deactivate();
+		open_shop_key_config.deactivate();
+		open_unit_info_key_config.deactivate();
 	}
 	
 	static set_to_visual_options = function() {
@@ -230,9 +238,16 @@ function OptionsMenu(_menu_width_percentage, _menu_height_percentage) : PopupMen
 		
 		music_volume_slider.deactivate();
 		sound_effects_volume_slider.deactivate();
+		pause_game_key_config.deactivate();
+		open_shop_key_config.deactivate();
+		open_unit_info_key_config.deactivate();
 	}
 	
 	static set_to_control_options = function() {
+		pause_game_key_config.activate();
+		open_shop_key_config.activate();
+		open_unit_info_key_config.activate();
+		
 		music_volume_slider.deactivate();
 		sound_effects_volume_slider.deactivate();
 		fullscreen_toggle.deactivate();
@@ -300,10 +315,10 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 	static draw_parent = draw;
 	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
 	static draw = function(_button_highlight_enabled = true) {
-		draw_parent(absolute_x_pos, absolute_y_pos, _button_highlight_enabled && cached_game_state_manager != undefined && cached_game_state_manager.state == GAME_STATE.RUNNING);
-		draw_sprite(object_get_sprite(purchase_data.unit), 0, absolute_x_pos + 8 + TILE_SIZE/2, absolute_y_pos + 4 + TILE_SIZE);
+		draw_parent(x_pos, y_pos, _button_highlight_enabled && cached_game_state_manager != undefined && cached_game_state_manager.state == GAME_STATE.RUNNING);
+		draw_sprite(object_get_sprite(purchase_data.unit), 0, x_pos + 8 + TILE_SIZE/2, y_pos + 4 + TILE_SIZE);
 		draw_set_halign(fa_right);
-		draw_text(absolute_x_pos + sprite_get_width(button_sprite_default) - 8, absolute_y_pos + 72, string(purchase_data.price));
+		draw_text(x_pos + sprite_get_width(button_sprite_default) - 8, y_pos + 72, string(purchase_data.price));
 		draw_set_halign(fa_left);
 	}
 	
@@ -444,9 +459,8 @@ function UnitPurchaseMenu(_purchase_data_list) : UIComponent() constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the side is opened or closed
 
 	x_pos_open = (1-PURCHASE_MENU_SCREEN_PERCENTAGE) * view_w;
-	absolute_x_pos = view_w;
 	x_pos = view_w; //Window should start out closed
-	//y_pos = 0;
+
 	menu_width = view_w - x_pos_open;
 	menu_height = view_h*(1-UNIT_INFO_CARD_SCREEN_PERCENTAGE);
 	
@@ -536,42 +550,38 @@ function UnitPurchaseMenu(_purchase_data_list) : UIComponent() constructor {
 	
 	//This function moves the menu based on its current state. Also accepts a menu toggle boolean
 	//Shoud be called in a Step event.
-	//Returns the number of pixels the menu has moved, so that any other UI elements can be moved along with it.
-	static move_menu = function(_menu_toggle_pressed) {
+	static on_step = function() {
 		var _x_delta = 0;
 		switch (state) {
 			case SLIDING_MENU_STATE.CLOSED:
-				if(_menu_toggle_pressed) {
+				if(keyboard_check_pressed(ord(global.GAME_CONFIG_SETTINGS.controls.open_shop_key))) {
 					toggle_open();
 				}
 			    break;
 			case SLIDING_MENU_STATE.CLOSING:
-				_x_delta = min(SLIDING_MENU_MOVEMENT_SPEED, view_w - absolute_x_pos); //Move to the right, up to the right side of the screen
+				_x_delta = min(SLIDING_MENU_MOVEMENT_SPEED, view_w - x_pos); //Move to the right, up to the right side of the screen
 				move(_x_delta, 0);
 				parent.pause_button.move(_x_delta, 0);
-				if(absolute_x_pos >= view_w) {
+				if(x_pos >= view_w) {
 					state = SLIDING_MENU_STATE.CLOSED;
 				}
 				break;
 			case SLIDING_MENU_STATE.OPENING:
-				_x_delta = max(SLIDING_MENU_MOVEMENT_SPEED * -1, x_pos_open - absolute_x_pos); //Move to the left, up to the open position
+				_x_delta = max(SLIDING_MENU_MOVEMENT_SPEED * -1, x_pos_open - x_pos); //Move to the left, up to the open position
 				move(_x_delta, 0);
 				parent.pause_button.move(_x_delta, 0);
-				if(absolute_x_pos <= x_pos_open) {
+				if(x_pos <= x_pos_open) {
 					state = SLIDING_MENU_STATE.OPEN;
 				}
 				break;
 			case SLIDING_MENU_STATE.OPEN:
-				if(_menu_toggle_pressed) {
+				if(keyboard_check_pressed(ord(global.GAME_CONFIG_SETTINGS.controls.open_shop_key))) {
 					toggle_closed();
 				}
 				break;
 			default:
 			    break;
 		}
-		
-		//Will be 0 if menu hasn't moved, positive if the menu is closing, and negative if the menu is opening
-		return _x_delta;
 	}
 	
 }
@@ -607,7 +617,7 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 	static draw_parent = draw;
 	static draw = function() {		
 		if(stat_upgrade_data == undefined) {
-			draw_sprite(spr_blank_stat_icon, 0, absolute_x_pos, absolute_y_pos);
+			draw_sprite(spr_blank_stat_icon, 0, x_pos, y_pos);
 			return; //No drawing needed for a stat that doesn't exist
 		}
 
@@ -615,13 +625,13 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 		
 		draw_set_alignments(fa_right, fa_bottom);
 		if(stat_upgrade_data.current_level >= stat_upgrade_data.max_level) {
-			draw_text_color(absolute_x_pos + sprite_get_width(button_sprite_default)*0.9,
-				absolute_y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4, "MAX", 
+			draw_text_color(x_pos + sprite_get_width(button_sprite_default)*0.9,
+				y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4, "MAX", 
 				c_white, c_white, c_white, c_white, 1);
 		}
 		else {
-			draw_text_color(absolute_x_pos + sprite_get_width(button_sprite_default)*0.9, 
-				absolute_y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4, stat_upgrade_data.current_price, 
+			draw_text_color(x_pos + sprite_get_width(button_sprite_default)*0.9, 
+				y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4, stat_upgrade_data.current_price, 
 				c_white, c_white, c_white, c_white, 1);
 		}
 		draw_set_alignments();
@@ -684,11 +694,11 @@ function StatUpgradeDisplay(_x_pos, _y_pos) : UIComponent(_x_pos, _y_pos) constr
 
 		if(stat_upgrade_data != undefined) { //Draw blank space if you need to 
 			draw_sprite(stat_upgrade_data.upgrade_spr, 0, 
-				absolute_x_pos, absolute_y_pos);
-			draw_stat_level(absolute_x_pos, absolute_y_pos, stat_upgrade_data.current_level)
+				x_pos, y_pos);
+			draw_stat_level(x_pos, y_pos, stat_upgrade_data.current_level)
 		}
 		else {
-			draw_sprite(spr_blank_stat_icon, 0, absolute_x_pos, absolute_y_pos);
+			draw_sprite(spr_blank_stat_icon, 0, x_pos, y_pos);
 		}
 		draw_parent();
 	}
@@ -739,9 +749,9 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _sele
 		
 		draw_parent(_button_highlight_enabled);
 		if(unit_upgrade_data != undefined) {
-			draw_sprite(object_get_sprite(unit_upgrade_data.upgrade_to), 0, absolute_x_pos + 8 + TILE_SIZE/2, absolute_y_pos + 4 + TILE_SIZE);
+			draw_sprite(object_get_sprite(unit_upgrade_data.upgrade_to), 0, x_pos + 8 + TILE_SIZE/2, y_pos + 4 + TILE_SIZE);
 			draw_set_halign(fa_right);
-			draw_text(absolute_x_pos + sprite_get_width(button_sprite_default) - 8, absolute_y_pos + 72, string(unit_upgrade_data.price));
+			draw_text(x_pos + sprite_get_width(button_sprite_default) - 8, y_pos + 72, string(unit_upgrade_data.price));
 			draw_set_halign(fa_left);
 		}
 	}
@@ -771,8 +781,8 @@ function TargetingIndicator(_x_pos, _y_pos) : UIComponent(_x_pos, _y_pos) constr
 		var _mouse_x_gui = device_mouse_x_to_gui(0);
 		var _mouse_y_gui = device_mouse_y_to_gui(0);
 		
-		return (_mouse_x_gui >= absolute_x_pos && _mouse_x_gui <= absolute_x_pos + TARGETING_INDICATOR_WIDTH &&
-			_mouse_y_gui >= absolute_y_pos && _mouse_y_gui <= absolute_y_pos + TARGETING_INDICATOR_HEIGHT)
+		return (_mouse_x_gui >= x_pos && _mouse_x_gui <= x_pos + TARGETING_INDICATOR_WIDTH &&
+			_mouse_y_gui >= y_pos && _mouse_y_gui <= y_pos + TARGETING_INDICATOR_HEIGHT)
 	}
 	
 	
@@ -783,11 +793,11 @@ function TargetingIndicator(_x_pos, _y_pos) : UIComponent(_x_pos, _y_pos) constr
 
 		var _targeting_type = selected_unit.targeting_tracker.get_current_targeting_type();
 		
-		draw_rectangle_color(absolute_x_pos, absolute_y_pos, 
-			absolute_x_pos + TARGETING_INDICATOR_WIDTH, absolute_y_pos + TARGETING_INDICATOR_HEIGHT,
+		draw_rectangle_color(x_pos, y_pos, 
+			x_pos + TARGETING_INDICATOR_WIDTH, y_pos + TARGETING_INDICATOR_HEIGHT,
 			c_ltgray, c_ltgray, c_ltgray, c_ltgray, false)
 		draw_set_halign(fa_center);
-		draw_text(absolute_x_pos + 48, absolute_y_pos, _targeting_type.targeting_name);
+		draw_text(x_pos + 48, y_pos, _targeting_type.targeting_name);
 		draw_set_halign(fa_left);
 	}
 }
@@ -814,9 +824,9 @@ function SellButton(_x_pos, _y_pos, _selected_unit = noone) :
 			return; //Nothing to draw
 		}
 		
-		draw_sprite(button_sprite_default, 0, absolute_x_pos, absolute_y_pos);
+		draw_sprite(button_sprite_default, 0, x_pos, y_pos);
 		draw_set_alignments(fa_right, fa_center);
-		draw_text(absolute_x_pos + sprite_get_width(button_sprite_default) - 8, absolute_y_pos + sprite_get_height(button_sprite_default)/2, string(selected_unit.sell_price));
+		draw_text(x_pos + sprite_get_width(button_sprite_default) - 8, y_pos + sprite_get_height(button_sprite_default)/2, string(selected_unit.sell_price));
 		draw_set_alignments();
 	}
 	
@@ -887,14 +897,13 @@ function ToggleInfoCardButton(_x_pos, _y_pos) :
 	toggle_button: Button for opening and closing the unit info card.
 */
 
-function UnitInfoCard(/*_menu_height_percentage, _x_pos*/) : UIComponent() constructor {
+function UnitInfoCard() : UIComponent() constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the bottom is opened or closed
 	selected_unit = noone;
 	cached_game_state_manager = get_game_state_manager();
 	
 	y_pos_open = (1-UNIT_INFO_CARD_SCREEN_PERCENTAGE) * view_h; //NOTE: Is an absolute position
-	y_pos = view_h; //Window should start out closed
-	absolute_y_pos = view_h; //Hack since this absolute and relative coordinates are the same.
+	y_pos = view_h; //Hack since this absolute and relative coordinates are the same.
 	
 	//Stat Upgrade Info
 	stat_upgrade_button_1 = new StatUpgradeDisplay(TILE_SIZE*4.5, TILE_SIZE/2);
@@ -961,24 +970,24 @@ function UnitInfoCard(/*_menu_height_percentage, _x_pos*/) : UIComponent() const
 	
 	static is_highlighted = function() {
 		//Need to include check for toggle button, since it peaks past the normal boundaries of the menu
-		return device_mouse_y_to_gui(0) >= absolute_y_pos || toggle_button.is_highlighted(); 
+		return device_mouse_y_to_gui(0) >= y_pos || toggle_button.is_highlighted(); 
 	}
 	
 	
 	static draw_parent = draw;
 	static draw = function() {		
-		draw_rectangle_color(0, absolute_y_pos, view_w, view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
+		draw_rectangle_color(0, y_pos, view_w, view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
 		draw_parent(0, 0);
 		if(selected_unit != noone) {
-			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE, absolute_y_pos + 5*TILE_SIZE/4);
+			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE, y_pos + 5*TILE_SIZE/4);
 		}
 		
 		//Draw any necessary highlights. This is done after all of the other drawing so that they'll always be on top.
 		for(var i = 0; i < array_length(stat_upgrade_buttons); i++) {
 			var _mouse_x_gui = device_mouse_x_to_gui(0);
 			var _mouse_y_gui = device_mouse_y_to_gui(0);
-			var _region_highlighted = _mouse_x_gui >= stat_upgrade_buttons[i].absolute_x_pos && _mouse_x_gui <= stat_upgrade_buttons[i].absolute_x_pos + STAT_BUTTON_SIZE &&
-				_mouse_y_gui >= stat_upgrade_buttons[i].absolute_y_pos && _mouse_y_gui <= stat_upgrade_buttons[i].absolute_y_pos + STAT_BUTTON_SIZE
+			var _region_highlighted = _mouse_x_gui >= stat_upgrade_buttons[i].x_pos && _mouse_x_gui <= stat_upgrade_buttons[i].x_pos + STAT_BUTTON_SIZE &&
+				_mouse_y_gui >= stat_upgrade_buttons[i].y_pos && _mouse_y_gui <= stat_upgrade_buttons[i].y_pos + STAT_BUTTON_SIZE
 					
 			if(stat_upgrade_buttons[i].stat_upgrade_data != undefined && _region_highlighted) { //Need more than just standard highlight since this should include the icon along with the button
 				draw_highlight_info(stat_upgrade_buttons[i].stat_upgrade_data.title, 
@@ -1010,43 +1019,38 @@ function UnitInfoCard(/*_menu_height_percentage, _x_pos*/) : UIComponent() const
 	
 	//This function moves the menu based on its current state. Also accepts a menu toggle boolean
 	//Shoud be called in a Step event.
-	//Returns the number of pixels the menu has moved, so that any other UI elements can be moved along with it.
-	static move_menu = function(_menu_toggle_pressed) { //TODO: Change this to use absolute component movement
+	static on_step = function() {
 		var _y_delta = 0;
-		//var _y_pos_old = y_pos;
 		switch (state) {
 			case SLIDING_MENU_STATE.CLOSED:
-				if(_menu_toggle_pressed) {
+				if(keyboard_check_pressed(ord(global.GAME_CONFIG_SETTINGS.controls.open_unit_info_key))) {
 					toggle_open();
 				}
 			    break;
 			case SLIDING_MENU_STATE.CLOSING:
-				_y_delta = min(SLIDING_MENU_MOVEMENT_SPEED, view_h - absolute_y_pos);
+				_y_delta = min(SLIDING_MENU_MOVEMENT_SPEED, view_h - y_pos);
 				move(0, _y_delta);
 				parent.round_start_button.move(0, _y_delta);
-				if(absolute_y_pos >= view_h) {
+				if(y_pos >= view_h) {
 					state = SLIDING_MENU_STATE.CLOSED;
 				}
 				break;
 			case SLIDING_MENU_STATE.OPENING:
-				_y_delta = max(SLIDING_MENU_MOVEMENT_SPEED * -1, y_pos_open - absolute_y_pos);
+				_y_delta = max(SLIDING_MENU_MOVEMENT_SPEED * -1, y_pos_open - y_pos);
 				move(0, _y_delta);
 				parent.round_start_button.move(0, _y_delta);
-				if(absolute_y_pos <= y_pos_open) {
+				if(y_pos <= y_pos_open) {
 					state = SLIDING_MENU_STATE.OPEN;
 				}
 				break;
 			case SLIDING_MENU_STATE.OPEN:
-				if(_menu_toggle_pressed) {
+				if(keyboard_check_pressed(ord(global.GAME_CONFIG_SETTINGS.controls.open_unit_info_key))) {
 					toggle_closed();
 				}
 				break;
 			default:
 			    break;
 		}
-		
-		//Will be 0 if menu hasn't moved, positive if the menu is closing, and negative if the menu is opening
-		return _y_delta;
 	}
 }
 #endregion
@@ -1129,7 +1133,7 @@ function EndResultsHeader(_x_pos, _y_pos) : UIComponent(_x_pos, _y_pos) construc
 	}
 	
 	static draw = function() {
-		draw_sprite(header_sprite, 0, absolute_x_pos, absolute_y_pos);
+		draw_sprite(header_sprite, 0, x_pos, y_pos);
 	}
 	
 }

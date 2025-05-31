@@ -28,8 +28,8 @@ function LevelCard(_x_pos, _y_pos, _level_data) :
 			draw_parent();
 			shader_reset();
 			draw_sprite(level_data.level_portrait, 1,
-				absolute_x_pos + 16, absolute_y_pos + 16)
-			draw_text_color(absolute_x_pos + 16, absolute_y_pos + 100, level_data.level_name,
+				x_pos + 16, y_pos + 16)
+			draw_text_color(x_pos + 16, y_pos + 100, level_data.level_name,
 				c_black, c_black, c_black, c_black, 1)
 		}
 		

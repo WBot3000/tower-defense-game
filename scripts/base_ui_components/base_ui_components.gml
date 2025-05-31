@@ -6,20 +6,6 @@ Hierarchy of Activation:
 	Top-level UI components (StartMenuUI, LevelSelectUI, GameUI) are set to be active in their constructors, as there is no reason to de-activate these (they activate/de-activate all their own components)
 	A UIParent will not perform any actions while non-active, including performing checks on all of its children, essentially rendering them inactive as well, even if the children aren't marked explicitly as inactive.
 */
-#region MoveInstructions (Class)
-/*
-	Contains data for UI elements that should be moved a distance over a period of time
-*/
-/*
-function MoveInstructions(_x_new, _y_new, _num_frames) {
-	//These are stored in the event there's a rounding error caused by the delta division
-	//x_new = _x_new;
-	//y_new = _y_new;
-	x_delta = (x_new - component.x_pos) / num_frames;
-	y_delta = (y_new - component.y_pos) / num_frames;
-	num_frames = _num_frames;
-}*/
-#endregion
 
 #region UIComponent (Class)
 /*
@@ -27,23 +13,24 @@ function MoveInstructions(_x_new, _y_new, _num_frames) {
 	
 	Defines activatability and functions that all UI components should have.
 	
+	Argument Variables:
+	_coordinates_defined_relatively: Whether creation coordinates are specified in terms of the parent's origin (true) or the global window origin (false)
+	
 	Data Variables:
-		x_pos: The x_coordinate of the UIParent's top-left position. This will be 0 if the parent is meant to cover the entire UI.
+	x_pos: The x_coordinate of the UIParent's top-left position. This will be 0 if the parent is meant to cover the entire UI.
 	y_pos: The y_coordinate of the UIParent's top-left position. This will be 0 if the parent is meant to cover the entire UI.
 	parent: The UI element that "owns" this element in the hierarchy.
 */
-function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other) constructor {
+function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other, _coordinates_defined_relatively = true) constructor {
 	active = false;
-	x_pos = _x_pos;
-	y_pos = _y_pos;
 	
 	parent = undefined;
-	absolute_x_pos = x_pos;
-	absolute_y_pos = y_pos;
-	if(is_instanceof(_parent, UIComponent)) { //Prevents issues with the top-level UIComponent
+	x_pos = _x_pos;
+	y_pos = _y_pos;
+	if(_coordinates_defined_relatively && is_instanceof(_parent, UIComponent)) { //Prevents issues with the top-level UIComponent
 		parent = _parent;
-		absolute_x_pos += parent.absolute_x_pos;
-		absolute_y_pos += parent.absolute_y_pos;
+		x_pos += parent.x_pos;
+		y_pos += parent.y_pos;
 	}
 	
 	//TODO: Fetch on a needed basis
@@ -51,7 +38,6 @@ function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other) constructor {
 	view_h = camera_get_view_height(view_camera[0]);
 	
 	children = [];
-	move_instructions = [];
 	
 	//Basically just a wrapper for activating the component
 	static activate = function() { active = true; }
@@ -67,7 +53,7 @@ function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other) constructor {
 		}
 		//Array is searched from end to beginning so that elements drawn in the front are checked before elements drawn in the back
 		for(var i = array_length(children) - 1; i >= 0; i--) {
-			if(children[i].active && children[i].is_highlighted(x_pos, y_pos)) {
+			if(children[i].active && children[i].is_highlighted()) {
 				return children[i];
 			}
 		}
@@ -75,23 +61,14 @@ function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other) constructor {
 	}
 	
 	
-	static move = function(_x_delta = 0, _y_delta = 0, is_parent = true) {
-		absolute_x_pos += _x_delta;
-		absolute_y_pos += _y_delta;
-		if(is_parent) { //Only the parent element moves its relative position.
-			x_pos += _x_delta;
-			y_pos += _y_delta;
-		}
+	static move = function(_x_delta = 0, _y_delta = 0) {
+		x_pos += _x_delta;
+		y_pos += _y_delta;
 		for(var i = 0; i < array_length(children); ++i) { //Move all the children along with the parent
-				children[i].move(_x_delta, _y_delta, false);
+				children[i].move(_x_delta, _y_delta);
 		}
 	}
 	
-	//Called in on_step to move objects
-	/*
-	static move_over_time = function(_x_new, _y_new, _num_frames = 0) {
-		array_push(move_instructions, new MoveInstructions(_x_new, _y_new, _num_frames);
-	}*/
 	
 	static draw = function() {
 		if(!active) {
@@ -110,17 +87,7 @@ function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other) constructor {
 	static on_step = function() {
 		if(!active) {
 			return undefined;
-		}/*
-		for(var i = 0; i < array_length(move_instructions); ++i) { //Used to slide things in and out of frame
-				var instructions = move_instructions[i];
-				if(instructions.num_frames <= 0) {
-					//Can do this because move_instructions is FIFO
-					array_pop(move_instructions);
-				}
-				else {
-					move(instructions.x_delta, instructions.y_delta, true);
-				}
-		}*/
+		}
 		for(var i = array_length(children) - 1; i >= 0; i--) {
 				children[i].on_step();
 		}
@@ -128,7 +95,7 @@ function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other) constructor {
 		var _highlighted_elem = get_highlighted_child();
 		if(_highlighted_elem != undefined) {
 			if(mouse_check_button_pressed(mb_left)) {
-				_highlighted_elem.on_pressed(x_pos, y_pos);
+				_highlighted_elem.on_pressed();
 			}
 			if(mouse_check_button_released(mb_left)) {
 				//TODO: So I was able to fix the error with the sliders by just adding the release into the "on_step" event as well.
@@ -190,8 +157,8 @@ function Button(_x_pos, _y_pos,
 		//TODO: Passable view_camera index? And maybe rename these variables? Not sure.
 		var _view_x = device_mouse_x_to_gui(0);
 		var _view_y = device_mouse_y_to_gui(0);
-		return (_view_x >= absolute_x_pos && _view_x <= absolute_x_pos + sprite_get_width(button_sprite_default)
-			&& _view_y >= absolute_y_pos && _view_y <= absolute_y_pos + sprite_get_height(button_sprite_default));
+		return (_view_x >= x_pos && _view_x <= x_pos + sprite_get_width(button_sprite_default)
+			&& _view_y >= y_pos && _view_y <= y_pos + sprite_get_height(button_sprite_default));
 	}
 	
 	
@@ -207,7 +174,7 @@ function Button(_x_pos, _y_pos,
 		else {
 			_spr = button_sprite_default;
 		}
-		draw_sprite(_spr, 0, absolute_x_pos, absolute_y_pos);
+		draw_sprite(_spr, 0, x_pos, y_pos);
 	}
 }
 #endregion
@@ -240,18 +207,16 @@ function ToggleSwitch(_x_pos, _y_pos, _label = "Unnamed Toggle") : UIComponent(_
 		//TODO: Passable view_camera index? And maybe rename these variables? Not sure.
 		var _view_x = device_mouse_x_to_gui(0);
 		var _view_y = device_mouse_y_to_gui(0);
-		return (_view_x >= absolute_x_pos && _view_x <= absolute_x_pos + sprite_get_width(spr_toggle_switch_not_selected)
-			&& _view_y >= absolute_y_pos && _view_y <= absolute_y_pos + sprite_get_height(spr_toggle_switch_not_selected));
+		return (_view_x >= x_pos && _view_x <= x_pos + sprite_get_width(spr_toggle_switch_not_selected)
+			&& _view_y >= y_pos && _view_y <= y_pos + sprite_get_height(spr_toggle_switch_not_selected));
 	}
 	
 	
 	static draw = function() {
-		//var _draw_x_pos = x_pos + _x_offset;
-		//var _draw_y_pos = y_pos + _y_offset;
 		draw_set_halign(fa_right);
-		draw_text_color(absolute_x_pos - 8, absolute_y_pos, label, c_white, c_white, c_white, c_white, 1);
+		draw_text_color(x_pos - 8, y_pos, label, c_white, c_white, c_white, c_white, 1);
 		draw_set_halign(fa_left);
-		draw_sprite((is_toggled ? spr_toggle_switch_selected : spr_toggle_switch_not_selected), 0, absolute_x_pos, absolute_y_pos);
+		draw_sprite((is_toggled ? spr_toggle_switch_selected : spr_toggle_switch_not_selected), 0, x_pos, y_pos);
 	}
 	
 	
@@ -296,7 +261,7 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 	x_pos_right = _x_pos_right;
 	absolute_x_pos_right = _x_pos_right;
 	if(parent != undefined) {
-		absolute_x_pos_right += parent.absolute_x_pos;
+		absolute_x_pos_right += parent.x_pos;
 	}
 	//y_pos = _y_pos;
 	label = _label
@@ -305,7 +270,7 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 	
 	current_value = _default_value;
 	//No need to re-calculate this each time we draw the slider
-	current_value_x_pos = map_value(current_value, min_value, max_value, absolute_x_pos, absolute_x_pos_right);
+	current_value_x_pos = map_value(current_value, min_value, max_value, x_pos, absolute_x_pos_right);
 	
 	is_selected = false;
 	
@@ -314,16 +279,16 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 		//TODO: Passable view_camera index? And maybe rename these variables? Not sure.
 		var _view_x = device_mouse_x_to_gui(0);
 		var _view_y = device_mouse_y_to_gui(0);
-		return (_view_x >= absolute_x_pos - 16 && _view_x <= absolute_x_pos_right + 16
-			&& _view_y >= absolute_y_pos - 16 && _view_y <= absolute_y_pos + 16); //TODO: Should probably change 16 to relate to the size of the slider circle sprite.
+		return (_view_x >= x_pos - 16 && _view_x <= absolute_x_pos_right + 16
+			&& _view_y >= y_pos - 16 && _view_y <= y_pos + 16); //TODO: Should probably change 16 to relate to the size of the slider circle sprite.
 	}
 	
 	
 	static draw = function() {
 		if(active) {
-			draw_text_color(absolute_x_pos, absolute_y_pos - 32, label + ": " + string( floor(current_value)), c_white, c_white, c_white, c_white, 1);
-			draw_line_width_color(absolute_x_pos, absolute_y_pos, absolute_x_pos_right, absolute_y_pos, 4, c_white, c_white);
-			draw_sprite((is_selected ? spr_slider_circle_selected : spr_slider_circle_default), 0, current_value_x_pos, absolute_y_pos);
+			draw_text_color(x_pos, y_pos - 32, label + ": " + string( floor(current_value)), c_white, c_white, c_white, c_white, 1);
+			draw_line_width_color(x_pos, y_pos, absolute_x_pos_right, y_pos, 4, c_white, c_white);
+			draw_sprite((is_selected ? spr_slider_circle_selected : spr_slider_circle_default), 0, current_value_x_pos, y_pos);
 		}
 	}
 	
@@ -336,16 +301,16 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 	
 	
 	static change_slider_value = function(_new_x_pos) {
-		if(_new_x_pos <= absolute_x_pos) {
+		if(_new_x_pos <= x_pos) {
 			current_value = min_value;
-			current_value_x_pos = absolute_x_pos;
+			current_value_x_pos = x_pos;
 		}
 		else if(_new_x_pos >= absolute_x_pos_right) {
 			current_value = max_value;
 			current_value_x_pos = absolute_x_pos_right;
 		}
 		else {
-			current_value = map_value(_new_x_pos, absolute_x_pos, absolute_x_pos_right, min_value, max_value);
+			current_value = map_value(_new_x_pos, x_pos, absolute_x_pos_right, min_value, max_value);
 			current_value_x_pos = _new_x_pos;
 		}
 	}
@@ -369,8 +334,60 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 	//When the mouse is released
 	//TODO: Maybe changet this (and all other "on_released" functions) to "on_released"?
 	static on_released = function() {
-		//change_slider_value(device_mouse_x_to_gui(0));
 		is_selected = false;
+	}
+}
+#endregion
+
+
+#region KeyConfig (Class)
+/*
+	A component that lets you change the key for certain controls
+	
+	Data Cariables:
+	x_pos: X-coordinate of the top left corner
+	y_pos: Y-coordinate of the top left corner
+	key: String reference to the control that this component can change
+	label: The component's label
+*/
+function KeyConfig(_x_pos, _y_pos, _key, _label = "Unnamed Toggle") : UIComponent(_x_pos, _y_pos) constructor {
+	key = _key;
+	label = _label;
+	selected = false;
+
+	static is_highlighted = function() {
+		//TODO: Passable view_camera index? And maybe rename these variables? Not sure.
+		var _view_x = device_mouse_x_to_gui(0);
+		var _view_y = device_mouse_y_to_gui(0);
+		return (_view_x >= x_pos && _view_x <= x_pos + sprite_get_width(spr_key_config)
+			&& _view_y >= y_pos && _view_y <= y_pos + sprite_get_height(spr_key_config));
+	}
+	
+	
+	static draw = function() {
+		draw_set_halign(fa_right);
+		draw_text_color(x_pos - 8, y_pos, label, c_white, c_white, c_white, c_white, 1);
+		draw_set_halign(fa_center);
+		draw_sprite(spr_key_config, 0, x_pos, y_pos);
+		if(!selected || floor(get_timer()/500000) % 2 == 1) { //Basic flashing effect
+			draw_text_color(x_pos + 32, y_pos, global.GAME_CONFIG_SETTINGS.controls[$ key], 
+			c_white, c_white, c_white, c_white, 1);
+		}
+		draw_set_halign(fa_left)
+	}
+	
+	
+	static on_pressed = function() {
+		//TODO: If there's a toggle already selected, de-select it
+		selected = true;
+	};
+	
+	//TODO: Replace with key change modal probably
+	static on_step = function() {
+		if(selected && keyboard_check_pressed(vk_anykey)) {
+			global.GAME_CONFIG_SETTINGS.controls[$ key] = string_upper(keyboard_lastchar);
+			selected = false;
+		}
 	}
 }
 #endregion
@@ -387,7 +404,7 @@ function PopupMenuTab(_x_pos, _y_pos, _tab_name) :
 	static draw = function() {
 		draw_parent();
 		draw_set_alignments(fa_center, fa_center);
-		draw_text_color(absolute_x_pos + sprite_get_width(spr_menu_tab)/2 - 2, absolute_y_pos + sprite_get_height(spr_menu_tab)/2 + 2, tab_name, c_white, c_white, c_white, c_white, 1);
+		draw_text_color(x_pos + sprite_get_width(spr_menu_tab)/2 - 2, y_pos + sprite_get_height(spr_menu_tab)/2 + 2, tab_name, c_white, c_white, c_white, c_white, 1);
 		draw_set_alignments();
 	}
 }
@@ -421,11 +438,11 @@ function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UI
 	//TODO: Currently assumes all popup menus will start in the center of the screen. Should probably change this assumption.
 	x_pos = (view_w/2) - (_menu_width_percentage/2 * view_w); //From middle point, go to the left by the percentage amount
 	y_pos = (view_h/2) - (_menu_height_percentage/2 * view_h); //From middle point, go up by the percentage amount
-	absolute_x_pos = x_pos;
-	absolute_y_pos = y_pos;
+	x_pos = x_pos;
+	y_pos = y_pos;
 	if(parent != undefined) {
-		absolute_x_pos += parent.absolute_x_pos;
-		absolute_y_pos += parent.absolute_y_pos;
+		x_pos += parent.x_pos;
+		y_pos += parent.y_pos;
 	}
 	
 	menu_width = view_w * _menu_width_percentage;
@@ -436,26 +453,26 @@ function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UI
 	
 	static draw_parent = draw;
 	static draw = function(_x_offset = 0, _y_offset = 0) {
-		var _draw_x2 = absolute_x_pos + menu_width;
-		var _draw_y2 = absolute_y_pos + menu_height;
+		var _draw_x2 = x_pos + menu_width;
+		var _draw_y2 = y_pos + menu_height;
 		
-		draw_rectangle_color(absolute_x_pos - BORDER_PX, absolute_y_pos - BORDER_PX, _draw_x2 + BORDER_PX, _draw_y2 + BORDER_PX, 
+		draw_rectangle_color(x_pos - BORDER_PX, y_pos - BORDER_PX, _draw_x2 + BORDER_PX, _draw_y2 + BORDER_PX, 
 			c_white, c_white, c_white, c_white, false) //For a nice border
-		draw_rectangle_color(absolute_x_pos, absolute_y_pos, _draw_x2, _draw_y2, c_black, c_black, c_black, c_black, false);
+		draw_rectangle_color(x_pos, y_pos, _draw_x2, _draw_y2, c_black, c_black, c_black, c_black, false);
 		draw_set_halign(fa_center);
-		draw_text_color(absolute_x_pos + menu_width/2, absolute_y_pos + 32, title, c_white, c_white, c_white, c_white, 1);
+		draw_text_color(x_pos + menu_width/2, y_pos + 32, title, c_white, c_white, c_white, c_white, 1);
 		draw_set_halign(fa_left);
 		draw_parent();
 	}
 	
 	static is_highlighted = function() {
-		var _absolute_x2 = absolute_x_pos + menu_width;
-		var _absolute_y2 = absolute_y_pos + menu_height;
+		var _absolute_x2 = x_pos + menu_width;
+		var _absolute_y2 = y_pos + menu_height;
 		
 		var _mouse_x_gui = device_mouse_x_to_gui(0);
 		var _mouse_y_gui = device_mouse_y_to_gui(0);
-		return _mouse_x_gui >= absolute_x_pos - BORDER_PX && _mouse_x_gui <= _absolute_x2 + BORDER_PX && 
-			_mouse_y_gui >= absolute_y_pos - BORDER_PX && _mouse_y_gui <= _absolute_y2 + BORDER_PX;
+		return _mouse_x_gui >= x_pos - BORDER_PX && _mouse_x_gui <= _absolute_x2 + BORDER_PX && 
+			_mouse_y_gui >= y_pos - BORDER_PX && _mouse_y_gui <= _absolute_y2 + BORDER_PX;
 	}
 	
 }

@@ -230,6 +230,7 @@
     {"id":{"name":"spr_increase_health_icon","path":"sprites/spr_increase_health_icon/spr_increase_health_icon.yy",},},
     {"id":{"name":"spr_increase_range_icon_big","path":"sprites/spr_increase_range_icon_big/spr_increase_range_icon_big.yy",},},
     {"id":{"name":"spr_increase_range_icon","path":"sprites/spr_increase_range_icon/spr_increase_range_icon.yy",},},
+    {"id":{"name":"spr_key_config","path":"sprites/spr_key_config/spr_key_config.yy",},},
     {"id":{"name":"spr_king_worm","path":"sprites/spr_king_worm/spr_king_worm.yy",},},
     {"id":{"name":"spr_level_portrait_PortraitNotFound","path":"sprites/spr_level_portrait_PortraitNotFound/spr_level_portrait_PortraitNotFound.yy",},},
     {"id":{"name":"spr_level_portrait_SampleLevel1","path":"sprites/spr_level_portrait_SampleLevel1/spr_level_portrait_SampleLevel1.yy",},},
