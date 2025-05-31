@@ -142,7 +142,12 @@ function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other) constructor {
 	
 	static on_pressed = function() {}
 	static on_released = function() {}
-	static clean_up = function() {}
+	
+	static clean_up = function() {
+		for(var i = 0; i < array_length(children); ++i) {
+			children[i].clean_up();
+		}
+	}
 }
 #endregion
 
