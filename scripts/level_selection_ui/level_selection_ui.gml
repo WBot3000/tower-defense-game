@@ -40,11 +40,38 @@ function LevelCard(_x_pos, _y_pos, _level_data) :
 #endregion
 
 
+#region LevelSelectFrame (Class)
+#macro LEVEL_SELECT_FRAME_THICKNESS 16
+function LevelSelectFrame() : UIComponent() constructor {
+	static draw = function() {
+		draw_rectangle_color(0, 0, LEVEL_SELECT_FRAME_THICKNESS, view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
+		draw_rectangle_color(view_w - LEVEL_SELECT_FRAME_THICKNESS, 0, view_w, view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
+		draw_rectangle_color(0, 0, view_w, LEVEL_SELECT_FRAME_THICKNESS*3, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
+		draw_rectangle_color(0, view_h - LEVEL_SELECT_FRAME_THICKNESS, view_w, view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
+		draw_set_halign(fa_center);
+		draw_text_color(view_w/2, LEVEL_SELECT_FRAME_THICKNESS*1.5, "Select a Level", c_white, c_white, c_white, c_white, 1);
+		draw_set_halign(fa_left);
+	}
+	
+	static is_highlighted = function() {
+		var _view_x = device_mouse_x_to_gui(0);
+		var _view_y = device_mouse_y_to_gui(0);
+		
+		return !(_view_x >= LEVEL_SELECT_FRAME_THICKNESS*2 && _view_x <= view_w - LEVEL_SELECT_FRAME_THICKNESS &&
+			_view_y >= LEVEL_SELECT_FRAME_THICKNESS && _view_y <= view_h - LEVEL_SELECT_FRAME_THICKNESS);
+	}
+}
+#endregion
+
+
 #region LevelSelectUI
 /*
 	Handles the UI for the Level Selection Menu
 */
 function LevelSelectUI() : UIComponent() constructor {
+	level_select_frame = new LevelSelectFrame();
+	level_select_frame.activate();
+	
 	//Buttons (NOTE: Positions don't use enums since these are more than likely temporary)
 	button_samplelevel1 = new LevelCard(TILE_SIZE * 0.5, TILE_SIZE, global.DATA_LEVEL_MAIN_SAMPLELEVEL1);
 	button_samplelevel1.activate();
@@ -55,7 +82,7 @@ function LevelSelectUI() : UIComponent() constructor {
 	button_samplelevel3 = new LevelCard(TILE_SIZE * 10.5, TILE_SIZE, global.DATA_LEVEL_MAIN_SAMPLELEVEL3);
 	button_samplelevel3.activate();
 	
-	children = [button_samplelevel1, button_samplelevel2, button_samplelevel3];
+	children = [level_select_frame, button_samplelevel1, button_samplelevel2, button_samplelevel3];
 	
 	active = true //We can just do this here instead of calling activate/deactivate, since this UI should always be active
 }

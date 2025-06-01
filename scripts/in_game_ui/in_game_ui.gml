@@ -550,7 +550,9 @@ function UnitPurchaseMenu(_purchase_data_list) : UIComponent() constructor {
 	
 	//This function moves the menu based on its current state. Also accepts a menu toggle boolean
 	//Shoud be called in a Step event.
+	static on_step_parent = on_step;
 	static on_step = function() {
+		on_step_parent();
 		var _x_delta = 0;
 		switch (state) {
 			case SLIDING_MENU_STATE.CLOSED:
@@ -1019,7 +1021,9 @@ function UnitInfoCard() : UIComponent() constructor {
 	
 	//This function moves the menu based on its current state. Also accepts a menu toggle boolean
 	//Shoud be called in a Step event.
+	static on_step_parent = on_step;
 	static on_step = function() {
+		on_step_parent();
 		var _y_delta = 0;
 		switch (state) {
 			case SLIDING_MENU_STATE.CLOSED:
@@ -1075,11 +1079,11 @@ function GameInfoDisplay(_controller_obj) : UIComponent() constructor {
 	
 	
 	static is_highlighted = function() {		
-		var _view_x = camera_get_view_x(view_camera[0]);
-		var _view_y = camera_get_view_y(view_camera[0]);
+		var _view_x = device_mouse_x_to_gui(0);
+		var _view_y = device_mouse_y_to_gui(0);
 		
 		//Only need two checks because this component is in the top left corner of the screen
-		return (device_mouse_x_to_gui(0) - _view_x <= GAME_INFO_DISPLAY_WIDTH && device_mouse_y_to_gui(0) - _view_y <= GAME_INFO_DISPLAY_HEIGHT);
+		return (_view_x <= GAME_INFO_DISPLAY_WIDTH && _view_y <= GAME_INFO_DISPLAY_HEIGHT);
 	}
 	
 	
