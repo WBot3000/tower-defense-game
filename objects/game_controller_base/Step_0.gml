@@ -1,4 +1,5 @@
 /// @description Run the camera controller, round manager and handle menu resizing selection
+transition_effect.on_step();
 
 #region Gathering User Inputs
 var _mouse_left_pressed = mouse_check_button_pressed(mb_left);

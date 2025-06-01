@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"transitions",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"transitions",
+  "parent":{
+    "name":"ui",
+    "path":"folders/Scripts/ui.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

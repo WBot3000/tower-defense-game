@@ -182,6 +182,7 @@
     {"id":{"name":"persistent_hitbox_effects","path":"scripts/persistent_hitbox_effects/persistent_hitbox_effects.yy",},},
     {"id":{"name":"purchase_management","path":"scripts/purchase_management/purchase_management.yy",},},
     {"id":{"name":"title_screen_ui","path":"scripts/title_screen_ui/title_screen_ui.yy",},},
+    {"id":{"name":"transitions","path":"scripts/transitions/transitions.yy",},},
     {"id":{"name":"utility","path":"scripts/utility/utility.yy",},},
     {"id":{"name":"shader_grayscale","path":"shaders/shader_grayscale/shader_grayscale.yy",},},
     {"id":{"name":"shader_levelcards","path":"shaders/shader_levelcards/shader_levelcards.yy",},},

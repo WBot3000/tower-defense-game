@@ -1,5 +1,5 @@
 /// @description Check for user input and perform actions accordingly
-
+transition_effect.on_step();
 #region Gathering User Inputs
 var _mouse_left_released = mouse_check_button_released(mb_left);
 #endregion

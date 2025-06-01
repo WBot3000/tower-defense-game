@@ -82,6 +82,9 @@ game_ui = new GameUI(self.id, purchase_data);
 	Normally, the Game State Manager handles this, but here is done manually the first time (since the Game State Manager is created before the GUI).
 */
 game_ui.set_gui_running();
+
+transition_effect = new Transition(1)
+transition_effect.fade_in();
 #endregion
 
 
