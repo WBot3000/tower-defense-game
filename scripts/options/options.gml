@@ -7,9 +7,11 @@ This file contains the data structure for managing game options, such as control
 */
 function OptionsManager() constructor{
 	//Controls Settings
-	pause_game_key = "Q";
-	open_shop_key = "E";
-	open_unit_info_key = "F";
+	controls = {
+		pause_game_key: "Q",
+		open_shop_key: "E",
+		open_unit_info_key: "F"
+	}
 	
 	//Audio Settings
 	music_volume = 100;

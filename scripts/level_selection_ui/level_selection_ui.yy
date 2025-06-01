@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"level_selection_ui",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"level_selection_ui",
+  "parent":{
+    "name":"ui",
+    "path":"folders/Scripts/ui.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

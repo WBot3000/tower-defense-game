@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"menus_and_ui",
+  "%Name":"title_screen_ui",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"menus_and_ui",
+  "name":"title_screen_ui",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/Scripts.yy",
+    "name":"ui",
+    "path":"folders/Scripts/ui.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

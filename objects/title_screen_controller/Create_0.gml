@@ -1,8 +1,14 @@
 /// @description Create StartMenuUI and some global stuff
 start_menu_ui = new StartMenuUI();
 
+//Play title music
 global.BACKGROUND_MUSIC_MANAGER.set_music(Music_Title_Theme);
 
+//Arrow keys = WASD
+keyboard_set_map(vk_up, ord("W"));
+keyboard_set_map(vk_left, ord("A"));
+keyboard_set_map(vk_down, ord("S"));
+keyboard_set_map(vk_right, ord("D"));
 
 //Particle Stuff!
 global.PARTICLE_SYSTEM = part_system_create_layer(PARTICLE_LAYER, true);
