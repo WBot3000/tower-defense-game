@@ -203,7 +203,7 @@ function OptionsMenu(_menu_width_percentage, _menu_height_percentage) : PopupMen
 	audio_tab.activate();
 	visuals_tab = new OptionsMenuVisualsTab(_tab_width, _tab_y);
 	visuals_tab.activate();
-	controls_tab = new OptionsMenuControlsTab(2*_tab_width, _tab_y);
+	controls_tab = new OptionsMenuControlsTab(2*_tab_width + 4, _tab_y);
 	controls_tab.activate();
 	
 	music_volume_slider = new MusicVolumeSlider(16, menu_width - 16, 128);
@@ -215,8 +215,8 @@ function OptionsMenu(_menu_width_percentage, _menu_height_percentage) : PopupMen
 	fullscreen_toggle = new SetFullscreenToggle(160, 96);
 	
 	pause_game_key_config = new KeyConfig(160, 96, "pause_game_key", "Pause Game");
-	open_shop_key_config = new KeyConfig(160, 128 + 16, "open_shop_key", "Open Shop");
-	open_unit_info_key_config = new KeyConfig(160, 161 + 32, "open_unit_info_key", "Show Unit Info");
+	open_shop_key_config = new KeyConfig(160, 128 + 8, "open_shop_key", "Open Shop");
+	open_unit_info_key_config = new KeyConfig(160, 161 + 16, "open_unit_info_key", "Show Unit Info");
 	
 	
 	children = [close_button, audio_tab, visuals_tab, controls_tab, music_volume_slider, sound_effects_volume_slider, fullscreen_toggle,
