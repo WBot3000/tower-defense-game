@@ -193,6 +193,7 @@
     {"id":{"name":"Music_Victory","path":"sounds/Music_Victory/Music_Victory.yy",},},
     {"id":{"name":"SFX_Menu_Close","path":"sounds/SFX_Menu_Close/SFX_Menu_Close.yy",},},
     {"id":{"name":"SFX_Menu_Open","path":"sounds/SFX_Menu_Open/SFX_Menu_Open.yy",},},
+    {"id":{"name":"SFX_Round_Complete","path":"sounds/SFX_Round_Complete/SFX_Round_Complete.yy",},},
     {"id":{"name":"spr_back_to_menu_button","path":"sprites/spr_back_to_menu_button/spr_back_to_menu_button.yy",},},
     {"id":{"name":"spr_bite","path":"sprites/spr_bite/spr_bite.yy",},},
     {"id":{"name":"spr_blank_stat_icon","path":"sprites/spr_blank_stat_icon/spr_blank_stat_icon.yy",},},

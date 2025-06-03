@@ -161,6 +161,11 @@ function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constru
 		var _round_completed = _round.remove_enemy_from_spawned_list(_enemy_id);
 		
 		if(_round_completed) {
+			var _gui = get_game_ui(controller_obj);
+			if(_gui != undefined) { //Player should know when they've completed a round
+				_gui.game_info_display.set_display_message("Round " + string(_round_number) + " completed!", true);
+			}
+			
 			var _round_index = array_get_index(rounds_currently_running, _round);
 			if(_round_index == -1) {
 				throw("Round " + string(_round) + " attempted to be removed from " + string(self) + ", where it isn't present."); //This should never happen in normal execution

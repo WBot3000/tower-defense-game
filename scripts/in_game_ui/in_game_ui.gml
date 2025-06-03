@@ -58,8 +58,9 @@ function RoundStartButton(_x_pos, _y_pos) :
 	
 	static on_released = function() {
 		if(is_enabled()) {
-			if(global.BACKGROUND_MUSIC_MANAGER.current_music == Music_PreRound) {
+			if(cached_round_manager.current_round == 0) {
 				global.BACKGROUND_MUSIC_MANAGER.fade_out_current_music(seconds_to_milliseconds(QUICK_MUSIC_FADING_TIME), Music_Round);
+				parent.game_info_display.set_display_message("Fight!");
 			}
 			//Round manager MUST exist if is_enabled returns true, so we don't have to check again in here.
 			cached_round_manager.start_round();
@@ -1076,14 +1077,15 @@ function UnitInfoCard() : UIComponent() constructor {
 
 function GameInfoDisplay(_controller_obj) : UIComponent() constructor {
 	controller_obj = _controller_obj;
-	
+	display_msg = "Place your Constructs"
 	
 	static is_highlighted = function() {		
 		var _view_x = device_mouse_x_to_gui(0);
 		var _view_y = device_mouse_y_to_gui(0);
 		
-		//Only need two checks because this component is in the top left corner of the screen
-		return (_view_x <= GAME_INFO_DISPLAY_WIDTH && _view_y <= GAME_INFO_DISPLAY_HEIGHT);
+		//First check is for big box, second check is for message box
+		return (_view_x <= GAME_INFO_DISPLAY_WIDTH && _view_y <= GAME_INFO_DISPLAY_HEIGHT) ||
+		(_view_x <= view_w/2 && _view_y <= GAME_INFO_DISPLAY_HEIGHT/2);
 	}
 	
 	
@@ -1094,6 +1096,7 @@ function GameInfoDisplay(_controller_obj) : UIComponent() constructor {
 		var _round_manager = get_round_manager(controller_obj);
 		
 		//Draw background
+		draw_rectangle_color(0, 0, view_w/2, GAME_INFO_DISPLAY_HEIGHT/2, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
 		draw_rectangle_color(0, 0, GAME_INFO_DISPLAY_WIDTH, GAME_INFO_DISPLAY_HEIGHT, c_silver, c_silver, c_silver, c_silver, false);
 		
 		//Draw basic game stats
@@ -1110,7 +1113,15 @@ function GameInfoDisplay(_controller_obj) : UIComponent() constructor {
 			draw_text_color(TILE_SIZE*(1/3), TILE_SIZE*(1/3), "Round: ???", c_black, c_black, c_black, c_black, 1);
 		}
 		draw_text_color(TILE_SIZE*(1/3), TILE_SIZE, "Money: " + string(global.player_money), c_black, c_black, c_black, c_black, 1);
+		draw_text_color(GAME_INFO_DISPLAY_WIDTH + 16, TILE_SIZE*(1/3), display_msg, c_white, c_white, c_white, c_white, 1);
 	};
+	
+	static set_display_message = function(_new_msg, _play_jingle = false) {
+		if(_play_jingle) {
+			play_sound_effect(SFX_Round_Complete);
+		}
+		display_msg = _new_msg;
+	}
 }
 #endregion
 
