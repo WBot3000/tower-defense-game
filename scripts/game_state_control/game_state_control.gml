@@ -88,10 +88,10 @@ function GameStateManager(_controller_obj, _initial_state = GAME_STATE.RUNNING) 
 	The below functions all are used for transfering data between components
 	Fetches a controller/manager if needed by an external object or another controller/manager.
 */
-#region get_game_controller (Function)
-function get_game_controller() {
-	var _game_controller = instance_find(game_controller_base, 0);
-	return _game_controller
+#region get_logic_controller (Function)
+function get_logic_controller() {
+	var _logic_controller = instance_find(logic_controller_base, 0);
+	return _logic_controller
 }
 #endregion
 
@@ -100,7 +100,7 @@ function get_game_controller() {
 //NOTE: You can also pass a controller object if you have one so that you don't have to fetch it. Should save a tiny bit of time.
 function get_game_state_manager(_controller_obj = undefined) {
 	if(_controller_obj == undefined) {
-		_controller_obj = get_game_controller();
+		_controller_obj = get_logic_controller();
 	}
 	if(_controller_obj == noone || !variable_instance_exists(_controller_obj, "game_state_manager")) {
 		return undefined;
@@ -114,7 +114,7 @@ function get_game_state_manager(_controller_obj = undefined) {
 //NOTE: You can also pass a controller object if you have one so that you don't have to fetch it. Should save a tiny bit of time.
 function get_round_manager(_controller_obj = undefined) {
 	if(_controller_obj == undefined) {
-		_controller_obj = get_game_controller();
+		_controller_obj = get_logic_controller();
 	}
 	if(_controller_obj == noone || !variable_instance_exists(_controller_obj, "round_manager")) {
 		return undefined;
@@ -128,7 +128,7 @@ function get_round_manager(_controller_obj = undefined) {
 //NOTE: You can also pass a controller object if you have one so that you don't have to fetch it. Should save a tiny bit of time.
 function get_purchase_manager(_controller_obj = undefined) {
 	if(_controller_obj == undefined) {
-		_controller_obj = get_game_controller();
+		_controller_obj = get_logic_controller();
 	}
 	if(_controller_obj == noone || !variable_instance_exists(_controller_obj, "purchase_manager")) {
 		return undefined;
@@ -142,7 +142,7 @@ function get_purchase_manager(_controller_obj = undefined) {
 //NOTE: You can also pass a controller object if you have one so that you don't have to fetch it. Should save a tiny bit of time.
 function get_camera_controller(_controller_obj = undefined) {
 	if(_controller_obj == undefined) {
-		_controller_obj = get_game_controller();
+		_controller_obj = get_logic_controller();
 	}
 	if(_controller_obj == noone || !variable_instance_exists(_controller_obj, "camera_controller")) {
 		return undefined;
@@ -157,7 +157,7 @@ function get_camera_controller(_controller_obj = undefined) {
 //NOTE: You can also pass a controller object if you have one so that you don't have to fetch it. Should save a tiny bit of time.
 function get_game_ui(_controller_obj = undefined) {
 	if(_controller_obj == undefined) {
-		_controller_obj = get_game_controller();
+		_controller_obj = get_logic_controller();
 	}
 	if(_controller_obj == noone || !variable_instance_exists(_controller_obj, "game_ui")) {
 		return undefined;
@@ -165,4 +165,18 @@ function get_game_ui(_controller_obj = undefined) {
 	return _controller_obj.game_ui;
 }
 #endregion
+
+
+#region get_room_transition (Function)
+function get_room_transition(_controller_obj = undefined) {
+	if(_controller_obj == undefined) {
+		_controller_obj = get_logic_controller();
+	}
+	if(_controller_obj == noone || !variable_instance_exists(_controller_obj, "transition_effect")) {
+		return undefined;
+	}
+	return _controller_obj.transition_effect;
+}
+#endregion
+
 #endregion

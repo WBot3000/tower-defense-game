@@ -24,7 +24,7 @@ switch (attack_state) {
 			if(focused_entity != noone) {
 				path_speed = 0;
 				
-				var _vector = vector_to_get_components(self, focused_entity, true);
+				var _vector = instances_vector_to_get_components(self, focused_entity, true);
 				direction_facing = get_entity_facing_direction(self, focused_entity.x)
 				image_xscale = direction_facing;
 	

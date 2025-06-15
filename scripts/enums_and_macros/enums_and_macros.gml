@@ -40,3 +40,9 @@ enum DIRECTION {
 }*/
 
 #macro SELL_PRICE_REDUCTION 0.8 //How much a unit sells for in comparison to how much it cost.
+
+enum CLOUD_STATE { //The state of the Cloud Construct's cloud summons
+	TRAVELING_TO_TARGET,
+	LINGERING,
+	DISSIPATING
+}

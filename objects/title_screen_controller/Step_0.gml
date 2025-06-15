@@ -9,7 +9,7 @@ transition_effect.on_step();
 
 if(_mouse_left_released) {
 	var _button_pressed = start_menu_ui.get_highlighted_child();
-	if(_button_pressed != undefined) { //Right now, button can either be Play (which does nothing) or Quit (which exits the game)
+	if(_button_pressed != undefined) { //Play, Options, Quit
 		_button_pressed.on_released();
 	}
 }

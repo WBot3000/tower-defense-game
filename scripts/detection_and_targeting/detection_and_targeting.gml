@@ -137,6 +137,18 @@ function MeleeRange(_unit) : CircularRange(_unit) constructor {
 }
 #endregion
 
+
+#region GlobalRange (Class)
+/*
+	A RectangularRange for enemies that can see the entire level at once.
+	Doesn't draw anything because creating a big white rectangle over the entire level sounds unpleasant.
+*/
+function GlobalRange(_unit) : RectangularRange(_unit, 0, 0, room_width, room_height) constructor {
+	static draw_range = function(){};
+}
+#endregion
+
+
 #endregion
 
 

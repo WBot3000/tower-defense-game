@@ -42,32 +42,11 @@ purchase_data = [
 	global.DATA_PURCHASE_COBBLESTONE,
 	global.DATA_PURCHASE_GOLD,
 	
+	global.DATA_PURCHASE_CLOUD,
 	global.DATA_PURCHASE_SAMPLE_GUNNER,
 	global.DATA_PURCHASE_SAMPLE_BRAWLER,
-	global.DATA_PURCHASE_SAMPLE_MORTAR,
 	
-	global.DATA_PURCHASE_SAMPLE_GUNNER,
-	global.DATA_PURCHASE_SAMPLE_BRAWLER,
 	global.DATA_PURCHASE_SAMPLE_MORTAR,
-	
-	global.DATA_PURCHASE_SAMPLE_GUNNER,
-	global.DATA_PURCHASE_SAMPLE_BRAWLER,
-	global.DATA_PURCHASE_SAMPLE_MORTAR,
-	
-	global.DATA_PURCHASE_SAMPLE_GUNNER,
-	global.DATA_PURCHASE_SAMPLE_BRAWLER,
-	global.DATA_PURCHASE_SAMPLE_MORTAR,
-	
-	global.DATA_PURCHASE_SAMPLE_GUNNER,
-	global.DATA_PURCHASE_SAMPLE_BRAWLER,
-	global.DATA_PURCHASE_SAMPLE_MORTAR,
-	
-	global.DATA_PURCHASE_SAMPLE_GUNNER,
-	global.DATA_PURCHASE_SAMPLE_BRAWLER,
-	global.DATA_PURCHASE_SAMPLE_MORTAR,
-	
-	global.DATA_PURCHASE_SAMPLE_GUNNER,
-	global.DATA_PURCHASE_SAMPLE_BRAWLER,
 ]
 
 #endregion
@@ -83,10 +62,6 @@ game_ui = new GameUI(self.id, purchase_data);
 */
 game_ui.set_gui_running();
 
-transition_effect = new Transition(1)
-transition_effect.fade_in();
+transition_effect = new SwipeTransition()
+transition_effect.transition_in();
 #endregion
-
-
-//NOTE: Delete this once testing
-gui_timer = 0;

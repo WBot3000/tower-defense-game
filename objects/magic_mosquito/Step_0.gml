@@ -23,7 +23,7 @@ if(!instance_exists(focused_entity) ||
 	var _min_vector_not_current = undefined;
 	with(base_unit) { //Iterate through all units, and find the closest one that's currently active
 		if(health_state != UNIT_STATE.KNOCKED_OUT) {
-			var _vector = vector_to_get_components(other, self, true);
+			var _vector = instances_vector_to_get_components(other, self, true);
 			if(_min_vector_not_current == undefined || _vector[VEC_LEN] < _min_vector_not_current[VEC_LEN]) {
 				_next_entity_to_target = self;
 				_min_vector_not_current = _vector;

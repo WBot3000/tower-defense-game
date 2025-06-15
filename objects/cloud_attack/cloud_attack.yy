@@ -1,22 +1,19 @@
 {
   "$GMObject":"",
-  "%Name":"level_select_screen_controller",
+  "%Name":"cloud_attack",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":64,"eventType":8,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":12,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
-  "name":"level_select_screen_controller",
+  "name":"cloud_attack",
   "overriddenProperties":[],
   "parent":{
-    "name":"logic_controllers",
-    "path":"folders/Objects/logic_controllers.yy",
+    "name":"Cloud",
+    "path":"folders/Objects/unit_types/Cloud.yy",
   },
-  "parentObjectId":{
-    "name":"logic_controller_base",
-    "path":"objects/logic_controller_base/logic_controller_base.yy",
-  },
+  "parentObjectId":null,
   "persistent":false,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,
@@ -34,7 +31,10 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":null,
+  "spriteId":{
+    "name":"spr_cloud_attack",
+    "path":"sprites/spr_cloud_attack/spr_cloud_attack.yy",
+  },
   "spriteMaskId":null,
   "visible":true,
 }

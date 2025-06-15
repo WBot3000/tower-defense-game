@@ -83,7 +83,7 @@ function draw_health_bar_target(x, y, _current_health, _max_health){
 //Enums for fading out visual effects
 enum VISUAL_EFFECT_STATUS {
 	STILL,
-	FADING_OUT
+	ROOM_OUT
 }
 #endregion
 

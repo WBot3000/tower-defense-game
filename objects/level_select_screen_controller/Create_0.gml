@@ -1,4 +1,4 @@
 /// @description Create LevelSelectUI
-transition_effect = new Transition(1);
-transition_effect.fade_in();
+transition_effect = new SwipeTransition();
+transition_effect.transition_in();
 level_select_ui = new LevelSelectUI();

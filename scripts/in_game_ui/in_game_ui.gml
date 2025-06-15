@@ -24,7 +24,7 @@
 function PauseButton(_x_pos, _y_pos) :
 		Button(_x_pos, _y_pos, spr_pause_menu_toggle) constructor {	
 	
-	static on_released = function() {
+	static released_fn = function() {
 		var _game_state_manager = get_game_state_manager();
 		if(_game_state_manager != undefined) {
 			_game_state_manager.pause_game();
@@ -56,7 +56,7 @@ function RoundStartButton(_x_pos, _y_pos) :
 	}
 	
 	
-	static on_released = function() {
+	static released_fn = function() {
 		if(is_enabled()) {
 			if(cached_round_manager.current_round == 0) {
 				global.BACKGROUND_MUSIC_MANAGER.fade_out_current_music(seconds_to_milliseconds(QUICK_MUSIC_FADING_TIME), Music_Round);
@@ -86,7 +86,7 @@ function RoundStartButton(_x_pos, _y_pos) :
 function ExitOptionsMenuButton(_x_pos, _y_pos) : 
 	Button(_x_pos, _y_pos, spr_close_button, spr_close_button, spr_close_button) constructor {
 	
-	static on_released = function() {
+	static released_fn = function() {
 		parent.deactivate();
 		//TODO: Move this to the ACTUAL PauseMenuExitButton
 		var _game_state_manager = get_game_state_manager();
@@ -102,7 +102,7 @@ function ExitOptionsMenuButton(_x_pos, _y_pos) :
 function OptionsMenuAudioTab(_x_pos, _y_pos) :
 	PopupMenuTab(_x_pos, _y_pos, "Audio") constructor {
 
-		static on_released = function() {
+		static released_fn = function() {
 			parent.set_to_audio_options();
 		}
 }
@@ -113,7 +113,7 @@ function OptionsMenuAudioTab(_x_pos, _y_pos) :
 function OptionsMenuVisualsTab(_x_pos, _y_pos) :
 	PopupMenuTab(_x_pos, _y_pos, "Visuals") constructor {
 		
-		static on_released = function() {
+		static released_fn = function() {
 			parent.set_to_visual_options();
 		}
 }
@@ -124,7 +124,7 @@ function OptionsMenuVisualsTab(_x_pos, _y_pos) :
 function OptionsMenuControlsTab(_x_pos, _y_pos) :
 	PopupMenuTab(_x_pos, _y_pos, "Controls") constructor {
 		
-		static on_released = function() {
+		static released_fn = function() {
 			parent.set_to_control_options();
 		}
 }
@@ -324,7 +324,7 @@ function UnitPurchaseButton(_x_pos, _y_pos, _purchase_data) :
 	}
 	
 	
-	static on_released = function() {
+	static released_fn = function() {
 		if(cached_game_state_manager == undefined || cached_game_state_manager.state != GAME_STATE.RUNNING) {
 			return; //You should only be able to select units while the game is running
 		}
@@ -355,7 +355,7 @@ function PreviousPagePurchaseMenuButton(_x_pos, _y_pos) :
 		return parent.current_page > 0; //Parent is the Purchase Menu struct itself
 	}
 	
-	static on_released = function() {
+	static released_fn = function() {
 		if(is_enabled()) {
 			for(var i = parent.current_page * PURCHASE_MENU_BPPAGE; i < (parent.current_page+1) * PURCHASE_MENU_BPPAGE && i < array_length(parent.purchase_buttons); ++i) {
 				parent.purchase_buttons[i].deactivate();
@@ -389,7 +389,7 @@ function NextPagePurchaseMenuButton(_x_pos, _y_pos) :
 		return array_length(parent.purchase_buttons) > (parent.current_page + 1) * PURCHASE_MENU_BPPAGE;
 	}
 	
-	static on_released = function() {
+	static released_fn = function() {
 		if(is_enabled()) {
 			for(var i = parent.current_page * PURCHASE_MENU_BPPAGE; i < (parent.current_page+1) * PURCHASE_MENU_BPPAGE && i < array_length(parent.purchase_buttons); ++i) {
 				parent.purchase_buttons[i].deactivate();
@@ -420,7 +420,7 @@ function NextPagePurchaseMenuButton(_x_pos, _y_pos) :
 function TogglePurchaseMenuButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_pointer_arrow_left) constructor {
 	
-	static on_released = function() {
+	static released_fn = function() {
 		switch (parent.state) {
 		    case SLIDING_MENU_STATE.OPEN:
 		        parent.toggle_closed();
@@ -646,7 +646,7 @@ function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
 			&& stat_upgrade_data.current_level < stat_upgrade_data.max_level);
 	}
 	
-	static on_released = function() {
+	static released_fn = function() {
 		if(stat_upgrade_data != undefined) {
 			global.player_money -= stat_upgrade_data.current_price;
 			stat_upgrade_data.on_upgrade();
@@ -759,7 +759,7 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _sele
 		}
 	}
 	
-	static on_released = function() {
+	static released_fn = function() {
 		if(unit_upgrade_data != undefined) {
 			global.player_money -= unit_upgrade_data.price;
 			with(selected_unit) {	
@@ -833,7 +833,7 @@ function SellButton(_x_pos, _y_pos, _selected_unit = noone) :
 		draw_set_alignments();
 	}
 	
-	static on_released = function() {
+	static released_fn = function() {
 		if(selected_unit != noone) {
 			//Since the origin of units is centre-bottom, check one point above the origin for the tile. Otherwise, we accidentally mark the tile below as free for placement.
 			var _tile = instance_position(selected_unit.x, selected_unit.y - 1, placeable_tile);
@@ -862,7 +862,7 @@ function SellButton(_x_pos, _y_pos, _selected_unit = noone) :
 function ToggleInfoCardButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_pointer_arrow_up) constructor {
 	
-	static on_released = function() {
+	static released_fn = function() {
 		switch (parent.state) {
 		    case SLIDING_MENU_STATE.OPEN:
 		        parent.toggle_closed();
@@ -1170,9 +1170,18 @@ function EndResultsHeader(_x_pos, _y_pos) : UIComponent(_x_pos, _y_pos) construc
 function RestartLevelButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_restart_button) constructor {
 		
-	static on_released = function() {
-		audio_stop_all();
-		room_restart();
+	static released_fn = function() {
+		_transition = get_room_transition();
+		if(_transition != undefined) {
+			_transition.transition_out(function() {
+				audio_stop_all();
+				room_restart();
+			})
+		}
+		else {
+			audio_stop_all();
+			room_restart();
+		}
 	}
 }
 #endregion
@@ -1195,9 +1204,18 @@ function RestartLevelButton(_x_pos, _y_pos) :
 function BackToLevelSelectionButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_back_to_menu_button) constructor {
 		
-	static on_released = function() {
-		audio_stop_all();
-		room_goto(LevelSelectScreen);
+	static released_fn = function() {
+		_transition = get_room_transition();
+		if(_transition != undefined) {
+			_transition.transition_out(function() {
+				audio_stop_all();
+				room_goto(LevelSelectScreen);
+			})
+		}
+		else {
+			audio_stop_all();
+			room_goto(LevelSelectScreen);
+		}
 	}
 }
 #endregion
@@ -1210,36 +1228,38 @@ function BackToLevelSelectionButton(_x_pos, _y_pos) :
 */
 function EndResultsCard(_menu_width_percentage, _menu_height_percentage) : UIComponent() constructor {
 	
-	var _view_w = camera_get_view_width(view_camera[0]);
-	var _view_h = camera_get_view_height(view_camera[0]);
+	x_pos = (view_w/2) - (_menu_width_percentage/2 * view_w); //From middle point, go to the left by the percentage amount
+	y_pos = (view_h/2) - (_menu_height_percentage/2 * view_h); //From middle point, go up by the percentage amount
 	
-	x1 = (_view_w/2) - (_menu_width_percentage/2 * _view_w); //From middle point, go to the left by the percentage amount
-	y1 = (_view_h/2) - (_menu_height_percentage/2 * _view_h); //From middle point, go up by the percentage amount
-	x2 = (_view_w/2) + (_menu_width_percentage/2 * _view_w); //From middle point, go to the right by the percentage amount
-	y2 = (_view_h/2) + (_menu_height_percentage/2 * _view_h); //From middle point, go down by the percentage amount
+	menu_width = view_w * _menu_width_percentage;
+	menu_height = view_h * _menu_height_percentage;
 	
+	x_pos_2 = x_pos + menu_width;
+	y_pos_2 = y_pos + menu_height;
+		
+	header = new EndResultsHeader(x_pos + (menu_width - sprite_get_width(spr_game_over)), 16);
+	header.activate();
+	restart_level_button = new RestartLevelButton(x_pos, 256);
+	restart_level_button.activate();
+	back_to_level_select_button = new BackToLevelSelectionButton(x_pos_2, 256);
+	back_to_level_select_button.activate();
 	
-	header = new EndResultsHeader((_view_w - sprite_get_width(spr_game_over)) / 2, 64);
+	children = [header, restart_level_button, back_to_level_select_button]
 	
-	restart_level_button = new RestartLevelButton(x1 + 256, 256);
-	back_to_level_select_button = new BackToLevelSelectionButton(x2 - sprite_get_width(spr_back_to_menu_button) - 256, 256);
-	
-	
+	static draw_parent = draw;
 	static draw = function() {
-		draw_rectangle_color(x1, y1, x2, y2, c_white, c_white, c_white, c_white, false);
-		header.draw();
-		restart_level_button.draw();
-		back_to_level_select_button.draw();
+		draw_rectangle_color(x_pos, y_pos, x_pos_2, y_pos_2, c_white, c_white, c_white, c_white, false);
+		draw_parent();
 	}
 	
 	
 	static is_highlighted = function() {
 		var _mouse_x_gui = device_mouse_x_to_gui(0);
 		var _mouse_y_gui = device_mouse_y_to_gui(0);
-		return _mouse_x_gui >= x1 && _mouse_x_gui <= x2 && _mouse_y_gui >= y1 && _mouse_y_gui <= y2;
+		return _mouse_x_gui >= x_pos && _mouse_x_gui <= x_pos_2 && _mouse_y_gui >= y_pos && _mouse_y_gui <= y_pos_2;
 	}
 	
-	
+	/*
 	static on_released = function() {
 		if(restart_level_button.is_highlighted()) {
 			restart_level_button.on_released();
@@ -1247,7 +1267,7 @@ function EndResultsCard(_menu_width_percentage, _menu_height_percentage) : UICom
 		else if(back_to_level_select_button.is_highlighted()) {
 			back_to_level_select_button.on_released();
 		}
-	}
+	}*/
 }
 #endregion
 

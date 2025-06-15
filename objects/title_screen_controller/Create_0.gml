@@ -39,5 +39,5 @@ initialize_digit_particles([global.PARTICLE_DIGIT_0, global.PARTICLE_DIGIT_1, gl
 	global.PARTICLE_DIGIT_7, global.PARTICLE_DIGIT_8, global.PARTICLE_DIGIT_9, global.PARTICLE_DIGIT_PLUS])
 
 //Create fade in effect
-transition_effect = new Transition(1)
-transition_effect.fade_in();
+transition_effect = new FadeTransition(1)
+transition_effect.transition_in();

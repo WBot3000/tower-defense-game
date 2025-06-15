@@ -48,9 +48,9 @@ function get_bbox_center_y(inst) {
 #macro VEC_Y 1
 #macro VEC_LEN 2
 //Returns x and y components of a vector originating from source_inst, pointing towards destination_inst, along with the vector's length
-function vector_to_get_components(source_inst, destination_inst, normalized = false) {
-	var _vector_x = get_bbox_center_x(destination_inst) - get_bbox_center_x(source_inst);
-	var _vector_y = get_bbox_center_y(destination_inst) - get_bbox_center_y(source_inst);
+function vector_to_get_components(source_x, source_y, dest_x, dest_y, normalized = false) {
+	var _vector_x = dest_x - source_x;
+	var _vector_y = dest_y - source_y;
 	var _vector_len = sqrt(sqr(_vector_x) + sqr(_vector_y));
 	
 	if(normalized) { //Set this when you want to use these components in a Step event for things like movement
@@ -59,6 +59,16 @@ function vector_to_get_components(source_inst, destination_inst, normalized = fa
 	}
 	
 	return [_vector_x, _vector_y, _vector_len];
+}
+#endregion
+
+
+#region instances_vector_to_get_components (Function)
+//When referencing values returned from this function, use these values to make code more understandable
+//Returns x and y components of a vector originating from source_inst, pointing towards destination_inst, along with the vector's length
+function instances_vector_to_get_components(source_inst, destination_inst, normalized = false) {
+	return vector_to_get_components(get_bbox_center_x(source_inst), get_bbox_center_y(source_inst), 
+		get_bbox_center_x(destination_inst), get_bbox_center_y(destination_inst), normalized);
 }
 #endregion
 

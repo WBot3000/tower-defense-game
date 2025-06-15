@@ -16,8 +16,17 @@ This file contains UI components on the title screen
 function LevelSelectButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_play_game_button) constructor {
 		
-		static on_released = function() {
-			room_goto(LevelSelectScreen);
+		static released_fn = function() {
+			//transition_effect = get_room_transition();
+			_title_screen_controller = get_logic_controller();
+			if(_title_screen_controller != undefined) {
+				//Need to replace fading transition with swipe transition
+				_title_screen_controller.transition_effect = new SwipeTransition(false);
+				_title_screen_controller.transition_effect.transition_out( function() {room_goto(LevelSelectScreen)} );
+			}
+			else {
+				room_goto(LevelSelectScreen);
+			}
 		}
 }
 #endregion
@@ -37,7 +46,7 @@ function LevelSelectButton(_x_pos, _y_pos) :
 function OptionsButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_options_button) constructor {
 		
-		static on_released = function() {
+		static released_fn = function() {
 			parent.options_menu.activate();
 		}
 }
@@ -58,7 +67,7 @@ function OptionsButton(_x_pos, _y_pos) :
 function QuitGameButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_quit_game_button) constructor {
 		
-		static on_released = function() {
+		static released_fn = function() {
 			game_end();
 		}
 }

@@ -17,7 +17,10 @@
     "name":"! Parents",
     "path":"folders/Objects/logic_controllers/! Parents.yy",
   },
-  "parentObjectId":null,
+  "parentObjectId":{
+    "name":"logic_controller_base",
+    "path":"objects/logic_controller_base/logic_controller_base.yy",
+  },
   "persistent":false,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,

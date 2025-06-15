@@ -33,8 +33,14 @@ function LevelCard(_x_pos, _y_pos, _level_data) :
 				c_black, c_black, c_black, c_black, 1)
 		}
 		
-		static on_released = function() {
-			room_goto(level_data.level_room);
+		static released_fn = function() {
+			transition_effect = get_room_transition();
+			if(transition_effect != undefined) {
+				transition_effect.transition_out( function() {room_goto(level_data.level_room)} );
+			}
+			else {
+				room_goto(level_data.level_room);
+			}
 		}
 }
 #endregion

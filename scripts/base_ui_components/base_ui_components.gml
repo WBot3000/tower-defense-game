@@ -27,10 +27,12 @@ function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other, _coordinates_defin
 	parent = undefined;
 	x_pos = _x_pos;
 	y_pos = _y_pos;
-	if(_coordinates_defined_relatively && is_instanceof(_parent, UIComponent)) { //Prevents issues with the top-level UIComponent
+	if(is_instanceof(_parent, UIComponent)) { //Prevents issues with the top-level UIComponent
 		parent = _parent;
-		x_pos += parent.x_pos;
-		y_pos += parent.y_pos;
+		if(_coordinates_defined_relatively) {
+			x_pos += parent.x_pos;
+			y_pos += parent.y_pos;
+		}
 	}
 	
 	//TODO: Fetch on a needed basis
@@ -107,8 +109,35 @@ function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other, _coordinates_defin
 		return _highlighted_elem
 	}
 	
-	static on_pressed = function() {}
-	static on_released = function() {}
+	
+	//The function that's called when the UIComponent is first clicked on
+	/*
+		To prevent an absolutely insane amount of:
+			on_pressed_parent
+			on_pressed
+		I decided to limit the on_pressed function to stuff all components do, and then make a separate function called pressed_fn that handles component unique stuff.
+		That way, you can just override pressed_fn instead of needing to do the parent stuff in the child component
+		on_released works the same way
+	*/
+	static pressed_fn = function() {};
+	static on_pressed = function() {
+		_transition = get_room_transition();
+		if(_transition != undefined && _transition.state != TRANSITION_STATE.NOT_FADING) { //Want to disable interaction when a transition effect is running
+			return;
+		}
+		pressed_fn(); //Code from deriving components would go here
+	}
+	
+	
+	static released_fn = function() {};
+	static on_released = function() {
+		_transition = get_room_transition();
+		if(_transition != undefined && _transition.state != TRANSITION_STATE.NOT_FADING) { //Want to disable interaction when a transition effect is running
+			return;
+		}
+		released_fn(); //Code from deriving parents would go here
+	}
+	
 	
 	static clean_up = function() {
 		for(var i = 0; i < array_length(children); ++i) {
@@ -223,8 +252,7 @@ function ToggleSwitch(_x_pos, _y_pos, _label = "Unnamed Toggle") : UIComponent(_
 	static on_toggle = function(){};
 	static on_untoggle = function(){};
 	
-	
-	static on_released = function() {
+	static released_fn = function() {
 		if(is_toggled) {
 			on_untoggle(); //If the switch is toggled, when we click it, it should untoggle
 		}
@@ -259,18 +287,18 @@ function ToggleSwitch(_x_pos, _y_pos, _label = "Unnamed Toggle") : UIComponent(_
 function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 	_min_value = 0, _max_value = 100, _default_value = _max_value) : UIComponent(_x_pos_left, _y_pos) constructor {
 	x_pos_right = _x_pos_right;
-	absolute_x_pos_right = _x_pos_right;
+	
 	if(parent != undefined) {
-		absolute_x_pos_right += parent.x_pos;
+		x_pos_right += parent.x_pos;
 	}
-	//y_pos = _y_pos;
+
 	label = _label
 	min_value = _min_value;
 	max_value = _max_value;
 	
 	current_value = _default_value;
 	//No need to re-calculate this each time we draw the slider
-	current_value_x_pos = map_value(current_value, min_value, max_value, x_pos, absolute_x_pos_right);
+	current_value_x_pos = map_value(current_value, min_value, max_value, x_pos, x_pos_right);
 	
 	is_selected = false;
 	
@@ -279,7 +307,7 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 		//TODO: Passable view_camera index? And maybe rename these variables? Not sure.
 		var _view_x = device_mouse_x_to_gui(0);
 		var _view_y = device_mouse_y_to_gui(0);
-		return (_view_x >= x_pos - 16 && _view_x <= absolute_x_pos_right + 16
+		return (_view_x >= x_pos - 16 && _view_x <= x_pos_right + 16
 			&& _view_y >= y_pos - 16 && _view_y <= y_pos + 16); //TODO: Should probably change 16 to relate to the size of the slider circle sprite.
 	}
 	
@@ -287,14 +315,14 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 	static draw = function() {
 		if(active) {
 			draw_text_color(x_pos, y_pos - 32, label + ": " + string( floor(current_value)), c_white, c_white, c_white, c_white, 1);
-			draw_line_width_color(x_pos, y_pos, absolute_x_pos_right, y_pos, 4, c_white, c_white);
+			draw_line_width_color(x_pos, y_pos, x_pos_right, y_pos, 4, c_white, c_white);
 			draw_sprite((is_selected ? spr_slider_circle_selected : spr_slider_circle_default), 0, current_value_x_pos, y_pos);
 		}
 	}
 	
 	
 	static move_parent = move;
-	static move = function(_x_delta, _y_delta, _is_parent) {
+	static move = function(_x_delta, _y_delta) {
 		move_parent();
 		current_value_x_pos += _x_delta //When moving the slider, we need to move the value of the knob too
 	}
@@ -307,10 +335,10 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 		}
 		else if(_new_x_pos >= absolute_x_pos_right) {
 			current_value = max_value;
-			current_value_x_pos = absolute_x_pos_right;
+			current_value_x_pos = x_pos_right;
 		}
 		else {
-			current_value = map_value(_new_x_pos, x_pos, absolute_x_pos_right, min_value, max_value);
+			current_value = map_value(_new_x_pos, x_pos, x_pos_right, min_value, max_value);
 			current_value_x_pos = _new_x_pos;
 		}
 	}
@@ -326,14 +354,12 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 	}
 	
 	//When the mouse is pressed
-	//TODO: Maybe change this to "on_pressed"?
-	static on_pressed = function() {
+	static pressed_fn = function() {
 		is_selected = true;
 	}
 	
 	//When the mouse is released
-	//TODO: Maybe changet this (and all other "on_released" functions) to "on_released"?
-	static on_released = function() {
+	static released_fn = function() {
 		is_selected = false;
 	}
 }
@@ -377,7 +403,7 @@ function KeyConfig(_x_pos, _y_pos, _key, _label = "Unnamed Toggle") : UIComponen
 	}
 	
 	
-	static on_pressed = function() {
+	static pressed_fn = function() {
 		//TODO: If there's a toggle already selected, de-select it
 		selected = true;
 	};
@@ -438,15 +464,14 @@ function PopupMenu(_menu_width_percentage, _menu_height_percentage, _title) : UI
 	//TODO: Currently assumes all popup menus will start in the center of the screen. Should probably change this assumption.
 	x_pos = (view_w/2) - (_menu_width_percentage/2 * view_w); //From middle point, go to the left by the percentage amount
 	y_pos = (view_h/2) - (_menu_height_percentage/2 * view_h); //From middle point, go up by the percentage amount
-	x_pos = x_pos;
-	y_pos = y_pos;
+	
 	if(parent != undefined) {
 		x_pos += parent.x_pos;
 		y_pos += parent.y_pos;
 	}
 	
 	menu_width = view_w * _menu_width_percentage;
-	menu_height = view_h * _menu_height_percentage
+	menu_height = view_h * _menu_height_percentage;
 	
 	title = _title;
 	
