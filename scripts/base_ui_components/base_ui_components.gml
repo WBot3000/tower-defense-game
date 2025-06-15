@@ -122,7 +122,7 @@ function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other, _coordinates_defin
 	static pressed_fn = function() {};
 	static on_pressed = function() {
 		_transition = get_room_transition();
-		if(_transition != undefined && _transition.state != TRANSITION_STATE.NOT_FADING) { //Want to disable interaction when a transition effect is running
+		if(_transition != undefined && _transition.state != TRANSITION_STATE.NOT_TRANSITIONING) { //Want to disable interaction when a transition effect is running
 			return;
 		}
 		pressed_fn(); //Code from deriving components would go here
@@ -132,7 +132,7 @@ function UIComponent(_x_pos = 0, _y_pos = 0, _parent = other, _coordinates_defin
 	static released_fn = function() {};
 	static on_released = function() {
 		_transition = get_room_transition();
-		if(_transition != undefined && _transition.state != TRANSITION_STATE.NOT_FADING) { //Want to disable interaction when a transition effect is running
+		if(_transition != undefined && _transition.state != TRANSITION_STATE.NOT_TRANSITIONING) { //Want to disable interaction when a transition effect is running
 			return;
 		}
 		released_fn(); //Code from deriving parents would go here

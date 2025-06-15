@@ -4,18 +4,23 @@ This file contains code for handling room transition effects
 enum TRANSITION_STATE {
 	ROOM_IN,
 	ROOM_OUT,
-	NOT_FADING
+	NOT_TRANSITIONING,
+	POST_TRANSITION_DELAY
 }
+
+#macro TRANSITION_DEFAULT_CALL_DELAY seconds_to_roomspeed_frames(0.25)
 
 //Draws a fading transition on top of the screen
 #macro FADING_RATE 0.05
-function FadeTransition(_starting_alpha = 1) constructor {
+function FadeTransition(_starting_alpha = 1, _post_transition_delay = TRANSITION_DEFAULT_CALL_DELAY) constructor {
 	alpha = _starting_alpha;
-	state = TRANSITION_STATE.NOT_FADING;
+	state = TRANSITION_STATE.NOT_TRANSITIONING;
 	view_w =  camera_get_view_width(view_camera[0]);
 	view_h = camera_get_view_height(view_camera[0]);
 	
 	call_fn = function() {};
+	post_transition_delay = _post_transition_delay;
+	delay_timer = 0;
 	
 	static draw = function() {
 		draw_set_alpha(alpha);
@@ -43,15 +48,33 @@ function FadeTransition(_starting_alpha = 1) constructor {
 		    case TRANSITION_STATE.ROOM_IN:
 		        alpha -= FADING_RATE;
 				if(alpha <= 0) {
-					state = TRANSITION_STATE.NOT_FADING;
-					call_fn();
+					if(post_transition_delay > 0) {
+						state = TRANSITION_STATE.POST_TRANSITION_DELAY;
+					}
+					else {
+						state = TRANSITION_STATE.NOT_TRANSITIONING;
+						call_fn();
+					}
 				}
 		        break;
 			case TRANSITION_STATE.ROOM_OUT:
 				alpha += FADING_RATE;
 				if(alpha >= 1) {
-					state = TRANSITION_STATE.NOT_FADING;
+					if(post_transition_delay > 0) {
+						state = TRANSITION_STATE.POST_TRANSITION_DELAY;
+					}
+					else {
+						state = TRANSITION_STATE.NOT_TRANSITIONING;
+						call_fn();
+					}
+				}
+				break;
+			case TRANSITION_STATE.POST_TRANSITION_DELAY:
+				delay_timer++;
+				if(delay_timer >= post_transition_delay) {
+					delay_timer = 0;
 					call_fn();
+					state = TRANSITION_STATE.NOT_TRANSITIONING;
 				}
 				break;
 		    default:
@@ -63,9 +86,8 @@ function FadeTransition(_starting_alpha = 1) constructor {
 
 //Draws a swiping transition on top of the screen
 #macro SWIPE_RATE 40
-#macro SWIPE_FUNCTION_CALL_DELAY seconds_to_roomspeed_frames(0.25)
-function SwipeTransition(_start_with_black = true) constructor {
-	state = TRANSITION_STATE.NOT_FADING;
+function SwipeTransition(_start_with_black = true, _post_transition_delay = TRANSITION_DEFAULT_CALL_DELAY) constructor {
+	state = TRANSITION_STATE.NOT_TRANSITIONING;
 	view_w =  camera_get_view_width(view_camera[0]);
 	view_h = camera_get_view_height(view_camera[0]);
 	
@@ -74,7 +96,8 @@ function SwipeTransition(_start_with_black = true) constructor {
 	x_right = _start_with_black ? view_w : -1;
 	
 	call_fn = function() {};
-	call_fn_timer = 0; //This lets you "hang" on the transition for a while after it has completed
+	post_transition_delay = _post_transition_delay;
+	delay_timer = 0;
 	
 	static draw = function() {
 		draw_rectangle_color(x_left, 0, x_right, view_h, c_black, c_black, c_black, c_black, false);
@@ -106,10 +129,11 @@ function SwipeTransition(_start_with_black = true) constructor {
 		        x_right -= SWIPE_RATE;
 				if(x_right < 0) {
 					x_left = -1;
-					call_fn_timer++;
-					if(call_fn_timer >= SWIPE_FUNCTION_CALL_DELAY) {
-						call_fn_timer = 0;
-						state = TRANSITION_STATE.NOT_FADING;
+					if(post_transition_delay > 0) {
+						state = TRANSITION_STATE.POST_TRANSITION_DELAY;
+					}
+					else {
+						state = TRANSITION_STATE.NOT_TRANSITIONING;
 						call_fn();
 					}
 				}
@@ -117,12 +141,21 @@ function SwipeTransition(_start_with_black = true) constructor {
 			case TRANSITION_STATE.ROOM_OUT:
 				x_left -= SWIPE_RATE;
 				if(x_left <= 0) {
-					call_fn_timer++;
-					if(call_fn_timer >= SWIPE_FUNCTION_CALL_DELAY) {
-						call_fn_timer = 0;
-						state = TRANSITION_STATE.NOT_FADING;
+					if(post_transition_delay > 0) {
+						state = TRANSITION_STATE.POST_TRANSITION_DELAY;
+					}
+					else {
+						state = TRANSITION_STATE.NOT_TRANSITIONING;
 						call_fn();
 					}
+				}
+				break;
+			case TRANSITION_STATE.POST_TRANSITION_DELAY:
+				delay_timer++;
+				if(delay_timer >= post_transition_delay) {
+					delay_timer = 0;
+					call_fn();
+					state = TRANSITION_STATE.NOT_TRANSITIONING;
 				}
 				break;
 		    default:
