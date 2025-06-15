@@ -1,19 +1,71 @@
 /// @description Move the cloud
 
 switch (state) {
-    case CLOUD_STATE.TRAVELING_TO_TARGET: //TODO: Needs to do something if the target is destroyed before being reached (choose another target or just stick with going the same direction?
-        var _vector = vector_to_get_components(x, y, target.x, target.y - TILE_SIZE, true);
+    case CLOUD_STATE.TRAVELING_TO_TARGET:
+        //If the original target no longer exists, pick a new one based on the summoner's current targeting
+		if(!instance_exists(target)) {
+			var _targeting_type = global.TARGETING_CLOSE; //In the event the owner was sold, need a fallback option
+			if(instance_exists(owner)) {
+				_targeting_type = owner.targeting_tracker.get_current_targeting_type();
+			}
+			target = _targeting_type.targeting_fn(self.id, global.ALL_ENEMIES_LIST, true);
+			if(target == noone) { //If no enemies can be found, just dissipate. TODO: Might change this behavior later
+				state = CLOUD_STATE.DISSIPATING
+				break;
+			}
+			ds_list_clear(enemies_in_range);
+		}
+		var _vector = vector_to_get_components(x, y, target.x, target.y - TILE_SIZE, true);
 		x += _vector[VEC_X]*cloud_speed;
 		y += _vector[VEC_Y]*cloud_speed;
+		if(abs(x - target.x) <= cloud_speed) { //Handle precision errors
+			x = target.x;
+		}
+		if(abs(y - (target.y - TILE_SIZE)) <= cloud_speed) {
+			y = target.y - TILE_SIZE;
+		}
 		if(x == target.x && y == target.y - TILE_SIZE) {
 			state = CLOUD_STATE.LINGERING;
 		}
         break;
 	case CLOUD_STATE.LINGERING:
-        // code here
+        if(!instance_exists(target)) {
+			var _targeting_type = global.TARGETING_CLOSE; //In the event the owner was sold, need a fallback option
+			if(instance_exists(owner)) {
+				_targeting_type = owner.targeting_tracker.get_current_targeting_type();
+			}
+			range.get_entities_in_range(base_enemy, enemies_in_range, true);
+			target = _targeting_type.targeting_fn(self.id, enemies_in_range, true);
+			if(target == noone) { //If no enemies can be found, just dissipate. TODO: Might change this behavior later
+				state = CLOUD_STATE.DISSIPATING;
+				
+			}
+			else {
+				state = CLOUD_STATE.TRAVELING_TO_TARGET;
+			}
+			part_emitter_stream(global.PARTICLE_SYSTEM, rain_emitter, global.PARTICLE_RAIN, 0);
+			ds_list_clear(enemies_in_range);
+			break;
+		}
+		
+		x = target.x;
+		y = target.y - TILE_SIZE;
+		part_emitter_region(global.PARTICLE_SYSTEM, rain_emitter, x - 8, x + 8, y + sprite_height, y + sprite_height, ps_shape_rectangle, ps_distr_linear);
+		
+		damage_timer++;
+		if(damage_timer >= seconds_to_damage) {
+			deal_damage(target, cloud_damage);
+			part_emitter_stream(global.PARTICLE_SYSTEM, rain_emitter, global.PARTICLE_RAIN, 1);
+			damage_timer = 0;
+		}
+		linger_timer++;
+		if(linger_timer >= seconds_to_linger) {
+			state = CLOUD_STATE.DISSIPATING;
+		}
         break;
 	case CLOUD_STATE.DISSIPATING:
-        // code here
+        //TODO: Replace this with a dissipating animation
+		instance_destroy();
         break;
     default:
         break;

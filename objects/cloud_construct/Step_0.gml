@@ -16,6 +16,7 @@ switch (health_state) {
 				instance_create_layer((self.bbox_left + self.bbox_right)/2, (self.bbox_top + self.bbox_bottom)/2, PROJECTILE_LAYER, cloud_attack,
 					{
 						target: _enemy_to_target,
+						owner: other,
 						cloud_speed: other.cloud_speed,
 						cloud_damage: other.cloud_damage,
 					});

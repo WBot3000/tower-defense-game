@@ -261,6 +261,7 @@
     {"id":{"name":"spr_pointer_arrow_up","path":"sprites/spr_pointer_arrow_up/spr_pointer_arrow_up.yy",},},
     {"id":{"name":"spr_punch","path":"sprites/spr_punch/spr_punch.yy",},},
     {"id":{"name":"spr_quit_game_button","path":"sprites/spr_quit_game_button/spr_quit_game_button.yy",},},
+    {"id":{"name":"spr_rain","path":"sprites/spr_rain/spr_rain.yy",},},
     {"id":{"name":"spr_restart_button","path":"sprites/spr_restart_button/spr_restart_button.yy",},},
     {"id":{"name":"spr_round_start_button_disabled","path":"sprites/spr_round_start_button_disabled/spr_round_start_button_disabled.yy",},},
     {"id":{"name":"spr_round_start_button_enabled","path":"sprites/spr_round_start_button_enabled/spr_round_start_button_enabled.yy",},},

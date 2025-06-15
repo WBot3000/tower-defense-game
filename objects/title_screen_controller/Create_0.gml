@@ -23,6 +23,16 @@ part_type_orientation(global.PARTICLE_SPARKLE, 0, 0, 0, 0, true);
 part_type_blend(global.PARTICLE_SPARKLE, 0);
 part_type_life(global.PARTICLE_SPARKLE, 20, 40);
 
+global.PARTICLE_RAIN = part_type_create();
+part_type_sprite(global.PARTICLE_RAIN, spr_rain, true, true, false);
+part_type_size(global.PARTICLE_RAIN, 1, 1, 0, 0);
+part_type_alpha3(global.PARTICLE_RAIN, 1, 1, 0);
+part_type_speed(global.PARTICLE_RAIN, 2, 2, 0, 0);
+part_type_direction(global.PARTICLE_RAIN, 270, 270, 0, 0);
+part_type_orientation(global.PARTICLE_RAIN, 90, 90, 0, 0, true);
+part_type_blend(global.PARTICLE_RAIN, 0);
+part_type_life(global.PARTICLE_RAIN, 15, 15);
+
 global.PARTICLE_DIGIT_0 = part_type_create();
 global.PARTICLE_DIGIT_1 = part_type_create();
 global.PARTICLE_DIGIT_2 = part_type_create();

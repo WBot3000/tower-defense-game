@@ -146,6 +146,17 @@ function MeleeRange(_unit) : CircularRange(_unit) constructor {
 function GlobalRange(_unit) : RectangularRange(_unit, 0, 0, room_width, room_height) constructor {
 	static draw_range = function(){};
 }
+
+/*
+	Because the global ranges for detecting a certain thing aren't location-dependent, two global ranges meant to find the same thing are essentially identical, and two entity lists utilizing them are as well.
+	So instead of creating a different ds_list for each unit/enemy that uses it, just one for each kind of target is created, and can then be refererenced.
+	NOTE: Remember not to delete these once a unit/enemy using them is deleted, they're meant to persist for the lifetime of the game.
+	
+	I thought about doing this for the ranges themselves too, but since rooms can be different sizes, I'd need to re-declare them on each room change, and the minor resources save (probably) isn't worth the additional overhead hassle. 
+	If there's massive performance issues, I'll go back and change it.
+*/
+global.ALL_ENEMIES_LIST = ds_list_create();
+global.ALL_UNITS_LIST = ds_list_create();
 #endregion
 
 
@@ -167,10 +178,11 @@ function target_close(_unit, _enemy_list, _list_is_ordered = false) {
 		return _enemy_list[| 0];
 	}
 	var _closest_enemy = _enemy_list[| 0];
-	var _closest_distance = sqrt(sqr(_unit.x - _closest_enemy.x) + sqr(_unit.y - _closest_enemy.y));
+	//NOTE: This is technically the distance SQUARED. However, since we aren't actually using this number for calculations, we don't have to take the square root.
+	var _closest_distance = sqr(_unit.x - _closest_enemy.x) + sqr(_unit.y - _closest_enemy.y);
 	for(var i = 1; i < ds_list_size(_enemy_list); ++i) {
 		var _enemy = _enemy_list[| i];
-		var _distance = sqrt(sqr(_unit.x - _enemy.x) + sqr(_unit.y - _enemy.y));
+		var _distance = sqr(_unit.x - _enemy.x) + sqr(_unit.y - _enemy.y);
 		if(_distance < _closest_distance) {
 			_closest_distance = _distance;
 			_closest_enemy = _enemy;
