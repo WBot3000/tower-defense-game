@@ -1,7 +1,9 @@
-NOTE: For any managers with an on_step function, they should just take the game state as a parameter input. 
-Less costly than fetching the game state manager in each of them.
+NOTE: For any managers with an on_step function, they should just take the game state as a parameter input, or cache it once obtained. 
+Less costly than fetching the game state manager every single time it's needed.
 
 TODO: For drawing and placing units, should I add macros for the offsets (since units have their origin at the bottom-centre instead of the top-left)?
 
+TODO: Not actually sure this is correct, since worm hole spawning behavior is off. Need to check this out
+~~In order to get the percentage per tile along the path, divide the total path length by the tile size.~~
 
-In order to get the percentage per tile along the path, divide the total path length by the tile size.
+TODO: State control for the intro is kind of messy. Ideally, the transition between moving camera -> start splash -> give player control should all be handled by the Game State Manager

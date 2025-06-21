@@ -333,7 +333,7 @@ function Slider(_x_pos_left, _x_pos_right, _y_pos, _label = "Unnamed Slider",
 			current_value = min_value;
 			current_value_x_pos = x_pos;
 		}
-		else if(_new_x_pos >= absolute_x_pos_right) {
+		else if(_new_x_pos >= x_pos_right) {
 			current_value = max_value;
 			current_value_x_pos = x_pos_right;
 		}

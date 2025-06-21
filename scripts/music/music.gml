@@ -26,7 +26,7 @@
 	
 	TODO: Currently, this assumes that all music should loop. Should add support for non-looping music.
 */
-function MusicManager(_initial_music/*, _initial_volume = global.GAME_CONFIG_SETTINGS.music_volume*/) constructor {
+function MusicManager(_initial_music) constructor {
 	current_music = _initial_music;
 	current_music_ref = -1;
 	//volume = _initial_volume

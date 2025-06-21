@@ -1,6 +1,7 @@
-Most distance variables on the number of tiles covered (a 64 x 64 square).
+Most distance variables are based on the number of tiles covered (a 64 x 64 square).
 These can be converted into pixels through the "tilesize_to_pixels" function in the "conversions" script.
 If you see a function, [assume it takes distance as tiles], then does coversions as needed.
+HOWEVER, movement for graphical elements is generally based on pixels directly, as these have no relation to the tile-based system used by the game anyways.
 
 Most time variables on number of seconds
 These can be converted into frames through the "seconds_to_roomspeed_frames" function in the "conversions" script.

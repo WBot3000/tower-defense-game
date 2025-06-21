@@ -1,20 +1,34 @@
 /// @description Run the camera controller, round manager and handle menu resizing selection
 transition_effect.on_step();
 
-#region Gathering User Inputs
+#region Gathering Necessary User Inputs (some of this is handled in other functions)
 var _mouse_left_pressed = mouse_check_button_pressed(mb_left);
 var _mouse_left_released = mouse_check_button_released(mb_left);
 var _mouse_right_released = mouse_check_button_released(mb_right);
 
-//var _q_pressed = keyboard_check_pressed(ord("Q"));
-//var _e_pressed = keyboard_check_pressed(ord("E"));
-//var _f_pressed = keyboard_check_pressed(ord("F"));
+var _pause_toggle_pressed = keyboard_check_pressed(ord(global.GAME_CONFIG_SETTINGS.controls.pause_game_key));
 var _o_pressed = keyboard_check_pressed(ord("O"));
 var _p_pressed = keyboard_check_pressed(ord("P"));;
 #endregion
 
+
+#region Run Managers
+//Check to see if the music should be changed based on events in the game
+global.BACKGROUND_MUSIC_MANAGER.on_step();
+
+//"Advance" the round spawning timer
+round_manager.on_step(game_state_manager.state);
+
+//Perform any necessary camera movement based on user_input or game state
+camera_controller.move_camera(game_state_manager.state);
+
+//Perform any per-frame UI changes, and check to see if you're highlighting a UI element at the moment.
+var _elem_highlighted = game_ui.on_step();
+#endregion
+
+
 //Check to see if the game should be paused or unpaused
-if(keyboard_check_pressed(ord(global.GAME_CONFIG_SETTINGS.controls.pause_game_key))) {
+if(_pause_toggle_pressed) {
 	if(game_state_manager.state == GAME_STATE.RUNNING) {
 		game_state_manager.pause_game();
 	}
@@ -22,19 +36,6 @@ if(keyboard_check_pressed(ord(global.GAME_CONFIG_SETTINGS.controls.pause_game_ke
 		game_state_manager.resume_game();
 	}
 }
-
-//Check to see if the music should be changed based on events in the game
-global.BACKGROUND_MUSIC_MANAGER.on_step();
-
-
-//"Advance" the round spawning timer
-round_manager.on_step(game_state_manager.state);
-
-//Perform any necessary camera movement based on user_input
-camera_controller.move_camera(game_state_manager.state);
-
-//Perform any per-frame UI changes, and check to see if you're highlighting a UI element at the moment.
-var _elem_highlighted = game_ui.on_step();
 
 //Not over a UI element, so you can take actions on the game field.
 if(_elem_highlighted == undefined && _mouse_left_released) {

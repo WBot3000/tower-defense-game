@@ -8,6 +8,38 @@
 	NEW DESCRIPTION:
 	Since the file was broken up, this now just contains the UI components for the game rounds
 */
+#region StartSplash (Class)
+/*
+	Used for displaying the little "start" at the beginning of the game
+*/
+#macro START_SPLASH_NUM_SECONDS seconds_to_roomspeed_frames(2)
+function StartSplash() : UIComponent() constructor {
+	x_pos = view_w/2;
+	y_pos = view_h/2;
+	on_screen_timer = 0;
+	num_seconds_to_display = START_SPLASH_NUM_SECONDS;
+	
+	static draw = function() {
+		draw_sprite(spr_start, 1, x_pos, y_pos);
+	}
+	
+	static on_step = function() {
+		//TODO: Rework on_step events like with the button on_click events, where there's one function that checks for active status and runs all the child on steps, and another where you can define component-specific on-step stuff
+		//This was causing an issue with the camera sequences because it was running even when the component wasn't active, causing the game to start prematurely
+		if(!active) {
+			return undefined
+		}
+		on_screen_timer++;
+		if(on_screen_timer >= num_seconds_to_display) {
+			var _game_state_manager = get_game_state_manager();
+			if(_game_state_manager != undefined) {
+				_game_state_manager.start_game();
+			}
+		}
+	}
+}
+#endregion
+
 
 #region PauseButton (Class)
 /*
@@ -1300,6 +1332,7 @@ function GameUI(_controller_obj, _purchase_data) : UIComponent() constructor {
 	//controller_obj = _controller_obj;
 	
 	//Pure Display Elements (no interactivity)
+	start_splash = new StartSplash();
 	game_info_display = new GameInfoDisplay(_controller_obj);
 	pause_background = -1; //Used in conjunction with the pause menu in order to continue showing all the instances on screen after they're deactivated
 	//NOTE: pause_background IS NOT a UI element, so don't treat it like one.
@@ -1317,23 +1350,26 @@ function GameUI(_controller_obj, _purchase_data) : UIComponent() constructor {
 	
 	children = [game_info_display,
 		pause_button, round_start_button,
-		purchase_menu, unit_info_card, options_menu, end_results_card];
+		purchase_menu, unit_info_card, options_menu, end_results_card, start_splash];
 		
 	active = true //We can just do this here instead of calling activate/deactivate, since this UI should always be active
 	
+	static set_gui_intro = function() {
+		start_splash.activate(); //Being somewhat lazy here, since this should always be the first "set" function called, I just activated the start splash without any deactivation stuff
+	}
 	
 	static set_gui_running = function() {
 		if(pause_background != -1) {
 			sprite_delete(pause_background);
 			pause_background = -1;
 		}
-		
 		game_info_display.activate();
 		purchase_menu.activate();
 		unit_info_card.activate();
 		pause_button.activate();
 		round_start_button.activate();
 		
+		start_splash.deactivate();
 		options_menu.deactivate();
 		end_results_card.deactivate();
 	}
@@ -1351,6 +1387,7 @@ function GameUI(_controller_obj, _purchase_data) : UIComponent() constructor {
 		unit_info_card.activate();
 		options_menu.activate();
 		
+		start_splash.deactivate();
 		pause_button.deactivate();
 		round_start_button.deactivate();
 		end_results_card.deactivate();
@@ -1372,6 +1409,7 @@ function GameUI(_controller_obj, _purchase_data) : UIComponent() constructor {
 		purchase_menu.activate();
 		unit_info_card.activate();
 		
+		start_splash.deactivate();
 		pause_button.deactivate();
 		round_start_button.deactivate();	
 	}

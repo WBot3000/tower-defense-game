@@ -6,9 +6,6 @@
   "inheritCreationOrder":false,
   "inheritLayers":false,
   "instanceCreationOrder":[
-    {"name":"inst_43249BB4_1","path":"rooms/SampleLevel2/SampleLevel2.yy",},
-    {"name":"inst_733147DB_1","path":"rooms/SampleLevel2/SampleLevel2.yy",},
-    {"name":"inst_4E1837CF","path":"rooms/SampleLevel2/SampleLevel2.yy",},
     {"name":"inst_2AA06C6F","path":"rooms/SampleLevel2/SampleLevel2.yy",},
     {"name":"inst_508286FE","path":"rooms/SampleLevel2/SampleLevel2.yy",},
     {"name":"inst_21011222","path":"rooms/SampleLevel2/SampleLevel2.yy",},
@@ -273,6 +270,9 @@
     {"name":"inst_7034A0D7","path":"rooms/SampleLevel2/SampleLevel2.yy",},
     {"name":"inst_228F16BC","path":"rooms/SampleLevel2/SampleLevel2.yy",},
     {"name":"inst_4724839E","path":"rooms/SampleLevel2/SampleLevel2.yy",},
+    {"name":"inst_733147DB_1","path":"rooms/SampleLevel2/SampleLevel2.yy",},
+    {"name":"inst_4E1837CF","path":"rooms/SampleLevel2/SampleLevel2.yy",},
+    {"name":"inst_43249BB4_1","path":"rooms/SampleLevel2/SampleLevel2.yy",},
   ],
   "isDnd":false,
   "layers":[
@@ -587,7 +587,7 @@
   },
   "sequenceId":null,
   "views":[
-    {"hborder":32,"hport":540,"hspeed":-1,"hview":540,"inherit":false,"objectId":null,"vborder":32,"visible":true,"vspeed":-1,"wport":960,"wview":960,"xport":0,"xview":0,"yport":0,"yview":160,},
+    {"hborder":32,"hport":540,"hspeed":-1,"hview":540,"inherit":false,"objectId":null,"vborder":32,"visible":true,"vspeed":-1,"wport":960,"wview":960,"xport":0,"xview":0,"yport":0,"yview":114,},
     {"hborder":32,"hport":768,"hspeed":-1,"hview":768,"inherit":false,"objectId":null,"vborder":32,"visible":false,"vspeed":-1,"wport":1366,"wview":1366,"xport":0,"xview":0,"yport":0,"yview":0,},
     {"hborder":32,"hport":768,"hspeed":-1,"hview":768,"inherit":false,"objectId":null,"vborder":32,"visible":false,"vspeed":-1,"wport":1366,"wview":1366,"xport":0,"xview":0,"yport":0,"yview":0,},
     {"hborder":32,"hport":768,"hspeed":-1,"hview":768,"inherit":false,"objectId":null,"vborder":32,"visible":false,"vspeed":-1,"wport":1366,"wview":1366,"xport":0,"xview":0,"yport":0,"yview":0,},

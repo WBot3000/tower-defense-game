@@ -53,7 +53,7 @@ function vector_to_get_components(source_x, source_y, dest_x, dest_y, normalized
 	var _vector_y = dest_y - source_y;
 	var _vector_len = sqrt(sqr(_vector_x) + sqr(_vector_y));
 	
-	if(normalized) { //Set this when you want to use these components in a Step event for things like movement
+	if(normalized && _vector_len > 0) { //Set this when you want to use these components in a Step event for things like movement (need the vector_len > 0 check to make sure you aren't dividing by zero)
 		_vector_x = _vector_x / _vector_len;
 		_vector_y = _vector_y / _vector_len;
 	}

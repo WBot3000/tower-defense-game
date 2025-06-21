@@ -6,10 +6,6 @@
   "inheritCreationOrder":false,
   "inheritLayers":false,
   "instanceCreationOrder":[
-    {"name":"inst_43249BB4_1_1","path":"rooms/SampleLevel3/SampleLevel3.yy",},
-    {"name":"inst_733147DB_1_1","path":"rooms/SampleLevel3/SampleLevel3.yy",},
-    {"name":"inst_4E1837CF_1","path":"rooms/SampleLevel3/SampleLevel3.yy",},
-    {"name":"inst_642DD2A9","path":"rooms/SampleLevel3/SampleLevel3.yy",},
     {"name":"inst_49722F5","path":"rooms/SampleLevel3/SampleLevel3.yy",},
     {"name":"inst_16D07294","path":"rooms/SampleLevel3/SampleLevel3.yy",},
     {"name":"inst_3A8783FB","path":"rooms/SampleLevel3/SampleLevel3.yy",},
@@ -340,6 +336,10 @@
     {"name":"inst_41C4D48","path":"rooms/SampleLevel3/SampleLevel3.yy",},
     {"name":"inst_5D7C708A","path":"rooms/SampleLevel3/SampleLevel3.yy",},
     {"name":"inst_6AC251D7","path":"rooms/SampleLevel3/SampleLevel3.yy",},
+    {"name":"inst_4E1837CF_1","path":"rooms/SampleLevel3/SampleLevel3.yy",},
+    {"name":"inst_642DD2A9","path":"rooms/SampleLevel3/SampleLevel3.yy",},
+    {"name":"inst_733147DB_1_1","path":"rooms/SampleLevel3/SampleLevel3.yy",},
+    {"name":"inst_43249BB4_1_1","path":"rooms/SampleLevel3/SampleLevel3.yy",},
   ],
   "isDnd":false,
   "layers":[

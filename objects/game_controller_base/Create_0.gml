@@ -29,9 +29,16 @@ round_manager = new RoundManager(self.id, array_length(current_level_data.round_
 purchase_manager = new PurchaseManager();
 
 camera_controller = new CameraController();
+#endregion
 
-//music_manager = new MusicManager(Music_PreRound);
-global.BACKGROUND_MUSIC_MANAGER.set_music(Music_PreRound);
+
+#region Camera Level-Start Movement Initialization
+//NOTE: Make sure all the targets are initialized BEFORE this controller, otherwise this won't work properly
+with(base_target) {
+	other.camera_controller.add_instance_location_to_sequence(self)
+}
+//Go back to starting camera position once you've seen all the targets in the level
+camera_controller.add_location_to_sequence(camera_get_view_x(view_camera[0]), camera_get_view_y(view_camera[0]), 0);
 #endregion
 
 
@@ -51,6 +58,9 @@ purchase_data = [
 
 #endregion
 
+//Fade out music from the Level Select screen
+global.BACKGROUND_MUSIC_MANAGER.fade_out_current_music(seconds_to_roomspeed_frames(2));
+
 
 #region GUI Data
 game_ui = new GameUI(self.id, purchase_data);
@@ -60,8 +70,21 @@ game_ui = new GameUI(self.id, purchase_data);
 	So to handle this, the GUI needs to be set to running mode.
 	Normally, the Game State Manager handles this, but here is done manually the first time (since the Game State Manager is created before the GUI).
 */
-game_ui.set_gui_running();
+//game_ui.set_gui_running();
 
 transition_effect = new SwipeTransition()
-transition_effect.transition_in();
+//TODO: Uh oh, is this starting to become callback hell? I don't wanna rewrite Javascript async though.
+//NOTE: Didn't do checks in callback functions because we KNOW these things exist at this point. If they don't, something's seriously gone wrong
+transition_effect.transition_in(function() { //Callback after transition
+		//This will kick off the camera's movement at the beginning of the level
+		var _camera_controller = get_camera_controller();
+		camera_controller.start_current_sequence(CAM_NUM_SECONDS_FROZEN_DEFAULT/2,
+			function() { //Callback after camera auto sequence
+				/*
+				var _game_state_manager = get_game_state_manager();
+				_game_state_manager.resume_game();*/
+				var _game_ui = get_game_ui();
+				_game_ui.set_gui_intro();
+			});
+	});
 #endregion

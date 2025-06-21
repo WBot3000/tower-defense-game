@@ -10,13 +10,15 @@
 #region GameStateManager (Class)
 /*
 	Enums for different game states
-	RUNNING: Game is running, enemies should move
+	INTRO: Running the camera-panning intro, don't let the player do anything at the moment.
+	RUNNING: Game is running, enemies should move, units should fight back
 	PAUSED: Game is paused, units and enemies shouldn't move or attack
 	VICTORY: Game has been won
 	DEFEAT: Game has been lost (might be able to merge into a single end condition with victory)
 	UNDEFINED: Game state returned when there's no valid game controller. Should never be set to.
 */
 enum GAME_STATE {
+	INTRO,
 	RUNNING,
 	PAUSED,
 	VICTORY,
@@ -30,12 +32,12 @@ enum GAME_STATE {
 	
 	Controller object is passed so we don't have to fetch it every time we want to work with it.
 */
-function GameStateManager(_controller_obj, _initial_state = GAME_STATE.RUNNING) constructor {
+function GameStateManager(_controller_obj, _initial_state = GAME_STATE.INTRO) constructor {
 	controller_obj = _controller_obj
 	state = _initial_state;
 	
 	static pause_game = function() {
-		if(state == GAME_STATE.RUNNING) { //Shouldn't be able to pause Victory or Defeat states
+		if(state == GAME_STATE.RUNNING) { //Shouldn't be able to pause states that aren't RUNNING
 			state = GAME_STATE.PAUSED;
 			with(controller_obj) {
 				instance_deactivate_all(true); //Keep the manager object alive, otherwise the game will just stop working
@@ -54,6 +56,16 @@ function GameStateManager(_controller_obj, _initial_state = GAME_STATE.RUNNING) 
 					game_ui.set_gui_running();
 				}
 			}
+	}
+	
+	
+	static start_game = function() { //Used for setting the game state to RUNNING for the first time. Need to do some extra initialization stuff on top of the standard resume_game call
+		if(controller_obj.camera_controller != undefined) {
+			controller_obj.camera_controller.state = CAMERA_STATE.PLAYER_MOVABLE;
+		}
+		global.BACKGROUND_MUSIC_MANAGER.set_music(Music_PreRound);
+		resume_game();
+		
 	}
 	
 	static win_game = function() {

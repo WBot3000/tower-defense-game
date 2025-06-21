@@ -1,0 +1,2 @@
+Since the level's logic controller object utilizes the placed target instances in the room, it needs to be initialized AFTER all of the targets have been.
+In general, the logic controller should be the LAST thing initialized in a room.

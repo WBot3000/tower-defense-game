@@ -29,7 +29,7 @@ draw_set_alpha(0.25);
 draw_rectangle_color(_tile_at_mouse.x, _tile_at_mouse.y, _tile_at_mouse.x + TILE_SIZE, _tile_at_mouse.y + TILE_SIZE,
 	_highlight_color, _highlight_color, _highlight_color, _highlight_color, false);
 draw_set_alpha(1);
-
+draw_sprite(spr_tile_hover, 1, _tile_at_mouse.x, _tile_at_mouse.y)
 
 //Draw the currently selected unit in grayscale
 if(purchase_manager.currently_selected_purchase != undefined) {
