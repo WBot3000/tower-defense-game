@@ -12,7 +12,7 @@
 /*
 	Used for displaying the little "start" at the beginning of the game
 */
-#macro START_SPLASH_NUM_SECONDS seconds_to_roomspeed_frames(2)
+#macro START_SPLASH_NUM_SECONDS seconds_to_roomspeed_frames(1)
 function StartSplash() : UIComponent() constructor {
 	x_pos = view_w/2;
 	y_pos = view_h/2;
@@ -795,6 +795,10 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _sele
 		if(unit_upgrade_data != undefined) {
 			global.player_money -= unit_upgrade_data.price;
 			with(selected_unit) {	
+				//TODO: Need a better way to perform upgrades
+				//1) I want to be able to run new code on upgrade. Can put it in create event and set flag to true, but I don't want to run destroy/clean up events
+				//2) The reference becomes invalid on the frame the instance is changed. Don't want that
+				//In general, I should work on a more data-oriented approach to defining units.
 				instance_change(other.unit_upgrade_data.upgrade_to, false);
 			}
 		}

@@ -78,7 +78,7 @@ transition_effect = new SwipeTransition()
 transition_effect.transition_in(function() { //Callback after transition
 		//This will kick off the camera's movement at the beginning of the level
 		var _camera_controller = get_camera_controller();
-		camera_controller.start_current_sequence(CAM_NUM_SECONDS_FROZEN_DEFAULT/2,
+		camera_controller.start_current_sequence(CAM_NUM_SECONDS_HANGING_DEFAULT/2,
 			function() { //Callback after camera auto sequence
 				/*
 				var _game_state_manager = get_game_state_manager();

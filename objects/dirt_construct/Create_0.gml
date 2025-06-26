@@ -31,14 +31,16 @@ shot_speed = 15;
 
 unit_buffs = [];
 
-//Stat Upgrades
-stat_upgrades = [undefined, undefined, undefined, undefined];
+//Stat Upgrades (TODO: Currently bugged, probably need to update some UI code too)
+stat_upgrades = [new DirtConstructDamageUpgrade(self.id), new DirtConstructAttackSpeedUpgrade(self.id), 
+	new DirtConstructRestorationUpgrade(self.id), undefined];
 
 //Unit Upgrades
-unit_upgrade_1 = undefined;
+unit_upgrade_1 = new UpgradeDirtConstruct1();
 unit_upgrade_2 = undefined;
 unit_upgrade_3 = undefined;
 
 sell_price = global.DATA_PURCHASE_DIRT.price * SELL_PRICE_REDUCTION;
 
 //TODO: Animation controller?
+animation_controller = new AnimationController(self, global.DATA_UNIT_DIRT_ANIMBANK);

@@ -9,7 +9,7 @@
 #region CameraController (Class)
 #macro CAM_SCROLL_SPEED_PLAYER 4 //How many pixels the camera should move each frame (when controlled by the player)
 #macro CAM_SCROLL_SPEED_AUTO 8 //How many pixels the camera should move each frame (when controlled by the game)
-#macro CAM_NUM_SECONDS_FROZEN_DEFAULT seconds_to_roomspeed_frames(2) //Default value for how many seconds should the camera stay frozen before switching modes
+#macro CAM_NUM_SECONDS_HANGING_DEFAULT seconds_to_roomspeed_frames(2) //Default value for how many seconds should the camera stay frozen before switching modes
 
 //Enums for when the camera should be movable by the player, and when it should be frozen
 enum CAMERA_STATE {
@@ -27,7 +27,7 @@ enum CAMERA_SEQUENCE_STATE {
 /*
 	A data point refering to where the camera should go to in a sequence, alongside how long it should hold on said point before moving on to the next one.
 */
-function CameraSequenceData(_dest_x, _dest_y, _seconds_to_hang = CAM_NUM_SECONDS_FROZEN_DEFAULT) constructor {
+function CameraSequenceData(_dest_x, _dest_y, _seconds_to_hang = CAM_NUM_SECONDS_HANGING_DEFAULT) constructor {
 	dest_x = _dest_x;
 	dest_y = _dest_y;
 	seconds_to_hang = _seconds_to_hang;
@@ -35,7 +35,7 @@ function CameraSequenceData(_dest_x, _dest_y, _seconds_to_hang = CAM_NUM_SECONDS
 
 /*
 */
-function CameraSequence(_initial_seconds_to_hang = CAM_NUM_SECONDS_FROZEN_DEFAULT,
+function CameraSequence(_initial_seconds_to_hang = CAM_NUM_SECONDS_HANGING_DEFAULT,
 	_after_sequence_callback = function(){}) constructor {
 	sequence_queue = []
 	sequence_state = CAMERA_SEQUENCE_STATE.CAMERA_HANGING;
@@ -48,7 +48,7 @@ function CameraSequence(_initial_seconds_to_hang = CAM_NUM_SECONDS_FROZEN_DEFAUL
 	
 	
 	//This data will be used to move the camera to a certain location when it's in AUTO_MOVABLE mode
-	static add_location = function(_dest_x, _dest_y, _seconds_to_hang = CAM_NUM_SECONDS_FROZEN_DEFAULT) {
+	static add_location = function(_dest_x, _dest_y, _seconds_to_hang = CAM_NUM_SECONDS_HANGING_DEFAULT) {
 		//Need to make sure they don't go beyond the level itself (hence the max and min checks)
 		//Right and down checks subtract the width/height of the view since coordinates are based on the top-left corner of the camera
 		//NOTE: I'm not caching these since they're only used once, and passing them through the camera manager would be ugly
@@ -146,17 +146,17 @@ function CameraController() constructor {
 	move_to_vector_y = 0;
 	
 	frozen_timer = 0;
-	num_seconds_frozen = -1; //Start out with indefinite freeze, then switch to CAM_NUM_SECONDS_FROZEN_DEFAULT when we want to start movement.
+	num_seconds_frozen = -1; //Start out with indefinite freeze, then switch to CAM_NUM_SECONDS_HANGING_DEFAULT when we want to start movement.
 	
 
 	//This data will be used to move the camera to a certain location when it's in SEQUENCE_MOVABLE mode
-	static add_location_to_sequence = function(_dest_x, _dest_y, _seconds_to_hang = CAM_NUM_SECONDS_FROZEN_DEFAULT) {
+	static add_location_to_sequence = function(_dest_x, _dest_y, _seconds_to_hang = CAM_NUM_SECONDS_HANGING_DEFAULT) {
 		current_sequence.add_location(_dest_x, _dest_y, _seconds_to_hang);
 	}
 
 
 	//This data will be used to move the camera so that a certain instance is centered when it's in SEQUENCE_MOVABLE mode
-	static add_instance_location_to_sequence = function(_instance, _seconds_to_hang = CAM_NUM_SECONDS_FROZEN_DEFAULT) {
+	static add_instance_location_to_sequence = function(_instance, _seconds_to_hang = CAM_NUM_SECONDS_HANGING_DEFAULT) {
 		//Camera coordinates are based on the top-left position of the screen, so need to make adjustments based on that
 		var _instance_camera_x = get_bbox_center_x(_instance) - view_w/2;
 		var _instance_camera_y = get_bbox_center_y(_instance) - view_h/2;
@@ -164,7 +164,7 @@ function CameraController() constructor {
 	}
 	
 	//Revokes camera control from the player, and starts the current camera auto-movement sequence
-	static start_current_sequence = function(_initial_seconds_to_hang = CAM_NUM_SECONDS_FROZEN_DEFAULT, _after_sequence_callback = function(){}) {
+	static start_current_sequence = function(_initial_seconds_to_hang = CAM_NUM_SECONDS_HANGING_DEFAULT, _after_sequence_callback = function(){}) {
 		//Initialize camera sequence values
 		current_sequence.current_seconds_to_hang = _initial_seconds_to_hang;
 		current_sequence.after_sequence_callback = _after_sequence_callback;

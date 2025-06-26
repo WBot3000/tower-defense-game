@@ -1,5 +1,7 @@
 /// @description Look for enemy, then fire (or recover health if knocked out)
 
+animation_controller.on_step();
+
 switch (health_state) {
     case UNIT_STATE.ACTIVE:
 		shot_timer++;
@@ -15,6 +17,7 @@ switch (health_state) {
 				direction_facing = get_entity_facing_direction(self, _enemy_to_target.x);
 				image_xscale = direction_facing; //Seperate variables for now just in case I want to do other things with direction_facing
 				
+				animation_controller.set_animation("SHOOT");
 				instance_create_layer((self.bbox_left + self.bbox_right)/2, (self.bbox_top + self.bbox_bottom)/2, PROJECTILE_LAYER, dirt_ball,
 					{
 						x_speed: _vector[VEC_X] * other.shot_speed,
@@ -28,6 +31,7 @@ switch (health_state) {
 		}
 		
 		if(current_health <= 0) {
+			animation_controller.set_animation("ON_KO"); //TODO: Write code for chaining animations together
 			health_state = UNIT_STATE.KNOCKED_OUT;
 			shot_timer = 0;
 		}
@@ -37,7 +41,7 @@ switch (health_state) {
 		var _amount_to_recover = recovery_rate / seconds_to_roomspeed_frames(1);
 		current_health = min(max_health, current_health + _amount_to_recover);
 		if(current_health >= max_health) {
-			//animation_controller.set_animation(spr_sample_gunner, LOOP_FOREVER);
+			animation_controller.set_animation("ON_RESTORE");
 			health_state = UNIT_STATE.ACTIVE; 
 		}
 		break;

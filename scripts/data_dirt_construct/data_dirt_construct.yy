@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"data_dirt_construct",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"data_dirt_construct",
+  "parent":{
+    "name":"units",
+    "path":"folders/Scripts/data/units.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

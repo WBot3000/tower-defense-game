@@ -43,5 +43,5 @@ curr_direction = DIRECTION.DOWN;
 
 sell_price = 100 * SELL_PRICE_REDUCTION;
 
-animation_controller = new AnimationController(self.id, spr_sample_brawler_down);
+animation_controller = new OldAnimationController(self.id, spr_sample_brawler_down);
 

@@ -67,7 +67,7 @@ if(!variable_instance_exists(self.id, "shot_timer")) {
 }
 
 if(!variable_instance_exists(self.id, "animation_controller")) { 
-	animation_controller = new AnimationController(self.id, spr_sample_gunner_upgrade_1);
+	animation_controller = new OldAnimationController(self.id, spr_sample_gunner_upgrade_1);
 }
 
 

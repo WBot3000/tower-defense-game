@@ -13,10 +13,8 @@ if(x >= 0 && x <= room_width && y >= 0 && y <= room_height) { //Only need to do 
 	collision_line_list(x, y, _end_x, _end_y, base_enemy, false, true, enemies_in_range, true);
 
 	if(ds_list_size(enemies_in_range) > 0) {
-		//Damage all enemies that should get hit by the projectile
-		for(var i = 0; i < ds_list_size(enemies_in_range); i++) {
-			deal_damage(enemies_in_range[| i], bullet_damage);
-		}
+		//Damage an enemy that should get hit by the projectile
+		deal_damage(enemies_in_range[| 0], bullet_damage);
 		
 		//Destroy the bullet
 		instance_destroy()

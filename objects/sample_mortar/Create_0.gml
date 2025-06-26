@@ -39,4 +39,4 @@ shot_timer = 120; //When the unit is placed, takes less time to take a shot.
 
 sell_price = 200 * SELL_PRICE_REDUCTION;
 
-animation_controller = new AnimationController(self.id, spr_sample_mortar);
+animation_controller = new OldAnimationController(self.id, spr_sample_mortar);
