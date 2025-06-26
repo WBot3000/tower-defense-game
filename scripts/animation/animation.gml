@@ -156,7 +156,7 @@ function AnimationController(_entity_obj, _animation_bank, _starting_animation_r
 		if(num_times_played <= LOOP_FOREVER) {
 			exit;
 		}
-		if(prev_image_index < entity_obj.image_index/*(entity_obj.image_index < entity_obj.image_number - entity_obj.image_speed)*/) { //TODO: Broken
+		if(prev_image_index < entity_obj.image_index) {
 			prev_image_index = entity_obj.image_index;
 			exit;
 		}
