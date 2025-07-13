@@ -31,7 +31,7 @@ function MusicManager(_initial_music) constructor {
 	current_music_ref = -1;
 	//volume = _initial_volume
 	if(_initial_music != undefined) {
-		current_music_ref = audio_play_sound(_initial_music, MAX_AUDIO_PRIORITY, true, global.GAME_CONFIG_SETTINGS.music_volume / 100);
+		current_music_ref = audio_play_sound(_initial_music, MAX_AUDIO_PRIORITY, true, global.GAME_CONFIG_OPTIONS.music_volume / 100);
 	}
 	
 	fading_out = false;
@@ -47,14 +47,14 @@ function MusicManager(_initial_music) constructor {
 		}
 		audio_stop_sound(current_music_ref);
 		current_music = _new_music;
-		current_music_ref = audio_play_sound(_new_music, MAX_AUDIO_PRIORITY, true);
+		current_music_ref = audio_play_sound(_new_music, MAX_AUDIO_PRIORITY, true, global.GAME_CONFIG_OPTIONS.music_volume / 100);
 	}
 	
 	
 	static adjust_volume = function(/*_new_volume*/) {
 		//volume = _new_volume;
 		if(current_music_ref != -1) {
-			audio_sound_gain(current_music_ref, global.GAME_CONFIG_SETTINGS.music_volume / 100, 0);
+			audio_sound_gain(current_music_ref, global.GAME_CONFIG_OPTIONS.music_volume / 100, 0);
 		}
 	}
 	
@@ -76,7 +76,7 @@ function MusicManager(_initial_music) constructor {
 			fading_start = -1;
 			if(next_music != undefined) {
 				current_music = next_music;
-				current_music_ref = audio_play_sound(next_music, MAX_AUDIO_PRIORITY, true, global.GAME_CONFIG_SETTINGS.music_volume / 100);
+				current_music_ref = audio_play_sound(next_music, MAX_AUDIO_PRIORITY, true, global.GAME_CONFIG_OPTIONS.music_volume / 100);
 				next_music = undefined;
 			}
 			else {
@@ -91,5 +91,5 @@ global.BACKGROUND_MUSIC_MANAGER = new MusicManager();
 
 //Don't need an entire manager for just sound effects. Just prioritize whatever was played most recently
 function play_sound_effect(sound_effect) {
-	audio_play_sound(sound_effect, 1, false, global.GAME_CONFIG_SETTINGS.sound_effects_volume / 100);
+	audio_play_sound(sound_effect, 1, false, global.GAME_CONFIG_OPTIONS.sound_effects_volume / 100);
 }

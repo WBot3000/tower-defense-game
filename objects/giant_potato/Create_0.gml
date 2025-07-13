@@ -1,8 +1,3 @@
-/// @description Insert description here
+/// @description Initialize entity data
 
-// Inherit the parent event
-event_inherited();
-
-max_health = 1000;
-current_health = 1000;
-
+entity_data = new Target(1000);

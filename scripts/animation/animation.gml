@@ -59,6 +59,22 @@ function UnitAnimationBank(_idle_active_animation, _idle_ko_animation = _idle_ac
 #endregion
 
 
+#region EnemyAnimationBank (Class)
+/*
+	Contains a series of animations that can be referenced in the same place.
+	Allows the passing of certain animations in the constructor to make initialization easier.
+*/
+function EnemyAnimationBank(_default_active_animation, _on_spawn_animation = _default_active_animation, 
+	_on_ko_animation = spr_enemy_defeated) : AnimationBank() constructor {
+		add_animation("DEFAULT_ACTIVE", _default_active_animation); //Default animation used by the enemy (usually some sort of movement animation)
+		add_animation("ON_SPAWN", _on_spawn_animation);	//Animation that plays when the enemy is spawned (useful for if they spawn on-screen)
+		add_animation("ON_KO", _on_ko_animation); //Animation that plays when the enemy's health reaches 0, and they get defeated
+
+		set_default_animation("DEFAULT_ACTIVE");
+}
+#endregion
+
+
 #region AnimationController (Class)
 #macro LOOP_FOREVER -1
 
@@ -85,6 +101,7 @@ function AnimationController(_entity_obj, _animation_bank, _starting_animation_r
 
 	num_times_played = LOOP_FOREVER;
 	played_counter = 0;
+	post_animation_callback = undefined;
 	
 	prev_image_index = -1;
 	
@@ -95,8 +112,9 @@ function AnimationController(_entity_obj, _animation_bank, _starting_animation_r
 		
 		Returns true if the animation was set successfully, returns false otherwise
 	*/
-	static set_animation = function(_animation_ref, _num_times_played = 1) {
+	static set_animation = function(_animation_ref, _num_times_played = 1, _post_animation_callback = undefined) {
 		var _sprite = animation_bank.get_animation(_animation_ref);
+		//TODO: Fallback on default animation?
 		if(_sprite == undefined) {
 			show_debug_message("Attempted to reference an animation that doesn't exist using reference: " + _animation_ref);
 			return false
@@ -107,6 +125,8 @@ function AnimationController(_entity_obj, _animation_bank, _starting_animation_r
 		played_counter = 0;
 		num_times_played = _num_times_played;
 		prev_image_index = -1;
+		
+		post_animation_callback = _post_animation_callback;
 		
 		with(entity_obj) {
 			sprite_index = _sprite;
@@ -130,6 +150,8 @@ function AnimationController(_entity_obj, _animation_bank, _starting_animation_r
 			sprite_index = _replacement_animation;
 			image_index = _new_image_index;
 		}
+		
+		animation_bank = _new_animation_bank;
 	}
 	
 	
@@ -164,6 +186,9 @@ function AnimationController(_entity_obj, _animation_bank, _starting_animation_r
 		prev_image_index = entity_obj.image_index;
 		played_counter++;
 		if(played_counter >= num_times_played) {
+			if(post_animation_callback != undefined) {
+				post_animation_callback();
+			}
 			clear_animation();
 		}
 	}

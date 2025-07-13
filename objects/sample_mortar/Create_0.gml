@@ -4,7 +4,7 @@ unit_name = "Sample Mortar";
 
 max_health = 100;
 current_health = 100;
-health_state = UNIT_STATE.ACTIVE;
+health_state = HEALTH_STATE.ACTIVE;
 recovery_rate = 10; //In health points per second
 
 radius = 4;
@@ -13,7 +13,7 @@ range = new CircularRange(id, x + sprite_width/2, y + sprite_height/2, tilesize_
 shooting_speed = 6;
 seconds_per_shot = 4;
 
-unit_buffs = [];
+buffs = [];
 
 //Stat Upgrades
 stat_upgrades = [undefined, undefined, undefined, undefined];

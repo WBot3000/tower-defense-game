@@ -19,7 +19,7 @@ attack_timer = min(attack_timer + 1, _frames_per_attack); //Done to prevent over
 switch (attack_state) {
     case ENEMY_ATTACKING_STATE.IN_ATTACK:
         //If the instance you were previously targeting gets knocked out or stops existing, then you'll need to choose a new unit to target
-		if(!instance_exists(unit_currently_attacking) || unit_currently_attacking.health_state == UNIT_STATE.KNOCKED_OUT) {
+		if(!instance_exists(unit_currently_attacking) || unit_currently_attacking.health_state == HEALTH_STATE.KNOCKED_OUT) {
 			unit_currently_attacking = noone; //Technically not necessary, but matches setting state below
 			path_speed = seconds_to_roomspeed_frames(default_movement_speed); //TODO: Change this along with the Create Event path speed
 			attack_state = ENEMY_ATTACKING_STATE.NOT_ATTACKING;
@@ -45,7 +45,7 @@ switch (attack_state) {
 		//Because units don't disappear when their health goes to zero, we first need to make sure that the enemy is a state in which it can be attacked.
 		for(var i = 0; i < ds_list_size(units_in_range); ++i) {
 			var _target = units_in_range[| i];
-			if(_target.health_state == UNIT_STATE.ACTIVE) {
+			if(_target.health_state == HEALTH_STATE.ACTIVE) {
 				unit_currently_attacking = _target;
 				show_debug_message("cat");
 				path_speed = 0;

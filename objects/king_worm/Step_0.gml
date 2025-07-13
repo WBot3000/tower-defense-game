@@ -49,7 +49,7 @@ switch (attack_state) {
 			//Prioritize units over targets (they'll be at the front of the list
 			range.get_entities_in_range(base_unit, units_in_range, true);
 			range.get_entities_in_range(base_target, targets_in_range, true);
-			var _entity_to_attack = enemy_target_close(units_in_range, targets_in_range);
+			var _entity_to_attack = enemy_target_default(units_in_range, targets_in_range);
 			if(_entity_to_attack != noone) {
 				path_speed = 0;
 				deal_damage(_entity_to_attack, melee_damage);

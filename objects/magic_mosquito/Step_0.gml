@@ -15,14 +15,14 @@ if(current_health <= 0) {
 	//is knocked out
 if(!instance_exists(focused_entity) || 
 	(object_is_ancestor(focused_entity.object_index, base_target) && instance_number(base_unit) > 0) ||
-	(object_is_ancestor(focused_entity.object_index, base_unit) && focused_entity.health_state == UNIT_STATE.KNOCKED_OUT)) {
+	(object_is_ancestor(focused_entity.object_index, base_unit) && focused_entity.health_state == HEALTH_STATE.KNOCKED_OUT)) {
 	attack_state = ENEMY_ATTACKING_STATE.NOT_ATTACKING
 	move_x = 0;
 	move_y = 0;
 	var _next_entity_to_target = noone;//instance_nearest((bbox_left + bbox_right)/2, (bbox_top + bbox_bottom)/2, base_unit);
 	var _min_vector_not_current = undefined;
 	with(base_unit) { //Iterate through all units, and find the closest one that's currently active
-		if(health_state != UNIT_STATE.KNOCKED_OUT) {
+		if(health_state != HEALTH_STATE.KNOCKED_OUT) {
 			var _vector = instances_vector_to_get_components(other, self, true);
 			if(_min_vector_not_current == undefined || _vector[VEC_LEN] < _min_vector_not_current[VEC_LEN]) {
 				_next_entity_to_target = self;

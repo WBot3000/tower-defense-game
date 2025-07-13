@@ -71,6 +71,16 @@ function CameraSequence(_initial_seconds_to_hang = CAM_NUM_SECONDS_HANGING_DEFAU
 	
 	//Will return "true" once the sequence has completed
 	static advance_sequence = function() {
+		//Code for abruptly ending the sequence, so the player doesn't have to watch it each time
+		var _cut_to_end = keyboard_check_pressed(vk_escape);
+		if(_cut_to_end) {
+			var _last_position = sequence_queue[array_length(sequence_queue) - 1];
+			camera_set_view_pos(view_camera[0], _last_position.dest_x, _last_position.dest_y);
+			clear_queue();
+			after_sequence_callback();
+			return true;
+		}
+		
 		switch (sequence_state) {
 		    case CAMERA_SEQUENCE_STATE.CAMERA_HANGING:
 		        if(current_seconds_to_hang < 0) { //Can use this to keep the camera frozen for an indefinite period of time

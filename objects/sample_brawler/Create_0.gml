@@ -7,7 +7,7 @@ unit_name = "Sample Brawler";
 
 max_health = 100;
 current_health = 100;
-health_state = UNIT_STATE.ACTIVE;
+health_state = HEALTH_STATE.ACTIVE;
 recovery_rate = 10; //In health points per second
 
 radius = 1.0;
@@ -16,7 +16,7 @@ range = new MeleeRange(id); //CircularRange(id, x + sprite_width/2, y + sprite_h
 punch_damage = 5
 seconds_per_punch = 0.5
 
-unit_buffs = [];
+buffs = [];
 
 //Stat Upgrades
 stat_upgrades = [undefined, undefined, undefined, undefined];

@@ -8,8 +8,8 @@
 	- Unit targeting functions
 */
 
-
 #region Ranges
+//NOTE: Ranges are based on the center of the unit's 64x64 sprite, not it's bounding box. This is so range location isn't based on sprite.
 
 #region Range (Class)
 /*
@@ -17,7 +17,7 @@
 	unit: the id of the unit object that uses this range
 */
 function Range(_unit) constructor {
-	unit = _unit;
+	unit = _unit; //TOOD: Change this to "entity" wherever needed (because these are used for enemies too)
 	
 	static draw_range = function(){};
 	static get_entities_in_range = function(){};
@@ -29,8 +29,8 @@ function Range(_unit) constructor {
 #region CircularRange (Class)
 /*
 	For units with a circular viewing range (think most towers from Bloons Tower Defense 6)
-	origin_x: x-coordinate of the circle's origin
-	origin_y: y-coordinate of the circle's origin
+	origin_x: x-coordinate of the circle's origin (relative to the unit's center)
+	origin_y: y-coordinate of the circle's origin (relative to the unit's center)
 	radius: How far the unit can "see"
 */
 function CircularRange(_unit, _origin_x, _origin_y, _radius) : Range(_unit) constructor {
@@ -40,19 +40,21 @@ function CircularRange(_unit, _origin_x, _origin_y, _radius) : Range(_unit) cons
 	
 	static draw_range = function() {
 		draw_set_alpha(0.125)
-		draw_circle_color(origin_x, origin_y, radius, c_white, c_white, false);
+		draw_circle_color(origin_x + unit.x, origin_y + unit.y - TILE_SIZE/2, radius, c_white, c_white, false);
 		draw_set_alpha(1)
 	}
 	
 	/*
 		Detect...
-		All of a certain type of entity (obj = _entity_type)
+		All of a certain type of entity(s) (obj = _entity_type[x])
 		Within it's radius (first three arguments)
 		Using boundary boxes for speed increase (prec = false)
 		While not targeting yourself (notme = true)
 	*/
-	static get_entities_in_range = function(_entity_type, _storage_list, _ordered) {
-		collision_circle_list(origin_x, origin_y, radius, _entity_type, false, true, _storage_list, _ordered);
+	static get_entities_in_range = function(_entity_types, _storage_list) {
+		for(var i = 0, len = array_length(_entity_types); i < len; ++i) {
+			collision_circle_list(origin_x + get_bbox_center_x(unit), origin_y + get_bbox_center_y(unit), radius, _entity_types[i], false, true, _storage_list, false);
+		}
 	}
 	
 	/*
@@ -72,10 +74,10 @@ function CircularRange(_unit, _origin_x, _origin_y, _radius) : Range(_unit) cons
 #region RectangularRange (Class)
 /*
 	For units with a rectangular viewing range (mostly for specialty towers, not very common)
-	x1: x-coordinate of the rectangle's top-left
-	y1: y-coordinate of the rectangle's top-left
-	x2: x-coordinate of the rectangle's bottom-right
-	y2: y-coordinate of the rectangle's bottom-right
+	x1: x-coordinate of the rectangle's top-left (relative to entity)
+	y1: y-coordinate of the rectangle's top-left (relative to entity)
+	x2: x-coordinate of the rectangle's bottom-right (relative to entity)
+	y2: y-coordinate of the rectangle's bottom-right (relative to entity)
 */
 function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor {
 	x1 = _x1;
@@ -85,19 +87,24 @@ function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor 
 	
 	static draw_range = function() {
 		draw_set_alpha(0.125)
-		draw_rectangle_color(x1, y1, x2, y2, c_white, c_white, c_white, c_white, false);
+		draw_rectangle_color(x1 + unit.x, y1 + unit.y - TILE_SIZE/2, x2 + unit.x, y2 + unit.y - TILE_SIZE/2, c_white, c_white, c_white, c_white, false);
 		draw_set_alpha(1)
 	}
 	
 	/*
 		Detect...
-		All of a certain type of entity (obj = _entity_type)
+		All of a certain type of entity (obj = _entity_types[x])
 		Within it's radius (first three arguments)
 		Using boundary boxes for speed increase (prec = false)
 		While not targeting yourself (notme = true)
 	*/
-	static get_entities_in_range = function(_entity_type, _storage_list, _ordered) {
-		collision_rectangle_list(x1, y1, x2, y2, _entity_type, false, true, _storage_list, _ordered);
+	static get_entities_in_range = function(_entity_types, _storage_list) {
+		var _center_x = get_bbox_center_x(inst);
+		var _center_y = get_bbox_center_y(inst);
+		
+		for(var i = 0, len = array_length(_entity_types); i < len; ++i) {
+			collision_rectangle_list(x1 + _center_x, y1 + _center_y, x2 + _center_x, y2 + _center_y, _entity_types[i], false, true, _storage_list, false);
+		}
 	}
 	
 	/*
@@ -131,8 +138,8 @@ function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor 
 	If you give all melee units the same range radius, then you have situations where the larger melee unit can't reach the smaller one.
 */
 function MeleeRange(_unit) : CircularRange(_unit) constructor {
-	origin_x = get_bbox_center_x(_unit);
-	origin_y = get_bbox_center_y(_unit);
+	origin_x = 0;//get_bbox_center_x(_unit);
+	origin_y = 0;//get_bbox_center_y(_unit);
 	radius = max((_unit.bbox_right - _unit.bbox_left)/2, (_unit.bbox_bottom - _unit.bbox_top)/2) * 1.5; //So that melee units have just a bit more range.
 }
 #endregion
@@ -143,7 +150,11 @@ function MeleeRange(_unit) : CircularRange(_unit) constructor {
 	A RectangularRange for enemies that can see the entire level at once.
 	Doesn't draw anything because creating a big white rectangle over the entire level sounds unpleasant.
 */
-function GlobalRange(_unit) : RectangularRange(_unit, 0, 0, room_width, room_height) constructor {
+function GlobalRange(_unit) : RectangularRange(_unit, 0, 0, 0, 0) constructor {
+	x1 = -1*_unit.x;
+	y1 = -1*_unit.y;
+	x2 = room_width - _unit.x;
+	y2 = room_height - _unit.y;
 	static draw_range = function(){};
 }
 
@@ -151,9 +162,6 @@ function GlobalRange(_unit) : RectangularRange(_unit, 0, 0, room_width, room_hei
 	Because the global ranges for detecting a certain thing aren't location-dependent, two global ranges meant to find the same thing are essentially identical, and two entity lists utilizing them are as well.
 	So instead of creating a different ds_list for each unit/enemy that uses it, just one for each kind of target is created, and can then be refererenced.
 	NOTE: Remember not to delete these once a unit/enemy using them is deleted, they're meant to persist for the lifetime of the game.
-	
-	I thought about doing this for the ranges themselves too, but since rooms can be different sizes, I'd need to re-declare them on each room change, and the minor resources save (probably) isn't worth the additional overhead hassle. 
-	If there's massive performance issues, I'll go back and change it.
 */
 global.ALL_ENEMIES_LIST = ds_list_create();
 global.ALL_UNITS_LIST = ds_list_create();
@@ -165,30 +173,76 @@ global.ALL_UNITS_LIST = ds_list_create();
 
 #region Unit Targeting
 
+#region TargetingParams (Class)
+/*
+	A struct that specifies what kinds of entities should be included or excluded from targeting.
+	By default, all entities picked up by a range will be considered valid targets for an action.
+	The functions determine the method for picking out an entity, while this acts as a "filter".
+	NOTE: This doesn't filter out entities based on their type, as you can just specify what kind of entities should be detected when using the ranges.
+*/
+function TargetingParams(_dont_target_knocked_out = false, _dont_target_attackable = false, _dont_target_buffs = [], _only_target_buffs = []) constructor {
+	dont_target_knocked_out = _dont_target_knocked_out;
+	dont_target_attackable = _dont_target_attackable;
+	dont_target_buffs = _dont_target_buffs;
+	only_target_buffs = _only_target_buffs;
+	
+	static is_entity_valid_target = function(_entity) {
+		//TODO: Add checking for buffs (before other checks)
+		if(dont_target_attackable && can_be_attacked(_entity)) {
+			return false;
+		}
+		if(dont_target_knocked_out && _entity.entity_data.health_state == HEALTH_STATE.KNOCKED_OUT) {
+			return false;
+		}
+		return true;
+	}
+}
+#endregion
+
+
+#region targeting_function_builder (Function)
+/*
+	Create new kinds of targeting using this function. Prevents inconsistencies from arising between the different targeting functions.
+	The _entity_to_value_fn should return a numerical value. The targeting function will pick the entity that satisfies the targeting parameters and generates the largest value.
+	If you want to pick the target with the smallest value instead, just multiply the result by -1 in the _entity_to_value_fn
+	
+	NOTE: Not all targeting functions need to use this. For example, the default enemy targeter just chooses the first entity in the list
+*/
+function targeting_fn_builder(_entity_to_value_fn) {
+	var _fn = function(_unit, _entity_list, _targeting_params) {
+		var _selected_entity = noone;
+		var _selected_entity_value = -1;
+		for(var i = 0, len = ds_list_size(_entity_list); i < len; ++i) {
+			if(!_targeting_params.is_entity_valid_target(_entity_list[| i])) { //Filter out inelligible entities
+				continue;
+			}
+			
+			if(_selected_entity == noone) {
+				_selected_entity = _entity_list[| i];
+				_selected_entity_value = entity_to_value_fn(_unit, _selected_entity);
+			}
+			else {
+				var _new_value = entity_to_value_fn(_unit, _entity_list[| i]);
+				if(_new_value > _selected_entity_value) {
+					_selected_entity = _entity_list[| i];
+					_selected_entity_value = _new_value;
+				}
+			}
+		}
+		return _selected_entity;
+	}
+	
+	//Need the method function to pass the outer value to the inner function, as seen here: https://forum.gamemaker.io/index.php?threads/inherit-struct-with-variable-parameter-as-parameter.91799/
+	return method({entity_to_value_fn: _entity_to_value_fn}, _fn);
+}
+
 
 #region target_close (Function)
 /*
-	Given an enemy list, selects the enemy closest to the unit. Can pass if the list has already been ordered to prevent the linear search.
+	Calculates the squared distance between the targeter and the targetee
 */
-function target_close(_unit, _enemy_list, _list_is_ordered = false) {
-	if(ds_list_empty(_enemy_list)) {
-		return noone;
-	}
-	if(_list_is_ordered) {
-		return _enemy_list[| 0];
-	}
-	var _closest_enemy = _enemy_list[| 0];
-	//NOTE: This is technically the distance SQUARED. However, since we aren't actually using this number for calculations, we don't have to take the square root.
-	var _closest_distance = sqr(_unit.x - _closest_enemy.x) + sqr(_unit.y - _closest_enemy.y);
-	for(var i = 1; i < ds_list_size(_enemy_list); ++i) {
-		var _enemy = _enemy_list[| i];
-		var _distance = sqr(_unit.x - _enemy.x) + sqr(_unit.y - _enemy.y);
-		if(_distance < _closest_distance) {
-			_closest_distance = _distance;
-			_closest_enemy = _enemy;
-		}
-	}
-	return _closest_enemy;
+function target_value_close(_targeter, _targetee) {
+	return sqr(_targeter.x - _targetee.x) + sqr(_targeter.y - _targetee.y);
 }
 #endregion
 
@@ -198,27 +252,11 @@ function target_close(_unit, _enemy_list, _list_is_ordered = false) {
 	Given an enemy list, selects the enemy closest to the wall.
 	Currently only takes into account enemies that have paths.
 */
-function target_first(_unit, _enemy_list) {
-	if(ds_list_empty(_enemy_list)) {
-		return noone;
+function target_value_first(_targeter, _targetee) {
+	if(_targetee.path_index != -1 && _targetee.path_index != pth_dummypath) {
+		return _targetee.path_position * -1;
 	}
-	var _most_ahead_enemy = _enemy_list[| 0];
-	var _most_ahead_percentage = 0;
-	if(_most_ahead_enemy.path_index != -1 && _most_ahead_enemy.path_index != pth_dummypath) {
-		_most_ahead_percentage = _most_ahead_enemy.path_position;
-	}
-	for(var i = 1; i < ds_list_size(_enemy_list); ++i) {
-		var _enemy = _enemy_list[| i];
-		var _ahead_percentage = 0;
-		if(_enemy.path_index != -1 && _enemy.path_index != pth_dummypath) {
-			_ahead_percentage = _enemy.path_position;
-		}
-		if(_ahead_percentage > _most_ahead_percentage) {
-			_most_ahead_enemy = _enemy;
-			_most_ahead_percentage = _ahead_percentage;
-		}
-	}
-	return _most_ahead_enemy;
+	return 101; //Since path_position can be between 0-100, the pathless targetee will never be prioritized over one with a path
 }
 #endregion
 
@@ -228,27 +266,11 @@ function target_first(_unit, _enemy_list) {
 	Given an enemy list, selects the enemy furthest from the wall.
 	Currently only takes into account enemies that have paths.
 */
-function target_last(_unit, _enemy_list) {
-	if(ds_list_empty(_enemy_list)) {
-		return noone;
+function target_value_last(_targeter, _targetee) {
+	if(_targetee.path_index != -1 && _targetee.path_index != pth_dummypath) {
+		return _targetee.path_position;
 	}
-	var _most_behind_enemy = _enemy_list[| 0];
-	var _most_behind_percentage = 1;
-	if(_most_behind_enemy.path_index != -1 && _most_behind_enemy.path_index != pth_dummypath) {
-		_most_behind_percentage = _most_behind_enemy.path_position;
-	}
-	for(var i = 1; i < ds_list_size(_enemy_list); ++i) {
-		var _enemy = _enemy_list[| i];
-		var _behind_percentage = 1;
-		if(_enemy.path_index != -1 && _enemy.path_index != pth_dummypath) {
-			_behind_percentage = _enemy.path_position;
-		}
-		if(_behind_percentage < _most_behind_percentage) {
-			_most_behind_enemy = _enemy;
-			_most_behind_percentage = _behind_percentage;
-		}
-	}
-	return _most_behind_enemy;
+	return -1;
 }
 #endregion
 
@@ -258,21 +280,8 @@ function target_last(_unit, _enemy_list) {
 	Given an enemy list, selects the enemy with the most amount of health
 	NOTE: Currently doesn't take into account health buffs/debuffs
 */
-function target_healthy(_unit, _enemy_list) {
-	if(ds_list_empty(_enemy_list)) {
-		return noone;
-	}
-
-	var _healthiest_enemy = _enemy_list[| 0];
-	var _highest_health = _healthiest_enemy.current_health
-	for(var i = 1; i < ds_list_size(_enemy_list); ++i) {
-		var _enemy = _enemy_list[| i];
-		if(_enemy.current_health > _highest_health) {
-			_highest_health = _enemy.current_health;
-			_healthiest_enemy = _enemy;
-		}
-	}
-	return _healthiest_enemy;
+function target_value_healthiest(_targeter, _targetee) {
+	return _targetee.entity_data.current_health;
 }
 #endregion
 
@@ -282,21 +291,8 @@ function target_healthy(_unit, _enemy_list) {
 	Given an enemy list, selects the enemy with the least amount of health
 	NOTE: Currently doesn't take into account health buffs/debuffs
 */
-function target_weak(_unit, _enemy_list) {
-	if(ds_list_empty(_enemy_list)) {
-		return noone;
-	}
-
-	var _weakest_enemy = _enemy_list[| 0];
-	var _lowest_health = _weakest_enemy.current_health
-	for(var i = 1; i < ds_list_size(_enemy_list); ++i) {
-		var _enemy = _enemy_list[| i];
-		if(_enemy.current_health < _lowest_health) {
-			_lowest_health = _enemy.current_health;
-			_weakest_enemy = _enemy;
-		}
-	}
-	return _weakest_enemy;
+function target_value_weakest(_targeter, _targetee) {
+	return _targetee.entity_data.current_health * -1;
 }
 #endregion
 
@@ -309,25 +305,31 @@ function target_weak(_unit, _enemy_list) {
 	All correspond to Data Variables
 	
 	Data Variables:
+	identifier: An internal id used to reference a specific targeting type
 	targeting_name: The string value that the targeting type is referred to in the targeting menu
 	targeting_fn: The function used to select a target from a list of enemies.
 */
-function TargetingType(_targeting_name, _targeting_fn) constructor {
+function TargetingType(/*_identifier,*/ _targeting_name, _targeting_fn) constructor {
 	targeting_name = _targeting_name;
 	targeting_fn = _targeting_fn;
 }
 
-global.TARGETING_CLOSE = new TargetingType("Close", target_close);
-global.TARGETING_FIRST = new TargetingType("Far Along", target_first);
-global.TARGETING_LAST = new TargetingType("At Back", target_last);
-global.TARGETING_HEALTHY = new TargetingType("Healthiest", target_healthy);
-global.TARGETING_WEAK = new TargetingType("Weakest", target_weak);
+
+global.TARGETING_CLOSE = new TargetingType("Close", targeting_fn_builder(target_value_close) );
+global.TARGETING_FIRST = new TargetingType("Far Along", targeting_fn_builder(target_value_first) );
+global.TARGETING_LAST = new TargetingType("At Back", targeting_fn_builder(target_value_last) );
+global.TARGETING_HEALTHY = new TargetingType("Healthiest", targeting_fn_builder(target_value_healthiest) );
+global.TARGETING_WEAK = new TargetingType("Weakest", targeting_fn_builder(target_value_weakest) );
+
+//Enemy targeting, allows the enemies to use the same targeting mechanisms as the units.
+//NOTE: The display names are never shown, so make them whatever you want
+global.ENEMY_TARGETING_DEFAULT = new TargetingType("", enemy_target_default);
 #endregion
 
 
 #region TargetingTracker (Class)
 /*
-	Used to keep track of a unit's current targeting option, as well as changing said option
+	Used to keep track of a unit's current targeting option, as well as changing said option.
 	
 	Argument Variables:
 	All correspond to Data Variables
@@ -336,7 +338,7 @@ global.TARGETING_WEAK = new TargetingType("Weakest", target_weak);
 	potential_targeting_types: A list of all the targeting types a unit can use. Should all be globals labeled TARGETING_[TARGETINGTYPE]
 	currently_selected_idx: Index into the potential_targeting_type list that 
 */
-function TargetingTracker(_potential_target_types = [TARGETING_TYPE.CLOSEST]) constructor {
+function TargetingTracker(_potential_target_types) constructor {
 	potential_targeting_types = _potential_target_types;
 	currently_selected_idx = 0; //By default, use the first option provided in the list
 	
@@ -360,6 +362,19 @@ function TargetingTracker(_potential_target_types = [TARGETING_TYPE.CLOSEST]) co
 			currently_selected_idx = array_length(potential_targeting_types) - 1;
 		}
 	}
+	
+	//Lets you switch targeting type
+	//Pass the global targeting type into this function
+	static set_targeting_type = function(_targeting_type) {
+		for (var i = array_length(potential_targeting_types) - 1; i >= 0; --i) {
+		   if(potential_targeting_types[i] == _targeting_type) {
+			   currently_selected_idx = i;
+			   return;
+		   }
+		}
+		//TODO: Throw? Or nah
+		show_debug_message("Targeting type " + _identifier + " not found in targeting tracker " + string(self.id) + ". Targeting type not changed."); 
+	}
 }
 #endregion
 
@@ -368,24 +383,20 @@ function TargetingTracker(_potential_target_types = [TARGETING_TYPE.CLOSEST]) co
 
 #region Enemy Targeting
 
-#region enemy_target_close (Function)
-//NOTE: Currently assumes that both lists are sorted
-function enemy_target_close(_unit_list, _target_list, _prioritize_targets = false) {
-	if(!ds_list_empty(_target_list) && _prioritize_targets) {
-		return _target_list[| 0];
-	}
-	for(var i = 0; i < ds_list_size(_unit_list); i++) {
-		var _current_unit = _unit_list[| i];
-		if(_current_unit.health_state == UNIT_STATE.ACTIVE) {
-			return _current_unit;
+#region enemy_target_default (Function)
+//NOTE: With this function, the enemy selection is determined by the order of the input list, unlike all the other ones
+//NOTE 2: Currently, this doesn't do anything with _enemy, it just takes it as an argument because all of the other 
+function enemy_target_default(_enemy, _entity_list) {
+	for(var i = 0, len = ds_list_size(_entity_list); i < len; ++i) {
+		var _current_entity = _entity_list[| i];
+		if(can_be_attacked(_current_entity)) {
+			return _current_entity;
 		}
 	}
-	if(!ds_list_empty(_target_list)) {
-		return _target_list[| 0];
-	}
 	return noone;
-	
 }
+#endregion
+
 #endregion
 
 #endregion

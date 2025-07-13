@@ -1,7 +1,5 @@
 /// @description Move along the path and occasionally bite a unit
 
-//TODO: Figure out how to write the AI in a more efficient manner?
-
 //Check to see if the enemy needs to be destroyed
 if(current_health <= 0) {
 	instance_destroy();

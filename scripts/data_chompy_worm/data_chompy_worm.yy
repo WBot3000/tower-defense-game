@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"damage",
+  "%Name":"data_chompy_worm",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"damage",
+  "name":"data_chompy_worm",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/Scripts.yy",
+    "name":"enemies",
+    "path":"folders/Scripts/data/enemies.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

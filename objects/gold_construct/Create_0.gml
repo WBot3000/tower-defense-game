@@ -7,7 +7,7 @@ unit_name = "Gold Construct";
 //Variables for managing unit health
 max_health = 100;
 current_health = 100;
-health_state = UNIT_STATE.ACTIVE;
+health_state = HEALTH_STATE.ACTIVE;
 recovery_rate = 5; //In health points per second
 defense_factor = 0.75;
 
@@ -24,7 +24,7 @@ targeting_tracker =
 					global.TARGETING_WEAK,
 	]);
 
-unit_buffs = [];
+buffs = [];
 
 money_generation_amount = 25;
 frames_per_generation = seconds_to_roomspeed_frames(10);

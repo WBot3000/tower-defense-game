@@ -15,8 +15,8 @@
     "path":"folders/Objects/enemy_types/Bugs/Butterfly-barian.yy",
   },
   "parentObjectId":{
-    "name":"base_enemy",
-    "path":"objects/base_enemy/base_enemy.yy",
+    "name":"base_enemy_old",
+    "path":"objects/base_enemy_old/base_enemy_old.yy",
   },
   "persistent":false,
   "physicsAngularDamping":0.1,

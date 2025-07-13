@@ -1,13 +1,11 @@
 /// @description Initialize variables for the Dirt Construct
 
-//event_inherited(); //TODO: Use event inheritance?
-
 unit_name = "Cloud Construct";
 
 //Variables for managing unit health
 max_health = 60;
 current_health = 60;
-health_state = UNIT_STATE.ACTIVE;
+health_state = HEALTH_STATE.ACTIVE;
 recovery_rate = 10; //In health points per second
 defense_factor = 1;
 
@@ -29,7 +27,7 @@ cloud_timer = 0;
 cloud_damage = 10;
 cloud_speed = 10;
 
-unit_buffs = [];
+buffs = [];
 
 //Stat Upgrades
 stat_upgrades = [undefined, undefined, undefined, undefined];
@@ -40,5 +38,3 @@ unit_upgrade_2 = undefined;
 unit_upgrade_3 = undefined;
 
 sell_price = global.DATA_PURCHASE_DIRT.price * SELL_PRICE_REDUCTION;
-
-//TODO: Animation controller?

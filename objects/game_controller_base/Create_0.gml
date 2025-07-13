@@ -2,7 +2,7 @@
 
 //If this controller wasn't provided with any level data, throw an error
 if(!variable_instance_exists(self.id, "current_level_data")) {
-	throw("No level data provided for game controller object " + string(self.id));
+	throw("No level data provided for game controller instance " + string(self.id));
 }
 
 #region Global Variable Initializations
@@ -21,14 +21,29 @@ global.player_money = 500;
 	Manager objects used to further control game state
 	Certain managers have this object passed in as reference for coordination purposes. It allows managers to "communicate" with each other
 */
-//Default game state is RUNNING
 game_state_manager = new GameStateManager(self.id);
 
 round_manager = new RoundManager(self.id, array_length(current_level_data.round_data), current_level_data.round_data);
 
 purchase_manager = new PurchaseManager();
 
+selected_entity_manager = new SelectedEntityManager();
+
 camera_controller = new CameraController();
+
+/*
+	TODO: 
+	Currently, several of these managers reference each other using fetching functions.
+	In order to make sure the reference isn't undefined, either:
+	1) Each time a manager is needed in another one, there is an attempt to fetch it
+		(b/c when first initialized, these will be undefined, as the game_controller doesn't actually "exist" yet)
+		(can cache them to prevent unnecessary fetches, but would still need to prevent the "fetch" code from running afterwards
+	2) All the managers are defined in a strict order, so that ones that rely on other managers are declared after those other managers are declared
+		(NOTE: This means that managers can't have any circular references (ex. round_manager references camera_controller, camera_controller references round_manager)
+	To remove some instructions being done on each frame, potentially put these in an array, attempt to fetch all needed managers here, and then remove them from array when fetching is done so the code isn't run when it isn't needed
+	Not doing this now since it might be overkill, but do want to keep this in mind
+*/
+
 #endregion
 
 
@@ -49,11 +64,11 @@ purchase_data = [
 	global.DATA_PURCHASE_COBBLESTONE,
 	global.DATA_PURCHASE_GOLD,
 	
-	global.DATA_PURCHASE_CLOUD,
-	global.DATA_PURCHASE_SAMPLE_GUNNER,
-	global.DATA_PURCHASE_SAMPLE_BRAWLER,
+	//global.DATA_PURCHASE_CLOUD,
+	//global.DATA_PURCHASE_SAMPLE_GUNNER,
+	//global.DATA_PURCHASE_SAMPLE_BRAWLER,
 	
-	global.DATA_PURCHASE_SAMPLE_MORTAR,
+	//global.DATA_PURCHASE_SAMPLE_MORTAR,
 ]
 
 #endregion
@@ -70,7 +85,6 @@ game_ui = new GameUI(self.id, purchase_data);
 	So to handle this, the GUI needs to be set to running mode.
 	Normally, the Game State Manager handles this, but here is done manually the first time (since the Game State Manager is created before the GUI).
 */
-//game_ui.set_gui_running();
 
 transition_effect = new SwipeTransition()
 //TODO: Uh oh, is this starting to become callback hell? I don't wanna rewrite Javascript async though.

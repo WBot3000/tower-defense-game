@@ -1,7 +1,7 @@
 /// @description Look for enemy, then fire (or recover health if knocked out)
 
 switch (health_state) {
-    case UNIT_STATE.ACTIVE:
+    case HEALTH_STATE.ACTIVE:
 		cloud_timer++;
 		if(cloud_timer >= frames_per_cloud) {
 			range.get_entities_in_range(base_enemy, enemies_in_range, true);
@@ -27,17 +27,17 @@ switch (health_state) {
 		}
 		
 		if(current_health <= 0) {
-			health_state = UNIT_STATE.KNOCKED_OUT;
+			health_state = HEALTH_STATE.KNOCKED_OUT;
 			cloud_timer = 0;
 		}
 		
         break;
-	case UNIT_STATE.KNOCKED_OUT:
+	case HEALTH_STATE.KNOCKED_OUT:
 		var _amount_to_recover = recovery_rate / seconds_to_roomspeed_frames(1);
 		current_health = min(max_health, current_health + _amount_to_recover);
 		if(current_health >= max_health) {
 			//animation_controller.set_animation(spr_sample_gunner, LOOP_FOREVER);
-			health_state = UNIT_STATE.ACTIVE; 
+			health_state = HEALTH_STATE.ACTIVE; 
 		}
 		break;
     default:

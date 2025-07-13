@@ -101,6 +101,7 @@ function GameStateManager(_controller_obj, _initial_state = GAME_STATE.INTRO) co
 	Fetches a controller/manager if needed by an external object or another controller/manager.
 */
 #region get_logic_controller (Function)
+//Used to be called the Game Controller, renamed to Logic Controller so it can be used with menus and such as well
 function get_logic_controller() {
 	var _logic_controller = instance_find(logic_controller_base, 0);
 	return _logic_controller
@@ -146,6 +147,20 @@ function get_purchase_manager(_controller_obj = undefined) {
 		return undefined;
 	}
 	return _controller_obj.purchase_manager;
+}
+#endregion
+
+
+#region get_selected_entity_manager (Function)
+//NOTE: You can also pass a controller object if you have one so that you don't have to fetch it. Should save a tiny bit of time.
+function get_selected_entity_manager(_controller_obj = undefined) {
+	if(_controller_obj == undefined) {
+		_controller_obj = get_logic_controller();
+	}
+	if(_controller_obj == noone || !variable_instance_exists(_controller_obj, "selected_entity_manager")) {
+		return undefined;
+	}
+	return _controller_obj.selected_entity_manager;
 }
 #endregion
 

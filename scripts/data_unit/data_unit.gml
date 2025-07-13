@@ -8,15 +8,54 @@
 */
 
 //Used to determine whether a unit should perform its tasks, or whether it needs to recover first.
-enum UNIT_STATE {
+enum HEALTH_STATE {
 	ACTIVE,
 	KNOCKED_OUT
 }
 
 
-/*
-function Unit() constructor {
-}*/
+function Unit() : Combatant() constructor {
+	
+	//Purchasable upgrades
+	stat_upgrades = [];
+	unit_upgrades = [];
+	
+	sell_price = global.DATA_PURCHASE_DIRT.price * SELL_PRICE_REDUCTION; //Default to Dirt Construct sell price
+	
+	//Performs all actions a unit can do while active
+	static while_active = function() {
+		for(var i = 0; i < array_length(action_queue); ++i) {
+			action_queue[i].execute();
+			action_queue[i].update_params();
+		}
+	}
+	
+	
+	//Called in the "dealing_damage" function once the entity's health reaches zero
+	static on_health_reached_zero = function() {
+		health_state = HEALTH_STATE.KNOCKED_OUT;
+		animation_controller.set_animation("ON_KO"); //TODO: Write code for chaining animations together
+		for(var i = 0; i < array_length(action_queue); ++i) {
+			action_queue[i].on_health_reached_zero();
+		}
+	}
+	
+	
+	//handles unit recovery. If you don't want the unit to recover then just override this with a delete function like the enemies have.
+	static while_knocked_out = function() {
+		var _amount_to_recover = recovery_rate / seconds_to_roomspeed_frames(1);
+		current_health = min(max_health, current_health + _amount_to_recover);
+		if(current_health >= max_health) {
+			animation_controller.set_animation("ON_RESTORE");
+			health_state = HEALTH_STATE.ACTIVE;
+			for(var i = 0; i < array_length(action_queue); ++i) {
+				action_queue[i].on_restore();
+			}
+		}
+	}
+	
+	//on_deletion defined in parent class
+}
 
 
 #region StatUpgrade
@@ -26,7 +65,6 @@ function Unit() constructor {
 	
 	Argument Variables:
 	_starting_level: The level at which the upgrade should start at.
-		TODO: Should standard "starting level" be 0 or 1?
 	(All other argument variables correspond with non-underscored data variables)
 	
 	Data Variables:
@@ -43,8 +81,8 @@ function Unit() constructor {
 		- Useful for not hardcoding in any costs.
 	upgrade_spr: The sprite used in the Unit Info Card
 */
-function StatUpgrade(_unit, _title = "No Name", _max_level = 5, _starting_level = 0,
-	_description = "No description provided", _upgrade_spr = spr_increase_attack_speed_icon) constructor {
+function StatUpgrade(_title = "No Name", _max_level = 5, _starting_level = 0,
+	_description = "No description provided", _upgrade_spr = spr_increase_attack_speed_icon, _unit = other) constructor {
 	unit = _unit;
 	title = _title;
 	
@@ -84,6 +122,50 @@ function StatUpgrade(_unit, _title = "No Name", _max_level = 5, _starting_level 
 	(All argument variables correspond with non-underscored data variables)
 	
 	Data Variables:
+	unit_to_upgrade: The unit that this upgrade should apply to. Passed automatically when this is declared in the unit's entity data.
+	price: How much the upgrade costs to purchase.
+	level_req_1: The level the unit's first upgradable stat needs to be in order to get purchased
+	level_req_2: The level the unit's second upgradable stat needs to be in order to get purchased
+	level_req_3: The level the unit's third upgradable stat needs to be in order to get purchased
+	new_animbank: The animation bank that will replace the current unit's animation bank
+	upgrade_fn: Code that's run when the upgrade is purchased. Use this function to do things like change stat values and add/edit/remove actions
+		- Called by on_upgrade, which calls this + does some other setting things.
+	
+*/
+function UnitUpgrade(_name, _price, _level_req_1 = 0, _level_req_2 = 0, _level_req_3 = 0, _unit_to_upgrade = other) constructor {
+	name = _name;
+	unit_to_upgrade = _unit_to_upgrade;
+	price = _price;
+	new_animbank = undefined; //Since you can't pass globals in as arguments to constructors, just declare it inside the constructor instead
+	new_stat_upgrade = undefined; //Same as above
+	
+	level_req_1 = _level_req_1;
+	level_req_2 = _level_req_2;
+	level_req_3 = _level_req_3;
+	
+	static upgrade_fn = function() {};
+	
+	static on_upgrade = function() {
+		if(new_animbank != undefined) {
+			unit_to_upgrade.animation_controller.set_animation_bank(new_animbank);
+		}
+		unit_to_upgrade.stat_upgrades[3] = new_stat_upgrade //Allow a new stat to be upgraded.
+		unit_to_upgrade.unit_upgrades = [undefined, undefined, undefined]; //Prevent the purchase of any more upgrades
+		
+		upgrade_fn(); //Used for upgrade-specifc code that needs to be run
+	}
+}
+#endregion
+
+
+#region OldUnitUpgrade
+/*
+	Contains code for upgrading one unit into a stronger version of itself. Contains the pre-requisites and cost of the upgrade.
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
 	upgrade_to: The unit that should be upgraded into upon getting the upgrade.
 	price: How much the upgrade costs to purchase.
 	level_req_1: The level the unit's first upgradable stat needs to be in order to get purchased
@@ -91,7 +173,7 @@ function StatUpgrade(_unit, _title = "No Name", _max_level = 5, _starting_level 
 	level_req_3: The level the unit's third upgradable stat needs to be in order to get purchased
 	
 */
-function UnitUpgrade(_upgrade_to, _price, _level_req_1 = 0, _level_req_2 = 0, _level_req_3 = 0) constructor {
+function OldUnitUpgrade(_upgrade_to, _price, _level_req_1 = 0, _level_req_2 = 0, _level_req_3 = 0) constructor {
 	upgrade_to = _upgrade_to;
 	price = _price;
 	
@@ -108,23 +190,11 @@ function UnitUpgrade(_upgrade_to, _price, _level_req_1 = 0, _level_req_2 = 0, _l
 #region SampleGunnerAttackSpeedUpgrade
 /*
 	Attack speed upgrade for Sample Gunner
-	
-	TODO: Write variables for this
 */
-function SampleGunnerAttackSpeedUpgrade(_unit) : 
-	StatUpgrade(_unit, "Faster Firing", 5, 0, 
-		"Decrease attack speed by 0.3 seconds with each upgrade.", spr_increase_attack_speed_icon) constructor {
-	/*
-	price_fn = function(upgrade_level) {
-		return 10*upgrade_level;
-	}
-	current_price = price_fn(1);
-	
-	on_upgrade = function() {
-		unit.seconds_per_shot -= 0.3;
-		current_level++;
-		current_price = price_fn(current_level+1);
-	}*/
+function SampleGunnerAttackSpeedUpgrade(_unit = other) : 
+	StatUpgrade("Faster Firing", 5, 0, 
+		"Decrease attack speed by 0.3 seconds with each upgrade.", spr_increase_attack_speed_icon, _unit) constructor {
+
 	static upgrade_stats_fn = function() {
 		unit.seconds_per_shot -= 0.3
 	}
@@ -141,12 +211,10 @@ function SampleGunnerAttackSpeedUpgrade(_unit) :
 #region SampleGunnerDamageUpgrade
 /*
 	Damage upgrade for Sample Gunner
-	
-	TODO: Write variables for this
 */
-function SampleGunnerDamageUpgrade(_unit) : 
-	StatUpgrade(_unit, "Stronger Shots", 5, 0,
-		"Increase damage by 10 with each upgrade.", spr_increase_damage_icon) constructor {
+function SampleGunnerDamageUpgrade(_unit = other) : 
+	StatUpgrade("Stronger Shots", 5, 0,
+		"Increase damage by 10 with each upgrade.", spr_increase_damage_icon, _unit) constructor {
 
 	static upgrade_stats_fn = function() {
 		unit.bullet_damage += 10;
@@ -163,12 +231,10 @@ function SampleGunnerDamageUpgrade(_unit) :
 #region SampleGunnerRangeUpgrade
 /*
 	Range for Sample Gunner
-	
-	TODO: Write variables for this
 */
-function SampleGunnerRangeUpgrade(_unit) : 
-	StatUpgrade(_unit, "Binocular Power", 5, 0,
-		"Increase radius by half a tile with each upgrade.", spr_increase_range_icon) constructor {
+function SampleGunnerRangeUpgrade(_unit = other) : 
+	StatUpgrade("Binocular Power", 5, 0,
+		"Increase radius by half a tile with each upgrade.", spr_increase_range_icon, _unit) constructor {
 
 	static upgrade_stats_fn = function() {
 		unit.range.radius += TILE_SIZE/2;
@@ -188,7 +254,7 @@ function SampleGunnerRangeUpgrade(_unit) :
 	Upgrade from Sample Gunner to Sample Gunner Upgrade 1
 */
 function UpgradeToSampleGunnerUpgrade1() :
-	UnitUpgrade(sample_gunner_upgrade_1, 100, 2, 0, 3) constructor {
+	OldUnitUpgrade(sample_gunner_upgrade_1, 100, 2, 0, 3) constructor {
 }
 #endregion
 

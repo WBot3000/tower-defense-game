@@ -205,6 +205,13 @@ function Button(_x_pos, _y_pos,
 		}
 		draw_sprite(_spr, 0, x_pos, y_pos);
 	}
+	
+	static on_released_parent = on_released;
+	static on_released = function() {
+		if(!is_enabled()) { return; }
+		on_released_parent();
+		
+	}
 }
 #endregion
 
@@ -396,7 +403,7 @@ function KeyConfig(_x_pos, _y_pos, _key, _label = "Unnamed Toggle") : UIComponen
 		draw_set_halign(fa_center);
 		draw_sprite(spr_key_config, 0, x_pos, y_pos);
 		if(!selected || floor(get_timer()/500000) % 2 == 1) { //Basic flashing effect
-			draw_text_color(x_pos + 32, y_pos, global.GAME_CONFIG_SETTINGS.controls[$ key], 
+			draw_text_color(x_pos + 32, y_pos, global.GAME_CONFIG_OPTIONS.controls[$ key], 
 			c_white, c_white, c_white, c_white, 1);
 		}
 		draw_set_halign(fa_left)
@@ -411,7 +418,7 @@ function KeyConfig(_x_pos, _y_pos, _key, _label = "Unnamed Toggle") : UIComponen
 	//TODO: Replace with key change modal probably
 	static on_step = function() {
 		if(selected && keyboard_check_pressed(vk_anykey)) {
-			global.GAME_CONFIG_SETTINGS.controls[$ key] = string_upper(keyboard_lastchar);
+			global.GAME_CONFIG_OPTIONS.controls[$ key] = string_upper(keyboard_lastchar);
 			selected = false;
 		}
 	}

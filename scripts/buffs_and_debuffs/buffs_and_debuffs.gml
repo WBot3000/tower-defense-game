@@ -1,5 +1,5 @@
 /*
-	buffs.gml
+	buffs_and_debuffs.gml
 	
 	This file contains information for unit and enemy buffs and debuffs.
 	

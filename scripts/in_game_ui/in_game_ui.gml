@@ -165,10 +165,14 @@ function OptionsMenuControlsTab(_x_pos, _y_pos) :
 
 #region MusicVolumeSlider (Class)
 function MusicVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x_pos_left, _x_pos_right, _y_pos, "Music Volume") constructor {
+	
+	current_value = global.GAME_CONFIG_OPTIONS.music_volume; //Do this each time the slider is created so options are maintained between rooms
+	current_value_x_pos = map_value(current_value, min_value, max_value, x_pos, x_pos_right);
+	
 	static on_step_parent = on_step;
 	static on_step = function() {
 		on_step_parent();
-		global.GAME_CONFIG_SETTINGS.music_volume = current_value
+		global.GAME_CONFIG_OPTIONS.music_volume = current_value
 		global.BACKGROUND_MUSIC_MANAGER.adjust_volume();
 	}
 }
@@ -177,10 +181,14 @@ function MusicVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x_pos_le
 
 #region SoundEffectsVolumeSlider (Class)
 function SoundEffectsVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x_pos_left, _x_pos_right, _y_pos, "Sound Effects Volume") constructor {
+	
+	current_value = global.GAME_CONFIG_OPTIONS.music_volume; //Do this each time the slider is created so options are maintained between rooms
+	current_value_x_pos = map_value(current_value, min_value, max_value, x_pos, x_pos_right);
+	
 	static on_step_parent = on_step;
 	static on_step = function() {
 		on_step_parent();
-		global.GAME_CONFIG_SETTINGS.sound_effects_volume = current_value
+		global.GAME_CONFIG_OPTIONS.sound_effects_volume = current_value
 	}
 }
 #endregion
@@ -565,7 +573,7 @@ function UnitPurchaseMenu(_purchase_data_list) : UIComponent() constructor {
 	
 	static toggle_open = function() {
 		var _game_state_manager = get_game_state_manager();
-		if(_game_state_manager && _game_state_manager.state != GAME_STATE.PAUSED) { //Don't do any toggling if the game is paused
+		if(_game_state_manager && _game_state_manager.state == GAME_STATE.RUNNING) { //Don't do any toggling if the game is paused
 			play_sound_effect(SFX_Menu_Open);
 			state = SLIDING_MENU_STATE.OPENING;
 		}
@@ -574,7 +582,7 @@ function UnitPurchaseMenu(_purchase_data_list) : UIComponent() constructor {
 	
 	static toggle_closed = function() {
 		var _game_state_manager = get_game_state_manager();
-		if(_game_state_manager && _game_state_manager.state != GAME_STATE.PAUSED) {
+		if(_game_state_manager && _game_state_manager.state == GAME_STATE.RUNNING) {
 			play_sound_effect(SFX_Menu_Close);
 			state = SLIDING_MENU_STATE.CLOSING;
 		}
@@ -589,7 +597,7 @@ function UnitPurchaseMenu(_purchase_data_list) : UIComponent() constructor {
 		var _x_delta = 0;
 		switch (state) {
 			case SLIDING_MENU_STATE.CLOSED:
-				if(keyboard_check_pressed(ord(global.GAME_CONFIG_SETTINGS.controls.open_shop_key))) {
+				if(keyboard_check_pressed(ord(global.GAME_CONFIG_OPTIONS.controls.open_shop_key))) {
 					toggle_open();
 				}
 			    break;
@@ -610,7 +618,7 @@ function UnitPurchaseMenu(_purchase_data_list) : UIComponent() constructor {
 				}
 				break;
 			case SLIDING_MENU_STATE.OPEN:
-				if(keyboard_check_pressed(ord(global.GAME_CONFIG_SETTINGS.controls.open_shop_key))) {
+				if(keyboard_check_pressed(ord(global.GAME_CONFIG_OPTIONS.controls.open_shop_key))) {
 					toggle_closed();
 				}
 				break;
@@ -631,77 +639,6 @@ function UnitPurchaseMenu(_purchase_data_list) : UIComponent() constructor {
 #macro STAT_BUTTON_SIZE sprite_get_width(spr_stat_icon)
 
 #region StatUpgradeButton (Class)
-/*
-	The button that should be clicked to purchase an upgrade
-	
-	Argument Variables:
-	(All argument variables correspond with non-underscored data variables)
-	
-	Data Variables:
-	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
-	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
-	stat_upgrade_data: Unit's upgrade data that should be displayed
-	
-	NOTE: All of these variables should be passed from the UnitInfoCardStatUpgrade
-*/
-function StatUpgradeButton(_x_pos, _y_pos, _stat_upgrade_data = undefined) :
-	Button(_x_pos, _y_pos, spr_upgrade_purchase_default, spr_upgrade_purchase_disabled) constructor {
-
-	stat_upgrade_data = _stat_upgrade_data;
-	
-	static draw_parent = draw;
-	static draw = function() {		
-		if(stat_upgrade_data == undefined) {
-			draw_sprite(spr_blank_stat_icon, 0, x_pos, y_pos);
-			return; //No drawing needed for a stat that doesn't exist
-		}
-
-		draw_parent();
-		
-		draw_set_alignments(fa_right, fa_bottom);
-		if(stat_upgrade_data.current_level >= stat_upgrade_data.max_level) {
-			draw_text_color(x_pos + sprite_get_width(button_sprite_default)*0.9,
-				y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4, "MAX", 
-				c_white, c_white, c_white, c_white, 1);
-		}
-		else {
-			draw_text_color(x_pos + sprite_get_width(button_sprite_default)*0.9, 
-				y_pos + sprite_get_height(stat_upgrade_data.upgrade_spr) - 4, stat_upgrade_data.current_price, 
-				c_white, c_white, c_white, c_white, 1);
-		}
-		draw_set_alignments();
-	}
-	
-	static is_enabled = function() {
-		return (stat_upgrade_data != undefined 
-			&& global.player_money >= stat_upgrade_data.current_price 
-			&& stat_upgrade_data.current_level < stat_upgrade_data.max_level);
-	}
-	
-	static released_fn = function() {
-		if(stat_upgrade_data != undefined) {
-			global.player_money -= stat_upgrade_data.current_price;
-			stat_upgrade_data.on_upgrade();
-		}
-	}
-	
-}
-#endregion
-
-
-#region StatUpgradeDisplay (Class)
-/*
-	Used to display a stat upgrade button alongside its graphic.
-	
-	Argument Variables:
-	
-	Data Variables:
-	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
-	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
-	stat_upgrade_data: Unit's upgrade data that should be displayed
-	(For draw_stat_level):
-	stat_level: The level of the stat being displayed
-*/
 function draw_stat_level(_x_pos, _y_pos, _stat_level) {
 	draw_set_alignments(fa_right, fa_bottom);
 	//Draws the number to the right
@@ -711,39 +648,109 @@ function draw_stat_level(_x_pos, _y_pos, _stat_level) {
 		c_white, c_white, c_white, c_white, 1);
 	draw_set_alignments();
 }
+/*
+	The button that should be clicked to purchase an upgrade
+	
+	Argument Variables:
+	(All argument variables correspond with non-underscored data variables)
+	
+	Data Variables:
+	x_pos: Horizontal position of the left of the upgrade info (relative to the UnitInfoCard)
+	y_pos: Vertical position of the top of the upgrade info (relative to the UnitInfoCard)
+	stat_upgrades: Unit's upgrade data that should be displayed
+	
+	NOTE: All of these variables should be passed from the UnitInfoCardStatUpgrade
+*/
 
-function StatUpgradeDisplay(_x_pos, _y_pos) : UIComponent(_x_pos, _y_pos) constructor {
-	stat_upgrade_data = undefined;
-	selected_unit = noone;
-	
-	stat_upgrade_button = new StatUpgradeButton(0, STAT_BUTTON_SIZE);
-	stat_upgrade_button.activate();
-	
-	children = [stat_upgrade_button];
+function StatUpgradeButton(_x_pos, _y_pos, _upgrade_idx) :
+	Button(_x_pos, _y_pos, spr_upgrade_purchase_default, spr_upgrade_purchase_disabled) constructor {
+
+	selected_entity_manager = get_selected_entity_manager(); //NOTE: So it seems like this already exists, despite me thinking it wouldn't beforehand.
+	//stat_upgrades = _stat_upgrades;
+	upgrade_idx = _upgrade_idx;
 	
 	static draw_parent = draw;
 	static draw = function() {
-		if(selected_unit == noone) {
-			return; //Nothing to draw
+		//TODO: This behavior appears a lot, find a good way to encapsulate it (tried doing it, but didn't seem like it was doing a lot, also brain kinda rotted now ngl)
+		selected_entity_manager = selected_entity_manager ?? get_selected_entity_manager();
+		if(selected_entity_manager == undefined) {
+			return false;
 		}
-
-		if(stat_upgrade_data != undefined) { //Draw blank space if you need to 
-			draw_sprite(stat_upgrade_data.upgrade_spr, 0, 
-				x_pos, y_pos);
-			draw_stat_level(x_pos, y_pos, stat_upgrade_data.current_level)
+		
+		var _entity = selected_entity_manager.currently_selected_entity;
+		
+		if(_entity == noone) {
+			return false;
+		}
+		
+		var _stat_upgrades = _entity.entity_data.stat_upgrades;
+		
+		draw_parent();
+		
+		if(_stat_upgrades[upgrade_idx] == undefined) {
+			draw_sprite(spr_blank_stat_icon, 0, x_pos, y_pos);
+			draw_sprite(spr_blank_stat_icon, 0, x_pos, y_pos - STAT_BUTTON_SIZE);
+			return; //No drawing needed for a stat that doesn't exist
+		}
+		
+		draw_sprite(_stat_upgrades[upgrade_idx].upgrade_spr, 0, x_pos, y_pos - STAT_BUTTON_SIZE);
+		draw_stat_level(x_pos, y_pos - STAT_BUTTON_SIZE, _stat_upgrades[upgrade_idx].current_level);
+		
+		draw_set_alignments(fa_right, fa_bottom);
+		if(_stat_upgrades[upgrade_idx].current_level >= _stat_upgrades[upgrade_idx].max_level) {
+			draw_text_color(x_pos + sprite_get_width(button_sprite_default)*0.9,
+				y_pos + sprite_get_height(_stat_upgrades[upgrade_idx].upgrade_spr) - 4, "MAX", 
+				c_white, c_white, c_white, c_white, 1);
 		}
 		else {
-			draw_sprite(spr_blank_stat_icon, 0, x_pos, y_pos);
+			draw_text_color(x_pos + sprite_get_width(button_sprite_default)*0.9, 
+				y_pos + sprite_get_height(_stat_upgrades[upgrade_idx].upgrade_spr) - 4, _stat_upgrades[upgrade_idx].current_price, 
+				c_white, c_white, c_white, c_white, 1);
 		}
-		draw_parent();
+		draw_set_alignments();
 	}
 	
 	
-	static on_selected_unit_change = function(_new_stat_data, _new_selected_unit) {
-		stat_upgrade_data = _new_stat_data;
-		stat_upgrade_button.stat_upgrade_data = _new_stat_data;
-		selected_unit = _new_selected_unit;
+	static is_enabled = function() {
+		selected_entity_manager = selected_entity_manager ?? get_selected_entity_manager();
+		if(selected_entity_manager == undefined) {
+			return;
+		}
+		
+		var _entity = selected_entity_manager.currently_selected_entity;
+		
+		if(_entity == noone) {
+			return;
+		}
+		
+		var _stat_upgrades = _entity.entity_data.stat_upgrades;
+		
+		return (_stat_upgrades[upgrade_idx] != undefined 
+			&& global.player_money >= _stat_upgrades[upgrade_idx].current_price 
+			&& _stat_upgrades[upgrade_idx].current_level < _stat_upgrades[upgrade_idx].max_level);
 	}
+	
+	
+	static released_fn = function() {
+		selected_entity_manager = selected_entity_manager ?? get_selected_entity_manager();
+		if(selected_entity_manager == undefined) {
+			return;
+		}
+		
+		var _entity = selected_entity_manager.currently_selected_entity;
+		
+		if(_entity == noone) {
+			return;
+		}
+		
+		var _stat_upgrades = _entity.entity_data.stat_upgrades;
+		
+		if(_stat_upgrades[upgrade_idx] != undefined) {
+			global.player_money -= _stat_upgrades[upgrade_idx].current_price;
+			_stat_upgrades[upgrade_idx].on_upgrade();
+		}
+	}
+	
 }
 #endregion
 
@@ -752,55 +759,74 @@ function StatUpgradeDisplay(_x_pos, _y_pos) : UIComponent(_x_pos, _y_pos) constr
 /*
 	Button clicked to upgrade a unit into a different one.
 */
-function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _selected_unit = noone) : 
+function UnitUpgradeButton(_x_pos, _y_pos, _upgrade_idx) : 
 		Button(_x_pos, _y_pos, spr_unit_purchase_button_default, spr_unit_purchase_button_disabled, spr_unit_purchase_button_highlighted) constructor {
 			
-	unit_upgrade_data = _unit_upgrade_data;
-	selected_unit = _selected_unit;
+	selected_entity_manager = get_selected_entity_manager();
+	upgrade_idx = _upgrade_idx;
 	
 	
 	static is_enabled = function() {
-		return (selected_unit != noone && unit_upgrade_data != undefined && global.player_money >= unit_upgrade_data.price &&
-			selected_unit.stat_upgrades[0].current_level >= unit_upgrade_data.level_req_1 &&
-			selected_unit.stat_upgrades[1].current_level >= unit_upgrade_data.level_req_2 &&
-			selected_unit.stat_upgrades[2].current_level >= unit_upgrade_data.level_req_3)
+		selected_entity_manager = selected_entity_manager ?? get_selected_entity_manager();
+		if(selected_entity_manager == undefined) {
+			return false;
+		}
+		
+		var _entity = selected_entity_manager.currently_selected_entity;
+		if(_entity == noone) {
+			return false;
+		}
+		
+		var _stat_upgrades = _entity.entity_data.stat_upgrades;
+		var _unit_upgrade = _entity.entity_data.unit_upgrades[upgrade_idx];
+		
+		return (_unit_upgrade != undefined && global.player_money >= _unit_upgrade.price &&
+			_stat_upgrades[0].current_level >= _unit_upgrade.level_req_1 &&
+			_stat_upgrades[1].current_level >= _unit_upgrade.level_req_2 &&
+			_stat_upgrades[2].current_level >= _unit_upgrade.level_req_3)
 	}
 	
 	
-	static on_selected_unit_change = function(_new_upgrade_data, _new_selected_unit) {
-		unit_upgrade_data = _new_upgrade_data;
-		selected_unit = _new_selected_unit;
-	}
-	
-
 	static draw_parent = draw;
-	
-
 	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
 	static draw = function(_button_highlight_enabled = true) {
-		if(selected_unit == noone) {
-			return; //Nothing to draw
+		selected_entity_manager = selected_entity_manager ?? get_selected_entity_manager();
+		if(selected_entity_manager == undefined) {
+			return;
+		}
+		
+		var _entity = selected_entity_manager.currently_selected_entity;
+		if(_entity == noone) {
+			return false;
 		}
 		
 		draw_parent(_button_highlight_enabled);
-		if(unit_upgrade_data != undefined) {
-			draw_sprite(object_get_sprite(unit_upgrade_data.upgrade_to), 0, x_pos + 8 + TILE_SIZE/2, y_pos + 4 + TILE_SIZE);
+		
+		var _unit_upgrade = _entity.entity_data.unit_upgrades[upgrade_idx];
+		if(_unit_upgrade != undefined) {
+			var _upgrade_sprite = _unit_upgrade.new_animbank.get_animation("DEFAULT");
+			
+			draw_sprite(_upgrade_sprite, 0, x_pos + 8 + TILE_SIZE/2, y_pos + 4 + TILE_SIZE);
 			draw_set_halign(fa_right);
-			draw_text(x_pos + sprite_get_width(button_sprite_default) - 8, y_pos + 72, string(unit_upgrade_data.price));
+			draw_text(x_pos + sprite_get_width(button_sprite_default) - 8, y_pos + 72, string(_unit_upgrade.price));
 			draw_set_halign(fa_left);
 		}
 	}
 	
 	static released_fn = function() {
-		if(unit_upgrade_data != undefined) {
-			global.player_money -= unit_upgrade_data.price;
-			with(selected_unit) {	
-				//TODO: Need a better way to perform upgrades
-				//1) I want to be able to run new code on upgrade. Can put it in create event and set flag to true, but I don't want to run destroy/clean up events
-				//2) The reference becomes invalid on the frame the instance is changed. Don't want that
-				//In general, I should work on a more data-oriented approach to defining units.
-				instance_change(other.unit_upgrade_data.upgrade_to, false);
-			}
+		selected_entity_manager = selected_entity_manager ?? get_selected_entity_manager();
+		if(selected_entity_manager == undefined) {
+			return;
+		}
+		
+		var _entity = selected_entity_manager.currently_selected_entity;
+		if(_entity == noone) {
+			return false;
+		}
+		
+		if(_entity.entity_data.unit_upgrades[upgrade_idx] != undefined) {
+			global.player_money -= _entity.entity_data.unit_upgrades[upgrade_idx].price;
+			_entity.entity_data.unit_upgrades[upgrade_idx].on_upgrade();
 		}
 	}
 }
@@ -814,7 +840,8 @@ function UnitUpgradeButton(_x_pos, _y_pos, _unit_upgrade_data = undefined, _sele
 #macro TARGETING_INDICATOR_WIDTH 96
 #macro TARGETING_INDICATOR_HEIGHT 24
 function TargetingIndicator(_x_pos, _y_pos) : UIComponent(_x_pos, _y_pos) constructor {
-	selected_unit = noone;
+	
+	selected_entity_manager = get_selected_entity_manager();
 	
 	static is_highlighted = function() {
 		var _mouse_x_gui = device_mouse_x_to_gui(0);
@@ -826,11 +853,18 @@ function TargetingIndicator(_x_pos, _y_pos) : UIComponent(_x_pos, _y_pos) constr
 	
 	
 	static draw = function() {
-		if(selected_unit == noone || array_length(selected_unit.targeting_tracker.potential_targeting_types) == 0) {
+		selected_entity_manager = selected_entity_manager ?? get_selected_entity_manager();
+		if(selected_entity_manager == undefined) {
+			return
+		}
+		
+		var _entity = selected_entity_manager.currently_selected_entity
+		
+		if(_entity == noone || array_length(_entity.entity_data.targeting_tracker.potential_targeting_types) == 0) {
 			return;
 		}
 
-		var _targeting_type = selected_unit.targeting_tracker.get_current_targeting_type();
+		var _targeting_type = _entity.entity_data.targeting_tracker.get_current_targeting_type();
 		
 		draw_rectangle_color(x_pos, y_pos, 
 			x_pos + TARGETING_INDICATOR_WIDTH, y_pos + TARGETING_INDICATOR_HEIGHT,
@@ -847,36 +881,52 @@ function TargetingIndicator(_x_pos, _y_pos) : UIComponent(_x_pos, _y_pos) constr
 /*
 	Button clicked to sell a unit for cash back
 */
-function SellButton(_x_pos, _y_pos, _selected_unit = noone) :
+function SellButton(_x_pos, _y_pos) :
 		Button(_x_pos, _y_pos, spr_sell_button_default, spr_sell_button_disabled, spr_sell_button_default) constructor {
 
-	selected_unit = _selected_unit;
+	selected_entity_manager = get_selected_entity_manager();
 	
 	static is_enabled = function() {
-		return selected_unit != noone;
+		selected_entity_manager = selected_entity_manager ?? get_selected_entity_manager();
+		if(selected_entity_manager == undefined) {
+			return false;
+		}
+		return selected_entity_manager.currently_selected_entity != noone;
 	}
 	
 	//_x_offset and _y_offset are the origins of the menu
 	// _button_highlight_enabled lets you turn of the button highlighting while the game is paused
 	static draw = function(_x_offset, _y_offset, _button_highlight_enabled = true) {
-		if(selected_unit == noone) {
-			return; //Nothing to draw
+		selected_entity_manager = selected_entity_manager ?? get_selected_entity_manager();
+		if(selected_entity_manager == undefined) {
+			return
+		}
+		
+		var _entity = selected_entity_manager.currently_selected_entity
+		if(_entity == noone) {
+			return;
 		}
 		
 		draw_sprite(button_sprite_default, 0, x_pos, y_pos);
 		draw_set_alignments(fa_right, fa_center);
-		draw_text(x_pos + sprite_get_width(button_sprite_default) - 8, y_pos + sprite_get_height(button_sprite_default)/2, string(selected_unit.sell_price));
+		draw_text(x_pos + sprite_get_width(button_sprite_default) - 8, y_pos + sprite_get_height(button_sprite_default)/2, string(_entity.entity_data.sell_price));
 		draw_set_alignments();
 	}
 	
 	static released_fn = function() {
-		if(selected_unit != noone) {
+		selected_entity_manager = selected_entity_manager ?? get_selected_entity_manager();
+		if(selected_entity_manager == undefined) {
+			return
+		}
+		
+		var _entity = selected_entity_manager.currently_selected_entity
+		if(_entity != noone) {
 			//Since the origin of units is centre-bottom, check one point above the origin for the tile. Otherwise, we accidentally mark the tile below as free for placement.
-			var _tile = instance_position(selected_unit.x, selected_unit.y - 1, placeable_tile);
+			var _tile = instance_position(_entity.x, _entity.y - 1, placeable_tile);
 			_tile.placed_unit = noone;
-			global.player_money += selected_unit.sell_price;
-			instance_destroy(selected_unit);
-			parent.on_selected_unit_change(noone); //Don't want this menu referencing a unit that doesn't exist anymore
+			global.player_money += _entity.entity_data.sell_price;
+			selected_entity_manager.deselect_entity(); //Need to clear this reference so it isn't pointing to something invalid
+			instance_destroy(_entity);
 		}
 	}
 }
@@ -938,30 +988,30 @@ function ToggleInfoCardButton(_x_pos, _y_pos) :
 
 function UnitInfoCard() : UIComponent() constructor {
 	state = SLIDING_MENU_STATE.CLOSED; //Whether the menu on the bottom is opened or closed
-	selected_unit = noone;
 	cached_game_state_manager = get_game_state_manager();
+	selected_entity_manager = get_selected_entity_manager();
 	
 	y_pos_open = (1-UNIT_INFO_CARD_SCREEN_PERCENTAGE) * view_h; //NOTE: Is an absolute position
 	y_pos = view_h; //Hack since this absolute and relative coordinates are the same.
 	
 	//Stat Upgrade Info
-	stat_upgrade_button_1 = new StatUpgradeDisplay(TILE_SIZE*4.5, TILE_SIZE/2);
+	stat_upgrade_button_1 = new StatUpgradeButton(TILE_SIZE*4.5, TILE_SIZE, 0);
 	stat_upgrade_button_1.activate();
-	stat_upgrade_button_2 = new StatUpgradeDisplay(TILE_SIZE*5.25, TILE_SIZE/2);
+	stat_upgrade_button_2 = new StatUpgradeButton(TILE_SIZE*5.25, TILE_SIZE, 1);
 	stat_upgrade_button_2.activate();
-	stat_upgrade_button_3 = new StatUpgradeDisplay(TILE_SIZE*6, TILE_SIZE/2);
+	stat_upgrade_button_3 = new StatUpgradeButton(TILE_SIZE*6, TILE_SIZE, 2);
 	stat_upgrade_button_3.activate();
-	stat_upgrade_button_4 = new StatUpgradeDisplay(TILE_SIZE*6.75, TILE_SIZE/2);
+	stat_upgrade_button_4 = new StatUpgradeButton(TILE_SIZE*6.75, TILE_SIZE, 3);
 	stat_upgrade_button_4.activate();
 	//For iterating through the stat upgrade buttons
 	stat_upgrade_buttons = [stat_upgrade_button_1, stat_upgrade_button_2, stat_upgrade_button_3, stat_upgrade_button_4];
 	
 	//Unit Upgrade Info
-	unit_upgrade_button_1 = new UnitUpgradeButton(TILE_SIZE*8, TILE_SIZE/2, undefined, noone);
+	unit_upgrade_button_1 = new UnitUpgradeButton(TILE_SIZE*8, TILE_SIZE/2, 0);
 	unit_upgrade_button_1.activate();
-	unit_upgrade_button_2 = new UnitUpgradeButton(TILE_SIZE*9.5, TILE_SIZE/2, undefined, noone);
+	unit_upgrade_button_2 = new UnitUpgradeButton(TILE_SIZE*9.5, TILE_SIZE/2, 1);
 	unit_upgrade_button_2.activate();
-	unit_upgrade_button_3 = new UnitUpgradeButton(TILE_SIZE*11, TILE_SIZE/2, undefined, noone);
+	unit_upgrade_button_3 = new UnitUpgradeButton(TILE_SIZE*11, TILE_SIZE/2, 2);
 	unit_upgrade_button_3.activate();
 	
 	//Targeting Indicator
@@ -969,7 +1019,7 @@ function UnitInfoCard() : UIComponent() constructor {
 	targeting_indicator.activate();
 	
 	//Sell Button
-	sell_button = new SellButton(TILE_SIZE*13, TILE_SIZE/4, noone);
+	sell_button = new SellButton(TILE_SIZE*13, TILE_SIZE/4);
 	sell_button.activate();
 	
 	//Menu Toggle Button
@@ -980,32 +1030,6 @@ function UnitInfoCard() : UIComponent() constructor {
 		unit_upgrade_button_1, unit_upgrade_button_2, unit_upgrade_button_3,
 		targeting_indicator, sell_button, toggle_button];
 	
-	//Called when the selected unit is changed
-	static on_selected_unit_change = function(_new_selected_unit) {
-		selected_unit = _new_selected_unit;
-		sell_button.selected_unit = selected_unit
-		targeting_indicator.selected_unit = selected_unit;
-		
-		if(_new_selected_unit != noone) {
-			stat_upgrade_button_1.on_selected_unit_change(selected_unit.stat_upgrades[0], selected_unit);
-			stat_upgrade_button_2.on_selected_unit_change(selected_unit.stat_upgrades[1], selected_unit);
-			stat_upgrade_button_3.on_selected_unit_change(selected_unit.stat_upgrades[2], selected_unit);
-			stat_upgrade_button_4.on_selected_unit_change(selected_unit.stat_upgrades[3], selected_unit);
-			unit_upgrade_button_1.on_selected_unit_change(selected_unit.unit_upgrade_1, selected_unit);
-			unit_upgrade_button_2.on_selected_unit_change(selected_unit.unit_upgrade_2, selected_unit);
-			unit_upgrade_button_3.on_selected_unit_change(selected_unit.unit_upgrade_3, selected_unit);
-		}
-		else {
-			stat_upgrade_button_1.on_selected_unit_change(undefined, noone);
-			stat_upgrade_button_2.on_selected_unit_change(undefined, noone);
-			stat_upgrade_button_3.on_selected_unit_change(undefined, noone);
-			stat_upgrade_button_4.on_selected_unit_change(undefined, noone);
-			unit_upgrade_button_1.on_selected_unit_change(undefined, noone);
-			unit_upgrade_button_2.on_selected_unit_change(undefined, noone);
-			unit_upgrade_button_3.on_selected_unit_change(undefined, noone);
-		}
-	}
-
 	
 	static is_highlighted = function() {
 		//Need to include check for toggle button, since it peaks past the normal boundaries of the menu
@@ -1017,30 +1041,37 @@ function UnitInfoCard() : UIComponent() constructor {
 	static draw = function() {		
 		draw_rectangle_color(0, y_pos, view_w, view_h, c_dkgray, c_dkgray, c_dkgray, c_dkgray, false);
 		draw_parent(0, 0);
-		if(selected_unit != noone) {
-			draw_sprite(selected_unit.sprite_index, 0, TILE_SIZE, y_pos + 5*TILE_SIZE/4);
+		
+		selected_entity_manager = selected_entity_manager ?? get_selected_entity_manager();
+		if(selected_entity_manager == undefined) {
+			return
 		}
 		
-		//Draw any necessary highlights. This is done after all of the other drawing so that they'll always be on top.
-		for(var i = 0; i < array_length(stat_upgrade_buttons); i++) {
-			var _mouse_x_gui = device_mouse_x_to_gui(0);
-			var _mouse_y_gui = device_mouse_y_to_gui(0);
-			var _region_highlighted = _mouse_x_gui >= stat_upgrade_buttons[i].x_pos && _mouse_x_gui <= stat_upgrade_buttons[i].x_pos + STAT_BUTTON_SIZE &&
-				_mouse_y_gui >= stat_upgrade_buttons[i].y_pos && _mouse_y_gui <= stat_upgrade_buttons[i].y_pos + STAT_BUTTON_SIZE
+		var _entity = selected_entity_manager.currently_selected_entity
+		
+		if(_entity != noone) {
+			draw_sprite(_entity.sprite_index, 0, TILE_SIZE, y_pos + 5*TILE_SIZE/4);
+			
+			//Draw any necessary highlights. This is done after all of the other drawing so that they'll always be on top.
+			var _data = _entity.entity_data;
+			for(var i = 0; i < array_length(_data.stat_upgrades); ++i) {
+				var _mouse_x_gui = device_mouse_x_to_gui(0);
+				var _mouse_y_gui = device_mouse_y_to_gui(0);
+				var _region_highlighted = _mouse_x_gui >= stat_upgrade_buttons[i].x_pos && _mouse_x_gui <= stat_upgrade_buttons[i].x_pos + STAT_BUTTON_SIZE &&
+					_mouse_y_gui >= stat_upgrade_buttons[i].y_pos - STAT_BUTTON_SIZE && _mouse_y_gui <= stat_upgrade_buttons[i].y_pos + STAT_BUTTON_SIZE
 					
-			if(stat_upgrade_buttons[i].stat_upgrade_data != undefined && _region_highlighted) { //Need more than just standard highlight since this should include the icon along with the button
-				draw_highlight_info(stat_upgrade_buttons[i].stat_upgrade_data.title, 
-				stat_upgrade_buttons[i].stat_upgrade_data.description);
-				break; //Only need to draw one highlight
+				if(_data.stat_upgrades[i] != undefined && _region_highlighted) { //Need more than just standard highlight since this should include the icon along with the button
+					draw_highlight_info(_data.stat_upgrades[i].title, _data.stat_upgrades[i].description);
+					break; //Only need to draw one highlight
+				}
 			}
 		}
-		
 	}
 	
 	
 	static toggle_open = function() {
 		var _game_state_manager = get_game_state_manager();
-		if(_game_state_manager && _game_state_manager.state != GAME_STATE.PAUSED) { //Don't do any toggling if the game is paused
+		if(_game_state_manager && _game_state_manager.state == GAME_STATE.RUNNING) { //Only allow toggling if the game is running
 			play_sound_effect(SFX_Menu_Open);
 			state = SLIDING_MENU_STATE.OPENING;
 		}
@@ -1049,7 +1080,7 @@ function UnitInfoCard() : UIComponent() constructor {
 	
 	static toggle_closed = function() {
 		var _game_state_manager = get_game_state_manager();
-		if(_game_state_manager && _game_state_manager.state != GAME_STATE.PAUSED) { //Don't do any toggling if the game is paused
+		if(_game_state_manager && _game_state_manager.state == GAME_STATE.RUNNING) {
 			play_sound_effect(SFX_Menu_Close);
 			state = SLIDING_MENU_STATE.CLOSING;
 		}
@@ -1064,7 +1095,7 @@ function UnitInfoCard() : UIComponent() constructor {
 		var _y_delta = 0;
 		switch (state) {
 			case SLIDING_MENU_STATE.CLOSED:
-				if(keyboard_check_pressed(ord(global.GAME_CONFIG_SETTINGS.controls.open_unit_info_key))) {
+				if(keyboard_check_pressed(ord(global.GAME_CONFIG_OPTIONS.controls.open_unit_info_key))) {
 					toggle_open();
 				}
 			    break;
@@ -1085,7 +1116,7 @@ function UnitInfoCard() : UIComponent() constructor {
 				}
 				break;
 			case SLIDING_MENU_STATE.OPEN:
-				if(keyboard_check_pressed(ord(global.GAME_CONFIG_SETTINGS.controls.open_unit_info_key))) {
+				if(keyboard_check_pressed(ord(global.GAME_CONFIG_OPTIONS.controls.open_unit_info_key))) {
 					toggle_closed();
 				}
 				break;

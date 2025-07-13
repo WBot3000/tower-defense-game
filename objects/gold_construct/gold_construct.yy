@@ -14,8 +14,8 @@
     "path":"folders/Objects/unit_types/Gold.yy",
   },
   "parentObjectId":{
-    "name":"base_unit",
-    "path":"objects/base_unit/base_unit.yy",
+    "name":"base_unit_old",
+    "path":"objects/base_unit_old/base_unit_old.yy",
   },
   "persistent":false,
   "physicsAngularDamping":0.1,

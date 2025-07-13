@@ -1,5 +1,4 @@
 /// @description Declare variables and initiate moving
-// TODO: Inherit from base enemy in case a value isn't defined?
 name = "Butterfly-barian"
 
 max_health = 30;

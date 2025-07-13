@@ -1,5 +1,14 @@
 /// @description Checks to see if enemy falls below zero health, and to destroy it if it does.
-if(current_health <= 0) {
-	instance_destroy();
-	exit;
+
+entity_data.animation_controller.on_step();
+
+switch (entity_data.health_state) {
+    case HEALTH_STATE.ACTIVE:
+		entity_data.while_active();
+        break;
+	case HEALTH_STATE.KNOCKED_OUT:
+		entity_data.while_knocked_out();
+		break;
+    default:
+        break;
 }

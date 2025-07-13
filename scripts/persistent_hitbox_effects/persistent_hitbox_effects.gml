@@ -48,7 +48,6 @@ function EntityCooldownList() constructor {
 	- Damanging them every frame would be excessive
 	Not strictly necesary if you just plan on inflicting the effect every frame.
 	
-	TODO: Think about using time sources for this too.
 	- Just using current time like this will break upon pausing the game. Time sources can be paused, so this issue goes away easily without having to manage multiple timers
 	TODO: Enable different effects for different kinds of entities?
 	- Specify this relationship using another struct

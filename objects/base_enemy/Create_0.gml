@@ -1,15 +1,7 @@
 ///@description Declare variables and initiate moving
+if(!variable_instance_exists(self, "enemy_data_type")) {
+	throw "Enemy data type not specified when attempting to spawn an enemy!"
+}
 
-name = "NAME_NOT_PROVIDED"
-
-max_health = 0;
-current_health = 0;
-
-default_movement_speed = 0;
-path_data = global.DATA_LEVEL_PATH_DUMMYPATH;
-
-monetary_value = 0;
-
-enemy_buffs = [];
-
-path_start(path_data.default_path, seconds_to_roomspeed_frames(default_movement_speed), path_action_stop, false);
+entity_data = new enemy_data_type(path_data, round_spawned_in);
+path_start(path_data.default_path, entity_data.default_movement_speed, path_action_stop, false);

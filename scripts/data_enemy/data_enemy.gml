@@ -11,8 +11,6 @@
 
 /*
 	Data that all enemies should have
-	obj: The corresponding object that is spawned with this data
-	name: What the enemy is referred to
 	max_health: The maximum amount of health this enemy normally has
 	current_health: The health that the enemy is currently has. Normally initialized to the same value as max_health.
 	monetary_value: The amount of money this enemy gives upon defeat
@@ -21,31 +19,39 @@
 	round_spawned_in: A pointer to the Round object that spawned the enemy. Needed to call back into the round when it gets destroyed
 	enemy_buffs: An array of all the buffs/debuffs the enemy has
 */
-/*
-function BaseEnemyData(_obj, _name, _max_health, _monetary_value, _round_spawned_in, _current_health = _max_health, _movement_path = pth_dummypath, _movement_speed = 0, _enemy_buffs = []) constructor{
-	obj = _obj;
-	name = _name;
+function Enemy(_path_data, _round_spawned_in) : Combatant() constructor {
 	
-	max_health = _max_health;
-	current_health = _current_health;
+	path_data = _path_data;
+	default_movement_speed = 1.5;
 	
-	monetary_value = _monetary_value;
+	round_spawned_in = _round_spawned_in
+	monetary_value = 50;
 	
-	movement_path = _movement_path;
-	movement_speed = _movement_speed;
+	//Performs all actions a unit can do while active
+	static while_active = function() {
+		for(var i = 0; i < array_length(action_queue); ++i) {
+			action_queue[i].execute();
+			action_queue[i].update_params();
+		}
+	}
 	
-	round_spawned_in = _round_spawned_in;
-	enemy_buffs = _enemy_buffs;
-
+	
+	//Called in the "dealing_damage" function once the entity's health reaches zero
+	static on_health_reached_zero = function() {
+		health_state = HEALTH_STATE.KNOCKED_OUT;
+		for(var i = 0; i < array_length(action_queue); ++i) {
+			action_queue[i].on_health_reached_zero();
+		}
+		with(inst) {
+			path_end();
+		}
+		animation_controller.set_animation("ON_KO", 1, function(){ instance_destroy(inst, true) });
+	}
+	
+	
+	static while_knocked_out = function() {} //Can put anything here that should be done after the enemy has been defeated
 }
 
-function SampleEnemyData(): BaseEnemyData(
-	_obj = sample_enemy,
-	_name = "Sample Enemy",
-	) constructor {
-	
-}
-*/
 
 /*
 	Whether an enemy should be moving or attacking

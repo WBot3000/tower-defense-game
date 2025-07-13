@@ -6,5 +6,6 @@ image_angle = darctan2(-y_speed, x_speed)
 
 enemies_in_range = ds_list_create();
 
+//pierce_count = 3
 //Prevents the same enemy from getting hit by the bullet more than once
 enemies_already_hit = []

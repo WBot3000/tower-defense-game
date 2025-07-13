@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"data_entity",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"data_entity",
+  "parent":{
+    "name":"data",
+    "path":"folders/Scripts/data.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -4,7 +4,7 @@ unit_name = "Sample Gunner";
 
 max_health = 100;
 current_health = 100;
-health_state = UNIT_STATE.ACTIVE;
+health_state = HEALTH_STATE.ACTIVE;
 recovery_rate = 10; //In health points per second
 
 radius = 2.5;
@@ -15,7 +15,7 @@ seconds_per_shot = 2;
 
 bullet_damage = 10;
 
-unit_buffs = [];
+buffs = [];
 
 //Stat Upgrades
 stat_upgrades = [new SampleGunnerAttackSpeedUpgrade(self.id), new SampleGunnerDamageUpgrade(self.id), 

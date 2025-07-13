@@ -16,12 +16,12 @@ animation_controller.on_step();
 var _frames_per_shot = seconds_to_roomspeed_frames(seconds_per_shot)
 shot_timer = min(shot_timer + 1, _frames_per_shot); //Done to prevent overflow
 
-if(health_state == UNIT_STATE.KNOCKED_OUT) {
+if(health_state == HEALTH_STATE.KNOCKED_OUT) {
 	var _amount_to_recover = recovery_rate / seconds_to_roomspeed_frames(1);
 	current_health = min(max_health, current_health + _amount_to_recover);
 	if(current_health >= max_health) {
 		animation_controller.set_animation(spr_sample_gunner_upgrade_1, LOOP_FOREVER);
-		health_state = UNIT_STATE.ACTIVE; 
+		health_state = HEALTH_STATE.ACTIVE; 
 	}
 	else { //If the unit can come back this frame, let them take action (why this is in an else)
 		exit; 
@@ -30,7 +30,7 @@ if(health_state == UNIT_STATE.KNOCKED_OUT) {
 
 if(current_health <= 0) { //If unit's health drops below zero, then it should get knocked out
 	animation_controller.set_animation(spr_sample_gunner_upgrade_1_ko, LOOP_FOREVER);
-	health_state = UNIT_STATE.KNOCKED_OUT;
+	health_state = HEALTH_STATE.KNOCKED_OUT;
 	exit;
 }
 

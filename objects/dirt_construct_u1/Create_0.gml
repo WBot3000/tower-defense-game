@@ -13,7 +13,7 @@ if(!variable_instance_exists(self.id, "current_health")) {
 	current_health = 100;
 }
 if(!variable_instance_exists(self.id, "health_state")) { 
-	health_state = UNIT_STATE.ACTIVE;
+	health_state = HEALTH_STATE.ACTIVE;
 }
 if(!variable_instance_exists(self.id, "recovery_rate")) { 
 	recovery_rate = 10; //In health points per second
@@ -58,8 +58,8 @@ if(!variable_instance_exists(self.id, "shot_speed")) {
 }
 shot_pierce = 3; //Number of enemies the shot can pierce before getting destroyed
 
-if(!variable_instance_exists(self.id, "unit_buffs")) { 
-	unit_buffs = [];
+if(!variable_instance_exists(self.id, "buffs")) { 
+	buffs = [];
 }
 
 //Stat Upgrades (TODO: Currently bugged, probably need to update some UI code too)

@@ -19,7 +19,7 @@ switch (attack_state) {
 			//Prioritize units over targets (they'll be at the front of the list
 			range.get_entities_in_range(base_unit, units_in_range, true);
 			range.get_entities_in_range(base_target, targets_in_range, true);
-			focused_entity = enemy_target_close(units_in_range, targets_in_range);
+			focused_entity = enemy_target_default(units_in_range, targets_in_range);
 
 			if(focused_entity != noone) {
 				path_speed = 0;
@@ -65,7 +65,7 @@ switch (attack_state) {
 				//Prioritize units over targets (they'll be at the front of the list
 				range.get_entities_in_range(base_unit, units_in_range, true);
 				range.get_entities_in_range(base_target, targets_in_range, true);
-				focused_entity = enemy_target_close(units_in_range, targets_in_range);
+				focused_entity = enemy_target_default(units_in_range, targets_in_range);
 				
 				if(focused_entity != noone) {
 					var _vector_x = (focused_entity.bbox_left + focused_entity.bbox_right)/2 - (self.bbox_left + self.bbox_right)/2;

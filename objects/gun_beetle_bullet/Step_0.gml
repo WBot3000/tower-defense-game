@@ -14,7 +14,7 @@ if(x >= 0 && x <= room_width && y >= 0 && y <= room_height) { //Only need to do 
 	collision_line_list(x, y, _end_x, _end_y, base_unit, false, true, units_in_range, true);
 
 	for(var i = 0; i < ds_list_size(units_in_range); ++i) {
-		if(units_in_range[| i].health_state == UNIT_STATE.ACTIVE) { //Don't want to shoot at knocked out units
+		if(units_in_range[| i].health_state == HEALTH_STATE.ACTIVE) { //Don't want to shoot at knocked out units
 			deal_damage(units_in_range[| i], bullet_damage);
 			_unit_was_hit = true;
 		}

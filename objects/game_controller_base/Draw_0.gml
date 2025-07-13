@@ -1,6 +1,6 @@
-if(game_ui.unit_info_card.selected_unit != undefined) { //Draw range on the currently selected unit.
-	with(game_ui.unit_info_card.selected_unit) {
-		range.draw_range();
+if(selected_entity_manager.currently_selected_entity != undefined) { //Draw range on the currently selected unit.
+	with(selected_entity_manager.currently_selected_entity) {
+		entity_data.range.draw_range();
 	}
 }
 

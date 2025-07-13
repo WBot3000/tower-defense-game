@@ -21,4 +21,4 @@ function OptionsManager() constructor{
 	is_fullscreen = false;
 }
 
-global.GAME_CONFIG_SETTINGS = new OptionsManager();
+global.GAME_CONFIG_OPTIONS = new OptionsManager();

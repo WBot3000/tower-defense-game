@@ -13,7 +13,7 @@ if(!variable_instance_exists(self.id, "current_health")) {
 }
 
 if(!variable_instance_exists(self.id, "health_state")) { 
-	health_state = UNIT_STATE.ACTIVE;
+	health_state = HEALTH_STATE.ACTIVE;
 }
 
 if(!variable_instance_exists(self.id, "recovery_rate")) { 
@@ -40,8 +40,8 @@ if(!variable_instance_exists(self.id, "bullet_damage")) {
 	bullet_damage = 10;
 }
 
-if(!variable_instance_exists(self.id, "unit_buffs")) { 
-	unit_buffs = [];
+if(!variable_instance_exists(self.id, "buffs")) { 
+	buffs = [];
 }
 
 //Upgradable Stats
