@@ -2,7 +2,7 @@
 This file contains data about the Dirt Construct and its upgrades
 */
 global.ANIMBANK_GOLD = new UnitAnimationBank(spr_gold_construct)
-global.ANIMBANK_GOLD.add_animation("GENERATE", spr_gold_construct);
+global.ANIMBANK_GOLD.add_animation("GENERATE", spr_gold_construct_generate);
 
 #region GoldConstruct (Class)
 function GoldConstruct() : Unit() constructor {

@@ -2,9 +2,7 @@
   "$GMObject":"",
   "%Name":"gold_construct",
   "eventList":[
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":3,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
     {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
-    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":12,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
   ],
   "managed":true,
   "name":"gold_construct",
@@ -14,8 +12,8 @@
     "path":"folders/Objects/unit_types/Gold.yy",
   },
   "parentObjectId":{
-    "name":"base_unit_old",
-    "path":"objects/base_unit_old/base_unit_old.yy",
+    "name":"base_unit",
+    "path":"objects/base_unit/base_unit.yy",
   },
   "persistent":false,
   "physicsAngularDamping":0.1,

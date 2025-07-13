@@ -192,23 +192,23 @@ function GenerateMoneyAction(_action_id, _amount_generated, _frames_between_gene
 		
 		
 		static execute = function() {
-			if(!round_manager.is_spawning_enemies() || timer < frames_between_shots) { return; }
+			if(!round_manager.is_spawning_enemies() || timer < frames_between_generation) { return; }
 			
-			global.player_money += money_generation_amount;
+			global.player_money += amount_generated;
 			timer = 0;
 			
 			actor.animation_controller.set_animation("GENERATE");
 			//TODO: Make these sparkles configurable if need be
 			part_particles_create(global.PARTICLE_SYSTEM,
-				x + random_range(-TILE_SIZE/2 + 8, -TILE_SIZE/2 + 16),  y - random_range(16, 24),
+				actor.inst.x + random_range(-TILE_SIZE/2 + 8, -TILE_SIZE/2 + 16),  actor.inst.y - random_range(16, 24),
 				global.PARTICLE_SPARKLE, 1);
 					
 			part_particles_create(global.PARTICLE_SYSTEM,
-				x + random_range(TILE_SIZE/2 - 16, TILE_SIZE/2 - 8),  y - random_range(20, 28),
+				actor.inst.x + random_range(TILE_SIZE/2 - 16, TILE_SIZE/2 - 8),  actor.inst.y - random_range(20, 28),
 				global.PARTICLE_SPARKLE, 1);
 					
 			part_particles_create(global.PARTICLE_SYSTEM,
-				x + random_range(-4, 4),  y - random_range(32, 40),
+				actor.inst.x + random_range(-4, 4),  actor.inst.y - random_range(32, 40),
 				global.PARTICLE_SPARKLE, 1);
 		}
 		

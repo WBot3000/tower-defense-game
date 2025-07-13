@@ -248,6 +248,7 @@
     {"id":{"name":"spr_enemy_spawner","path":"sprites/spr_enemy_spawner/spr_enemy_spawner.yy",},},
     {"id":{"name":"spr_game_over","path":"sprites/spr_game_over/spr_game_over.yy",},},
     {"id":{"name":"spr_giant_potato","path":"sprites/spr_giant_potato/spr_giant_potato.yy",},},
+    {"id":{"name":"spr_gold_construct_generate","path":"sprites/spr_gold_construct_generate/spr_gold_construct_generate.yy",},},
     {"id":{"name":"spr_gold_construct","path":"sprites/spr_gold_construct/spr_gold_construct.yy",},},
     {"id":{"name":"spr_grass_tiles","path":"sprites/spr_grass_tiles/spr_grass_tiles.yy",},},
     {"id":{"name":"spr_gun_beetle_bullet","path":"sprites/spr_gun_beetle_bullet/spr_gun_beetle_bullet.yy",},},
