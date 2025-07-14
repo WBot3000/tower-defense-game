@@ -8,8 +8,8 @@
 /*
 	Contains a series of animations that can be referenced in the same place.
 */
-function AnimationBank() constructor {
-	animations = {"DEFAULT": undefined};
+function AnimationBank(_default_animation = undefined) constructor {
+	animations = {"DEFAULT": _default_animation};
 	
 	static add_animation = function(_animation_ref, _sprite) { //Returns true if animation was successfully added, false otherwise
 		var _ref_hash = variable_get_hash(_animation_ref);
@@ -47,14 +47,12 @@ function AnimationBank() constructor {
 	Allows the passing of certain animations in the constructor to make initialization easier.
 */
 function UnitAnimationBank(_idle_active_animation, _idle_ko_animation = _idle_active_animation,
-	_on_spawn_animation = _idle_active_animation, _on_ko_animation = _idle_active_animation, _on_restore_animation = _idle_active_animation) : AnimationBank() constructor {
+	_on_spawn_animation = _idle_active_animation, _on_ko_animation = _idle_active_animation, _on_restore_animation = _idle_active_animation) : AnimationBank(_idle_active_animation) constructor {
 		add_animation("IDLE_ACTIVE", _idle_active_animation); //Animation that plays when the unit is active and not doing anything
 		add_animation("IDLE_KO", _idle_ko_animation);	//Animation that plays when the unit is knocked out and not doing anything
 		add_animation("ON_SPAWN", _on_spawn_animation);	//Animation that plays when the unit is purchased and spawned in for the first time
 		add_animation("ON_KO", _on_ko_animation); //Animation that plays when the unit's health reaches 0, and they get knocked out
 		add_animation("ON_RESTORE", _on_restore_animation); //Animation that plays when the unit is done restoring, and becomes active again
-
-		set_default_animation("IDLE_ACTIVE");
 }
 #endregion
 
@@ -65,12 +63,10 @@ function UnitAnimationBank(_idle_active_animation, _idle_ko_animation = _idle_ac
 	Allows the passing of certain animations in the constructor to make initialization easier.
 */
 function EnemyAnimationBank(_default_active_animation, _on_spawn_animation = _default_active_animation, 
-	_on_ko_animation = spr_enemy_defeated) : AnimationBank() constructor {
+	_on_ko_animation = spr_enemy_defeated) : AnimationBank(_default_active_animation) constructor {
 		add_animation("DEFAULT_ACTIVE", _default_active_animation); //Default animation used by the enemy (usually some sort of movement animation)
 		add_animation("ON_SPAWN", _on_spawn_animation);	//Animation that plays when the enemy is spawned (useful for if they spawn on-screen)
 		add_animation("ON_KO", _on_ko_animation); //Animation that plays when the enemy's health reaches 0, and they get defeated
-
-		set_default_animation("DEFAULT_ACTIVE");
 }
 #endregion
 

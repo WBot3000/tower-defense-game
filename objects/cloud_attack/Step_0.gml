@@ -1,9 +1,11 @@
 /// @description Move the cloud
 
+animation_controller.on_step();
+
 switch (state) {
     case CLOUD_STATE.TRAVELING_TO_TARGET:
         //If the original target no longer exists, pick a new one based on the summoner's current targeting
-		if(!instance_exists(target)) {
+		if(!can_be_attacked(target)) {
 			var _targeting_type = global.TARGETING_CLOSE; //In the event the owner was sold, need a fallback option
 			if(instance_exists(owner)) {
 				_targeting_type = owner.targeting_tracker.get_current_targeting_type();
@@ -11,17 +13,18 @@ switch (state) {
 			target = _targeting_type.targeting_fn(self.id, global.ALL_ENEMIES_LIST, true);
 			if(target == noone) { //If no enemies can be found, just dissipate. TODO: Might change this behavior later
 				state = CLOUD_STATE.DISSIPATING
+				animation_controller.set_animation("DISSIPATING", 1, function(){ instance_destroy(self, true) });
 				break;
 			}
 			ds_list_clear(enemies_in_range);
 		}
 		var _vector = vector_to_get_components(x, y, target.x, target.y - TILE_SIZE, true);
-		x += _vector[VEC_X]*travel_speed;
-		y += _vector[VEC_Y]*travel_speed;
-		if(abs(x - target.x) <= travel_speed) { //Handle precision errors
+		x += _vector[VEC_X] * data.travel_speed;
+		y += _vector[VEC_Y] * data.travel_speed;
+		if(abs(x - target.x) <= data.travel_speed) { //Handle precision errors
 			x = target.x;
 		}
-		if(abs(y - (target.y - TILE_SIZE)) <= travel_speed) {
+		if(abs(y - (target.y - TILE_SIZE)) <= data.travel_speed) {
 			y = target.y - TILE_SIZE;
 		}
 		if(x == target.x && y == target.y - TILE_SIZE) {
@@ -29,7 +32,7 @@ switch (state) {
 		}
         break;
 	case CLOUD_STATE.LINGERING:
-        if(!instance_exists(target)) {
+        if(!can_be_attacked(target)) {
 			var _targeting_type = global.TARGETING_CLOSE; //In the event the owner was sold, need a fallback option
 			if(instance_exists(owner)) {
 				_targeting_type = owner.targeting_tracker.get_current_targeting_type();
@@ -38,6 +41,7 @@ switch (state) {
 			target = _targeting_type.targeting_fn(self.id, enemies_in_range, true);
 			if(target == noone) { //If no enemies can be found, just dissipate. TODO: Might change this behavior later
 				state = CLOUD_STATE.DISSIPATING;
+				animation_controller.set_animation("DISSIPATING", 1, function(){ instance_destroy(self, true) });
 				
 			}
 			else {
@@ -61,12 +65,10 @@ switch (state) {
 		linger_timer++;
 		if(linger_timer >= data.seconds_to_linger) {
 			state = CLOUD_STATE.DISSIPATING;
+			animation_controller.set_animation("DISSIPATING", 1, function(){ instance_destroy(self, true) });
 		}
         break;
 	case CLOUD_STATE.DISSIPATING:
-        //TODO: Replace this with a dissipating animation
-		instance_destroy();
-        break;
     default:
         break;
 }

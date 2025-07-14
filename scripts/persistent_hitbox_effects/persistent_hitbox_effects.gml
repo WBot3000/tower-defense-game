@@ -37,6 +37,12 @@ function EntityCooldownList() constructor {
 		}
 		return false;
 	}
+	
+	//Check to see if an entity is currently on cooldown already
+	static is_entity_on_cooldown = function(_entity) {
+		var _entity_id_hash =  variable_get_hash(_entity.id);
+		return struct_get_from_hash(entities_on_cooldown, _entity_id_hash);
+	}
 }
 #endregion
 

@@ -14,10 +14,10 @@
 #region Range (Class)
 /*
 	Base "range" from which all other ranges can derive from. Largely used as an interface.
-	unit: the id of the unit object that uses this range
+	entity: the id of the entity object that uses this range
 */
-function Range(_unit) constructor {
-	unit = _unit; //TOOD: Change this to "entity" wherever needed (because these are used for enemies too)
+function Range(_entity) constructor {
+	entity = _entity;
 	
 	static draw_range = function(){};
 	static get_entities_in_range = function(){};
@@ -28,19 +28,19 @@ function Range(_unit) constructor {
 
 #region CircularRange (Class)
 /*
-	For units with a circular viewing range (think most towers from Bloons Tower Defense 6)
+	For entities with a circular viewing range (think most towers from Bloons Tower Defense 6)
 	origin_x: x-coordinate of the circle's origin (relative to the unit's center)
 	origin_y: y-coordinate of the circle's origin (relative to the unit's center)
 	radius: How far the unit can "see"
 */
-function CircularRange(_unit, _origin_x, _origin_y, _radius) : Range(_unit) constructor {
+function CircularRange(_entity, _origin_x, _origin_y, _radius) : Range(_entity) constructor {
 	origin_x = _origin_x;
 	origin_y = _origin_y;
 	radius = _radius;
 	
 	static draw_range = function() {
 		draw_set_alpha(0.125)
-		draw_circle_color(origin_x + unit.x, origin_y + unit.y - TILE_SIZE/2, radius, c_white, c_white, false);
+		draw_circle_color(origin_x + entity.x, origin_y + entity.y - TILE_SIZE/2, radius, c_white, c_white, false);
 		draw_set_alpha(1)
 	}
 	
@@ -53,7 +53,7 @@ function CircularRange(_unit, _origin_x, _origin_y, _radius) : Range(_unit) cons
 	*/
 	static get_entities_in_range = function(_entity_types, _storage_list) {
 		for(var i = 0, len = array_length(_entity_types); i < len; ++i) {
-			collision_circle_list(origin_x + get_bbox_center_x(unit), origin_y + get_bbox_center_y(unit), radius, _entity_types[i], false, true, _storage_list, false);
+			collision_circle_list(origin_x + get_bbox_center_x(entity), origin_y + get_bbox_center_y(entity), radius, _entity_types[i], false, true, _storage_list, false);
 		}
 	}
 	
@@ -73,13 +73,13 @@ function CircularRange(_unit, _origin_x, _origin_y, _radius) : Range(_unit) cons
 
 #region RectangularRange (Class)
 /*
-	For units with a rectangular viewing range (mostly for specialty towers, not very common)
+	For entities with a rectangular viewing range (mostly for specialty towers, not very common)
 	x1: x-coordinate of the rectangle's top-left (relative to entity)
 	y1: y-coordinate of the rectangle's top-left (relative to entity)
 	x2: x-coordinate of the rectangle's bottom-right (relative to entity)
 	y2: y-coordinate of the rectangle's bottom-right (relative to entity)
 */
-function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor {
+function RectangularRange(_entity, _x1, _y1, _x2, _y2) : Range(_entity) constructor {
 	x1 = _x1;
 	y1 = _y1;
 	x2 = _x2;
@@ -87,7 +87,7 @@ function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor 
 	
 	static draw_range = function() {
 		draw_set_alpha(0.125)
-		draw_rectangle_color(x1 + unit.x, y1 + unit.y - TILE_SIZE/2, x2 + unit.x, y2 + unit.y - TILE_SIZE/2, c_white, c_white, c_white, c_white, false);
+		draw_rectangle_color(x1 + entity.x, y1 + entity.y - TILE_SIZE/2, x2 + entity.x, y2 + entity.y - TILE_SIZE/2, c_white, c_white, c_white, c_white, false);
 		draw_set_alpha(1)
 	}
 	
@@ -99,8 +99,8 @@ function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor 
 		While not targeting yourself (notme = true)
 	*/
 	static get_entities_in_range = function(_entity_types, _storage_list) {
-		var _center_x = get_bbox_center_x(inst);
-		var _center_y = get_bbox_center_y(inst);
+		var _center_x = get_bbox_center_x(entity);
+		var _center_y = get_bbox_center_y(entity);
 		
 		for(var i = 0, len = array_length(_entity_types); i < len; ++i) {
 			collision_rectangle_list(x1 + _center_x, y1 + _center_y, x2 + _center_x, y2 + _center_y, _entity_types[i], false, true, _storage_list, false);
@@ -131,16 +131,16 @@ function RectangularRange(_unit, _x1, _y1, _x2, _y2) : Range(_unit) constructor 
 
 #region MeleeRange (Class)
 /*
-	A Circular Range that's used for units/enemies that attack up close.
+	A Circular Range that's used for entities that attack up close.
 	ex) Cobblestone Construct, Sword Beetle
 	
 	In order to accomodate for melee units having different bounding boxes, the radius is proportional to said bounding box
 	If you give all melee units the same range radius, then you have situations where the larger melee unit can't reach the smaller one.
 */
-function MeleeRange(_unit) : CircularRange(_unit) constructor {
+function MeleeRange(_entity) : CircularRange(_entity) constructor {
 	origin_x = 0;//get_bbox_center_x(_unit);
 	origin_y = 0;//get_bbox_center_y(_unit);
-	radius = max((_unit.bbox_right - _unit.bbox_left)/2, (_unit.bbox_bottom - _unit.bbox_top)/2) * 1.5; //So that melee units have just a bit more range.
+	radius = max((_entity.bbox_right - _entity.bbox_left)/2, (_entity.bbox_bottom - _entity.bbox_top)/2) * 1.5; //So that melee units have just a bit more range.
 }
 #endregion
 
@@ -150,11 +150,11 @@ function MeleeRange(_unit) : CircularRange(_unit) constructor {
 	A RectangularRange for enemies that can see the entire level at once.
 	Doesn't draw anything because creating a big white rectangle over the entire level sounds unpleasant.
 */
-function GlobalRange(_unit) : RectangularRange(_unit, 0, 0, 0, 0) constructor {
-	x1 = -1*_unit.x;
-	y1 = -1*_unit.y;
-	x2 = room_width - _unit.x;
-	y2 = room_height - _unit.y;
+function GlobalRange(_entity) : RectangularRange(_entity, 0, 0, 0, 0) constructor {
+	x1 = -1*_entity.x;
+	y1 = -1*_entity.y;
+	x2 = room_width - _entity.x;
+	y2 = room_height - _entity.y;
 	static draw_range = function(){};
 }
 

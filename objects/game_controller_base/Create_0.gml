@@ -64,11 +64,7 @@ purchase_data = [
 	global.DATA_PURCHASE_COBBLESTONE,
 	global.DATA_PURCHASE_GOLD,
 	
-	//global.DATA_PURCHASE_CLOUD,
-	//global.DATA_PURCHASE_SAMPLE_GUNNER,
-	//global.DATA_PURCHASE_SAMPLE_BRAWLER,
-	
-	//global.DATA_PURCHASE_SAMPLE_MORTAR,
+	global.DATA_PURCHASE_CLOUD,
 ]
 
 #endregion

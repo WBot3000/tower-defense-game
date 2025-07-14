@@ -1,5 +1,5 @@
 /*
-This file contains data about the Dirt Construct and its upgrades
+This file contains data about the Cobblestone Construct and its upgrades
 */
 global.ANIMBANK_COBBLESTONE = new UnitAnimationBank(spr_cobblestone_construct)
 global.ANIMBANK_COBBLESTONE.add_animation("ATTACK", spr_cobblestone_construct);

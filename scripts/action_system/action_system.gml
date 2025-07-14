@@ -55,6 +55,7 @@ function DirectDamageAction(_action_id, _valid_targets, _frames_between_attacks,
 		attack_damage = _attack_damage;
 		effect_sprite = _effect_sprite;
 		
+		round_manager = get_round_manager();
 		timer = 0;
 		entities_in_range = ds_list_create();
 		static targeting_params = new TargetingParams(true, false);
@@ -83,13 +84,88 @@ function DirectDamageAction(_action_id, _valid_targets, _frames_between_attacks,
 		
 		
 		static update_params = function() {
-			timer++;
-			ds_list_clear(entities_in_range);
+			if(round_manager.is_spawning_enemies()) { //Prevents waiting for timers to expire in between rounds
+				timer++;
+				ds_list_clear(entities_in_range);
+			}
 		}
 		
 		
 		static on_health_reached_zero = function() {
 			timer = 0;
+		}
+		
+		
+		static on_deletion = function() {
+			ds_list_destroy(entities_in_range);
+		}
+}
+#endregion
+
+
+#region RapidDirectDamageAction (Class)
+/*
+	Similar to the DirectDamageAction, but will attack any valid unit as soon as possible, then put the attacked entity on a cooldown timer.
+	Used for Butterfly-barian.
+	
+	Variables:
+	frames_between_attacks: The number of frames that occur between one attack and the next
+	attack_damage: How much damage the attack should do (for attacks that have configurable damage)
+	effect: An effect that can be drawn on the enemy to indicate that a direct attack is occuring
+	
+	action_id and actor are the same as the base Action
+*/
+//TODO: Instead of having this and Direct Damage Action, maybe make different kinds of "timers" that can be used with different actions.
+//Can essentially assemble actions like lego blocks
+function RapidDirectDamageAction(_action_id, _valid_targets, _frames_between_attacks, _attack_damage, _effect_sprite = undefined, _actor = other) 
+	: Action(_action_id, _actor) constructor {
+		
+		valid_targets = _valid_targets;
+		frames_between_attacks = _frames_between_attacks; //Used for individual cooldowns instead
+		attack_damage = _attack_damage;
+		effect_sprite = _effect_sprite;
+		
+		round_manager = get_round_manager();
+		entities_in_range = ds_list_create();
+		attack_cooldowns = new EntityCooldownList();
+		static targeting_params = new TargetingParams(true, false);
+		
+		
+		static execute = function() {
+			actor.range.get_entities_in_range(valid_targets, entities_in_range);
+			if(ds_list_empty(entities_in_range)) { return; }
+			
+			var _do_attack_animation = false;
+			for (var i = 0, len = ds_list_size(entities_in_range); i < len; ++i) {
+				var _entity = entities_in_range[| i];
+			    if(targeting_params.is_entity_valid_target(_entity) && !attack_cooldowns.is_entity_on_cooldown(_entity)) {
+					_do_attack_animation = true;
+					deal_damage(_entity, attack_damage);
+					if(effect_sprite != undefined) {
+						draw_damage_effect(_entity, effect_sprite);
+					}
+					attack_cooldowns.add_entity(_entity, frames_between_attacks);
+				}
+			}
+			
+			actor.direction_facing = get_entity_facing_direction(actor.inst, entities_in_range[| 0].x); //Just look at the first entity in the list
+			actor.inst.image_xscale = actor.direction_facing; //Seperate variables for now just in case I want to do other things with direction_facing
+			
+			if(_do_attack_animation) {
+				actor.animation_controller.set_animation("ATTACK");
+			}
+		}
+		
+		
+		static update_params = function() {
+			if(round_manager.is_spawning_enemies()) { //Prevents waiting for timers to expire in between rounds
+				attack_cooldowns.tick();
+			}
+			ds_list_clear(entities_in_range);
+		}
+		
+		
+		static on_health_reached_zero = function() {
 		}
 		
 		
@@ -120,6 +196,7 @@ function ShootProjectileAction(_action_id, _projectile, _valid_targets, _frames_
 		frames_between_shots = _frames_between_shots;
 		projectile_data = _projectile_data;
 		
+		round_manager = get_round_manager();
 		timer = 0;
 		entities_in_range = ds_list_create();
 		static targeting_params = new TargetingParams(true, false);
@@ -143,6 +220,7 @@ function ShootProjectileAction(_action_id, _projectile, _valid_targets, _frames_
 			actor.animation_controller.set_animation("SHOOT");
 			instance_create_layer((actor.inst.bbox_left + actor.inst.bbox_right)/2, (actor.inst.bbox_top + actor.inst.bbox_bottom)/2, PROJECTILE_LAYER, projectile,
 				{
+					target: _enemy_to_target, //Needed for homing projectiles
 					x_speed: _vector[VEC_X] * projectile_data.travel_speed,
 					y_speed: _vector[VEC_Y] * projectile_data.travel_speed,
 					data: projectile_data //NOTE: Also includes travel speed not broken up + normalized
@@ -153,8 +231,10 @@ function ShootProjectileAction(_action_id, _projectile, _valid_targets, _frames_
 		
 		
 		static update_params = function() {
-			timer++;
-			ds_list_clear(entities_in_range);
+			if(round_manager.is_spawning_enemies()) { //Prevents waiting for timers to expire in between rounds
+				timer++;
+				ds_list_clear(entities_in_range);
+			}
 		}
 		
 		

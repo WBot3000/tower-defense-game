@@ -15,3 +15,6 @@ enemies_in_range = global.ALL_ENEMIES_LIST; //Remember, don't destroy this! It's
 
 rain_emitter = part_emitter_create(global.PARTICLE_SYSTEM);
 part_emitter_region(global.PARTICLE_SYSTEM, rain_emitter, x - 8, x + 8, y + sprite_height, y + sprite_height, ps_shape_rectangle, ps_distr_linear);
+
+animation_controller = new AnimationController(self, global.ANIMBANK_CLOUD_ATTACK);
+animation_controller.set_animation("FORMING", 1);

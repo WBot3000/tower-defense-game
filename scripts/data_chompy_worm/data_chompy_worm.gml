@@ -1,7 +1,8 @@
 /*
-This file contains data about the Chompy Worm upgrade
+This file contains data about the Chompy Worm enemy
 */
 global.ANIMBANK_CHOMPYWORM = new EnemyAnimationBank(spr_chompy_worm);
+global.ANIMBANK_CHOMPYWORM.add_animation("ATTACK", spr_chompy_worm);
 
 function ChompyWorm(_path_data, _round_spawned_in) : 
 	Enemy(_path_data, _round_spawned_in) constructor {

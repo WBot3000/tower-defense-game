@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"data_butterflybarian",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"data_butterflybarian",
+  "parent":{
+    "name":"enemies",
+    "path":"folders/Scripts/data/enemies.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
