@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"data_sword_beetle",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"data_sword_beetle",
+  "parent":{
+    "name":"enemies",
+    "path":"folders/Scripts/data/enemies.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

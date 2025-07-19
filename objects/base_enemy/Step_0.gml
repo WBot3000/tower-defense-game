@@ -1,4 +1,4 @@
-/// @description Checks to see if enemy falls below zero health, and to destroy it if it does.
+/// @description Run enemy state functions.
 
 entity_data.animation_controller.on_step();
 

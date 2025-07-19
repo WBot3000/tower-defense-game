@@ -48,7 +48,7 @@ function Round(_round_number, _spawn_list, _timer_count) constructor {
 	//The enemies that this round has spawned. Used to keep track of when the round is over.
 	currently_spawned_enemies = [];
 	
-	reward_count = 100; //The amount of money earned upon completion of a round (add this?)
+	reward_count = 100; //The amount of money earned upon completion of a round (make configurable?)
 
 
 	//Create the enemy pointed to in the spawn list, and add it's id to the currently_spawned_enemies list to keep track of round progress
@@ -91,7 +91,7 @@ function Round(_round_number, _spawn_list, _timer_count) constructor {
 			exit;
 		}
 		spawn_timer++;
-		if(spawn_timer < timer_count) { //Guard clause to reduce nesting
+		if(spawn_timer < timer_count) {
 			exit;
 		}
 		

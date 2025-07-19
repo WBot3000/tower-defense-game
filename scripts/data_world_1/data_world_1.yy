@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"data_world_1",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"data_world_1",
+  "parent":{
+    "name":"levels",
+    "path":"folders/Scripts/data/levels.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

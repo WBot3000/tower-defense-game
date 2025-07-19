@@ -36,6 +36,44 @@ function Action(_action_id, _actor = other) constructor {
 #endregion
 
 
+#region PathTravelAction (Class)
+/*
+	Used to facilitate movement along a path. Controls when an enemy can move, when they need to stop moving, and when they can continue moving.
+	
+	Variables:
+	
+	
+	action_id and actor are the same as the base Action
+*/
+function PathTravelAction(_action_id, _path, _default_movement_speed, _end_action = path_action_stop, _actor = other)
+	: Action(_action_id, _actor) constructor {
+		
+		path = _path;
+		default_movement_speed = _default_movement_speed;
+		end_action = _end_action;
+		entity_previous_x = -1 //Used for determining enemy direction
+		
+		with(actor.inst) {
+			path_start(other.path, other.default_movement_speed, other.end_action, false);
+		}
+		
+		
+		static execute = function() {
+			//TODO: Blocking mechanics?
+			if(actor.inst.x > entity_previous_x) {
+				actor.direction_facing = DIRECTION_RIGHT;
+				actor.inst.image_xscale = DIRECTION_RIGHT;
+			}
+			if(actor.inst.x < entity_previous_x) {
+				actor.direction_facing = DIRECTION_LEFT;
+				actor.inst.image_xscale = DIRECTION_LEFT;
+			}
+			entity_previous_x = actor.inst.x;
+		}
+}
+#endregion
+
+
 #region DirectDamageAction (Class)
 /*
 	Used to deal direct damage to a detected enemy, without the use of something like a projectile
@@ -115,8 +153,6 @@ function DirectDamageAction(_action_id, _valid_targets, _frames_between_attacks,
 	
 	action_id and actor are the same as the base Action
 */
-//TODO: Instead of having this and Direct Damage Action, maybe make different kinds of "timers" that can be used with different actions.
-//Can essentially assemble actions like lego blocks
 function RapidDirectDamageAction(_action_id, _valid_targets, _frames_between_attacks, _attack_damage, _effect_sprite = undefined, _actor = other) 
 	: Action(_action_id, _actor) constructor {
 		

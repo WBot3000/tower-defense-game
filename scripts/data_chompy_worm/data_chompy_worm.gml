@@ -14,7 +14,11 @@ function ChompyWorm(_path_data, _round_spawned_in) :
 	health_state = HEALTH_STATE.ACTIVE
 	
 	//Stat modifiers
+	default_movement_speed = 1.5;
 	defense_factor = 1; //All taken damage is divided by this value
+	
+	//Monetary value
+	monetary_value = 50;
 	
 	range = new MeleeRange(inst);
 	targeting_tracker = 
@@ -22,6 +26,7 @@ function ChompyWorm(_path_data, _round_spawned_in) :
 	buffs = [];
 	
 	action_queue = [
+		new PathTravelAction("MOVE", _path_data.default_path, default_movement_speed),
 		new DirectDamageAction("BITE", [base_unit, base_target], seconds_to_roomspeed_frames(1), 10, spr_bite)
 	];
 	
