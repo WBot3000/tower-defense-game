@@ -1,0 +1,26 @@
+path_position: Normalized position an instance is along the path (0 at the beginning, 1 at the end)
+
+path_get_length(path_index): The length of the path specified by path_index
+
+path_position * path_get_length(path_index) = The amount of pixels along the path the instance currently is
+	- Assuming the instance is using the path specified by path_index, otherwise this number is nonsense
+	- Will call this path_position_in_pixels
+
+	
+path_speed = The number of pixels along the path the instance will move each step
+
+path_positions_in_pixels + path_speed = The position along the path (in pixels) that the unit should be on the next step
+- Will call this next_position_in_pixels
+
+
+next_position_in_pixels / path_get_length(path_index) = The next positiion normalized
+- Will call this next_position
+
+path_get_x(path_index, next_position), path_get_y(path_index, insnext_position) can be used to get the x and y coordinates of this upcoming position along the path
+	- Which can then be used to detect if there is anything in the way of the instance
+	
+NOTE: This assumes that the path originates at (0, 0). If the path originates anywhere else, all you have to do is add the x and y origin coordinates to the x and y given by the path_get_x/y functions.
+
+TODO: Should these values be cached in some kind of object? They'll be calculated a lot otherwise. Depends on whether the fetching is faster than the calculations.
+- Will probably do calculations for now, then do this if the game needs optimizing
+

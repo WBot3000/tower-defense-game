@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"dealing_damage",
+  "%Name":"data_king_worm",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"dealing_damage",
+  "name":"data_king_worm",
   "parent":{
-    "name":"Scripts",
-    "path":"folders/Scripts.yy",
+    "name":"enemies",
+    "path":"folders/Scripts/data/enemies.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

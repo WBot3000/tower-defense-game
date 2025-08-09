@@ -14,50 +14,6 @@ enum HEALTH_STATE {
 }
 
 
-function Unit() : Combatant() constructor {
-	
-	//Purchasable upgrades
-	stat_upgrades = [];
-	unit_upgrades = [];
-	
-	sell_price = global.DATA_PURCHASE_DIRT.price * SELL_PRICE_REDUCTION; //Default to Dirt Construct sell price
-	
-	//Performs all actions a unit can do while active
-	static while_active = function() {
-		for(var i = 0; i < array_length(action_queue); ++i) {
-			action_queue[i].execute();
-			action_queue[i].update_params();
-		}
-	}
-	
-	
-	//Called in the "dealing_damage" function once the entity's health reaches zero
-	static on_health_reached_zero = function() {
-		health_state = HEALTH_STATE.KNOCKED_OUT;
-		animation_controller.set_animation("ON_KO"); //TODO: Write code for chaining animations together
-		for(var i = 0; i < array_length(action_queue); ++i) {
-			action_queue[i].on_health_reached_zero();
-		}
-	}
-	
-	
-	//handles unit recovery. If you don't want the unit to recover then just override this with a delete function like the enemies have.
-	static while_knocked_out = function() {
-		var _amount_to_recover = recovery_rate / seconds_to_roomspeed_frames(1);
-		current_health = min(max_health, current_health + _amount_to_recover);
-		if(current_health >= max_health) {
-			animation_controller.set_animation("ON_RESTORE");
-			health_state = HEALTH_STATE.ACTIVE;
-			for(var i = 0; i < array_length(action_queue); ++i) {
-				action_queue[i].on_restore();
-			}
-		}
-	}
-	
-	//on_deletion defined in parent class
-}
-
-
 #region StatUpgrade
 /*
 	Contains code that keep tracks of a unit's "level" in a certain stat.

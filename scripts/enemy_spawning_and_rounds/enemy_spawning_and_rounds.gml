@@ -9,17 +9,17 @@
 #region EnemySpawningData (Class)
 #macro ENEMY_SPAWN_END -1 //Makes spawn data a bit prettier. Doesn't have much of an actual function as of right now.
 /*
-	The "base" unit of an enemy spawn list. An Enemy Spawn List consists of all of the enemies that will be spawned on one path in one round.
-	enemy_types: The list of enemies that should be spawned
-	enemy_paths: The level paths of the spawned enemies. The length of this list should be equal to the length of enemy_set.
+	The "base" component of an enemy spawn list. An Enemy Spawn List consists of all of the enemies that will be spawned on one path in one round.
+	enemy_types: The list of enemy types that should be spawned. Should be an enemy object.
+	enemy_path_data: The path data of the spawned enemies. The length of this list should be equal to the length of enemy_set.
 	time_until_next_spawn: The number of seconds until the next enemy spawn should occurs
 	spawn_count: The amount of that enemy that this EnemySpawningData should be referenced
 		- This is so you don't need to define multiple EnemySpawn for a simple pattern of the same enemy
 	repeat_delay: The amount of seconds that should be waited in repeating this data
 */
-function EnemySpawningData(_enemy_types, _enemy_paths, _time_until_next_spawn, _spawn_count, _repeat_delay) constructor {
+function EnemySpawningData(_enemy_types, _enemy_path_data, _time_until_next_spawn, _spawn_count, _repeat_delay) constructor {
 	enemy_types = _enemy_types;
-	enemy_paths = _enemy_paths
+	enemy_path_data = _enemy_path_data
 	//Might as well do conversions here. Might change this in the future
 	time_until_next_spawn = seconds_to_roomspeed_frames(_time_until_next_spawn)
 	spawn_count = _spawn_count;
@@ -51,8 +51,11 @@ function Round(_round_number, _spawn_list, _timer_count) constructor {
 	reward_count = 100; //The amount of money earned upon completion of a round (make configurable?)
 
 
-	//Create the enemy pointed to in the spawn list, and add it's id to the currently_spawned_enemies list to keep track of round progress
-	//Returns the spawned enemy in the event we need to do anything else to it
+	/*
+		Create the enemy pointed to in the spawn list, and give it any necessary data
+		Returns the spawned enemy in the event we need to do anything else to it
+		NOTE: Enemies should ONLY be spawned using this OR spawn_extra_enemy in the RoundManager, otherwise this can't keep track of them
+	*/
 	static spawn_enemy = function(_enemy_type, _path_data) {
 		var _new_enemy = instance_create_layer(_path_data.spawn_x, _path_data.spawn_y, ENEMY_LAYER, _enemy_type, 
 			{
@@ -98,7 +101,7 @@ function Round(_round_number, _spawn_list, _timer_count) constructor {
 		var _current_spawn_data = spawn_list[spawn_list_idx_ptr];
 		for (var i = 0; i < array_length(_current_spawn_data.enemy_types); ++i) { //Spawn each enemy in the spawn data
 			var _enemy_type = _current_spawn_data.enemy_types[i];
-			var _path_data = _current_spawn_data.enemy_paths[i];
+			var _path_data = _current_spawn_data.enemy_path_data[i];
 		    spawn_enemy(_enemy_type, _path_data);
 			//show_debug_message("Enemy spawned");
 		}
@@ -156,6 +159,7 @@ function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constru
 	};
 	
 	
+	//Call this whenever you want to destroy an enemy (ex. when it's health reaches zero)
 	static remove_enemy = function(_enemy_id, _round_number) {
 		var _round = all_rounds[_round_number - 1] //Index will be less than the round number
 		var _round_completed = _round.remove_enemy_from_spawned_list(_enemy_id);

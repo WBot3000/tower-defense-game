@@ -3,6 +3,8 @@ This file contains a potential implementation of an Action System, where unit/en
 Each action has a prerequisite, an execution function, and an update function (for updating things like timers or re-rolling random numbers)
 */
 
+//NOTE: Getting rid of this, replacing it with a simpler system
+
 #region Action (Class)
 /*
 	Base action for which all other actions are defined from
@@ -14,9 +16,6 @@ function Action(_action_id, _actor = other) constructor {
 	
 	action_id = _action_id;
 	actor = _actor;
-	
-	//What needs to be true for this action to run. Should return true if the action should be run on the current frame, false otherwise
-	static prerequisite = function() {return true};
 	
 	//The code of the action itself
 	static execute = function() {};
@@ -36,39 +35,91 @@ function Action(_action_id, _actor = other) constructor {
 #endregion
 
 
+#region TravelAction (Class)
+/*
+	Used to control entity movement (usually enemies, but will keep language vague in case I want to implement moving units/targets)
+	
+	Variables:
+	movement_state: Determines whether an entity is able to move or not based on surrounding circumstances //TODO: Use boolean instead?
+	start_movement_func: A function that determines whether or not an enemy can start moving again once blocked. Should return true if it can, false if it can't.
+	stop_movement_func: A function that determines whether or not an enemy can stop moving based on the surrounding environment. Should return true if it should stop, false if it shouldn't.
+	
+	action_id and actor are the same as the base Action
+*/
+enum MOVEMENT_STATE {
+	FREE,
+	BLOCKED
+}
+
+function TravelAction(_action_id, _movement_blocked_fn = function(){ return false; }, _actor = other) :
+	Action(_action_id, _actor) constructor {
+		movement_state = MOVEMENT_STATE.FREE;
+		
+		movement_blocked_fn = _movement_blocked_fn;
+}
+#endregion
+
+
 #region PathTravelAction (Class)
 /*
 	Used to facilitate movement along a path. Controls when an enemy can move, when they need to stop moving, and when they can continue moving.
 	
 	Variables:
+	path_data: The path data that the entity utilizes
+	default_movement_speed: The speed (in pixels per step) at which the enemy should travel
+	end_action: What the entity should do once they reach the end of the path
 	
+	entity_previous_x: Enemy's x-Used to determine enemy direction
 	
 	action_id and actor are the same as the base Action
+	movement_blocked_fn is the same as the base TravelAction
 */
-function PathTravelAction(_action_id, _path, _default_movement_speed, _end_action = path_action_stop, _actor = other)
-	: Action(_action_id, _actor) constructor {
+function PathTravelAction(_action_id, _path_data, _default_movement_speed, _movement_blocked_fn = function(){ return false; }, _end_action = path_action_stop, _actor = other)
+	: TravelAction(_action_id, _movement_blocked_fn, _actor) constructor {
 		
-		path = _path;
+		path_data = _path_data;
 		default_movement_speed = _default_movement_speed;
 		end_action = _end_action;
 		entity_previous_x = -1 //Used for determining enemy direction
 		
 		with(actor.inst) {
-			path_start(other.path, other.default_movement_speed, other.end_action, false);
+			path_start(other.path_data.default_path, other.default_movement_speed, other.end_action, false);
 		}
 		
 		
-		static execute = function() {
-			//TODO: Blocking mechanics?
-			if(actor.inst.x > entity_previous_x) {
-				actor.direction_facing = DIRECTION_RIGHT;
-				actor.inst.image_xscale = DIRECTION_RIGHT;
+		static execute = function() {	
+			var movement_blocked = movement_blocked_fn();
+			
+			switch (movement_state) {
+			    case MOVEMENT_STATE.FREE:
+			        if(actor.inst.x > entity_previous_x) {
+						actor.direction_facing = DIRECTION_RIGHT;
+						actor.inst.image_xscale = DIRECTION_RIGHT;
+					}
+					if(actor.inst.x < entity_previous_x) {
+						actor.direction_facing = DIRECTION_LEFT;
+						actor.inst.image_xscale = DIRECTION_LEFT;
+					}
+					entity_previous_x = actor.inst.x;
+					
+					if(movement_blocked) {
+						with(actor.inst) {
+							path_speed = 0;
+						}
+						movement_state = MOVEMENT_STATE.BLOCKED;
+					}
+			        break;
+				case MOVEMENT_STATE.BLOCKED:
+					if(movement_blocked) {
+						with(actor.inst) {
+							path_speed = default_movement_speed; //TODO: Take into account buffs/debuffs (maybe write function to adjust this)
+						}
+						movement_state = MOVEMENT_STATE.BLOCKED;
+					}
+					break;
+			    default:
+			        break;
 			}
-			if(actor.inst.x < entity_previous_x) {
-				actor.direction_facing = DIRECTION_LEFT;
-				actor.inst.image_xscale = DIRECTION_LEFT;
-			}
-			entity_previous_x = actor.inst.x;
 		}
 }
 #endregion
@@ -212,6 +263,7 @@ function RapidDirectDamageAction(_action_id, _valid_targets, _frames_between_att
 #endregion
 
 
+//TODO: Add configurable pre-requisutes to actions (such as timer and health level pre-requisites) that can be passed
 #region ShootProjectileAction (Class)
 /*
 	Used to shoot a projectile at an enemy

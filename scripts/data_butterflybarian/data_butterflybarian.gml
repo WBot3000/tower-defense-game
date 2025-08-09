@@ -5,7 +5,7 @@ global.ANIMBANK_BUTTERFLYBARIAN = new EnemyAnimationBank(spr_butterflybarian);
 global.ANIMBANK_BUTTERFLYBARIAN.add_animation("ATTACK", spr_butterflybarian);
 
 function Butterflybarian(_path_data, _round_spawned_in) : 
-	Enemy(_path_data, _round_spawned_in) constructor {
+	EnemyData(_path_data, _round_spawned_in) constructor {
 	name = "Butterflybarian";
 	
 	//Health variables
@@ -23,9 +23,12 @@ function Butterflybarian(_path_data, _round_spawned_in) :
 	//Doesn't use the default melee range, as the Butterflybarian sprite is just too small.
 	range = new CircularRange(inst, 0, 0, tilesize_to_pixels(0.75));
 	buffs = [];
+	path_data = _path_data;
+	
+	static movement_block_fn = method(self, enemy_standard_path_stop_moving_func)
 	
 	action_queue = [
-		new PathTravelAction("MOVE", _path_data.default_path, default_movement_speed),
+		new PathTravelAction("MOVE", path_data, default_movement_speed, movement_block_fn),
 		new RapidDirectDamageAction("SLASH", [base_target, base_unit], seconds_to_roomspeed_frames(1), 20, spr_slash)
 	];
 	

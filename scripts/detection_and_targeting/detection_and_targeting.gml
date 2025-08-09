@@ -40,7 +40,7 @@ function CircularRange(_entity, _origin_x, _origin_y, _radius) : Range(_entity) 
 	
 	static draw_range = function() {
 		draw_set_alpha(0.125)
-		draw_circle_color(origin_x + entity.x, origin_y + entity.y - TILE_SIZE/2, radius, c_white, c_white, false);
+		draw_circle_color(origin_x + get_bbox_center_x(entity), origin_y + get_bbox_center_y(entity), radius, c_white, c_white, false);
 		draw_set_alpha(1)
 	}
 	
@@ -150,12 +150,19 @@ function MeleeRange(_entity) : CircularRange(_entity) constructor {
 	A RectangularRange for enemies that can see the entire level at once.
 	Doesn't draw anything because creating a big white rectangle over the entire level sounds unpleasant.
 */
-function GlobalRange(_entity) : RectangularRange(_entity, 0, 0, 0, 0) constructor {
-	x1 = -1*_entity.x;
-	y1 = -1*_entity.y;
-	x2 = room_width - _entity.x;
-	y2 = room_height - _entity.y;
-	static draw_range = function(){};
+function GlobalRange(_entity) : Range(_entity) constructor {	
+	/*
+		Detect...
+		All of a certain type of entity (obj = _entity_types[x])
+		Within it's radius (first three arguments)
+		Using boundary boxes for speed increase (prec = false)
+		While not targeting yourself (notme = true)
+	*/
+	static get_entities_in_range = function(_entity_types, _storage_list) {
+		for (var i = 0, len = array_length(_entity_types); i < len; ++i) {
+			collision_rectangle_list(0, 0, room_width, room_height, _entity_types[i], false, true, _storage_list, false);
+		}
+	}
 }
 
 /*
@@ -180,7 +187,7 @@ global.ALL_UNITS_LIST = ds_list_create();
 	The functions determine the method for picking out an entity, while this acts as a "filter".
 	NOTE: This doesn't filter out entities based on their type, as you can just specify what kind of entities should be detected when using the ranges.
 */
-function TargetingParams(_dont_target_knocked_out = false, _dont_target_attackable = false, _dont_target_buffs = [], _only_target_buffs = []) constructor {
+function TargetingParams(_dont_target_knocked_out = true, _dont_target_attackable = false, _dont_target_buffs = [], _only_target_buffs = []) constructor {
 	dont_target_knocked_out = _dont_target_knocked_out;
 	dont_target_attackable = _dont_target_attackable;
 	dont_target_buffs = _dont_target_buffs;
@@ -197,6 +204,9 @@ function TargetingParams(_dont_target_knocked_out = false, _dont_target_attackab
 		return true;
 	}
 }
+
+
+global.DEFAULT_TARGETING_PARAMETERS = new TargetingParams(); //So this doesn't need to be created for every single unit/enemy that doesn't use specialized targeting parameters
 #endregion
 
 

@@ -4,7 +4,7 @@ This file contains the base EntityData struct, which contains data that all enti
 	2) Enemies (the entities that intend to destroy or help with the destroying of Targets)
 	3) Targets (the entities that the player needs to keep in tact)
 */
-function Entity() constructor {
+function EntityData() constructor {
 	inst = other;
 	name = "Unnamed";
 	
@@ -23,10 +23,11 @@ function Entity() constructor {
 /*
 	Units and Enemies share some additional data + functionality that Targets don't need, which is defined here.
 */
-function Combatant() : Entity() constructor {
+function CombatantData() : EntityData() constructor {
 	
 	buffs = []; //NOTE: Also includes debuffs
 	direction_facing = DIRECTION_LEFT;
+	can_block = false; //Determines whether an entity can block opposing units/enemies
 	
 	//Action system
 	//List of all the "things" the entity can do while active

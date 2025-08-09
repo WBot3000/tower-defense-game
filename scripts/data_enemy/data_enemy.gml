@@ -19,7 +19,7 @@
 	round_spawned_in: A pointer to the Round object that spawned the enemy. Needed to call back into the round when it gets destroyed
 	enemy_buffs: An array of all the buffs/debuffs the enemy has
 */
-function Enemy(_path_data, _round_spawned_in) : Combatant() constructor {
+function EnemyData(_path_data, _round_spawned_in) : CombatantData() constructor {
 	
 	path_data = _path_data;
 	default_movement_speed = 1.5;
@@ -76,4 +76,19 @@ function get_enemy_path_direction(_enemy) {
 		return _enemy.direction_facing;
 	}
 	return undefined;
+}
+
+//So I don't have to write a stop_moving_func for all basic enemies.
+//NOTE: You need to use the method function to bind this to an Enemy class, otherwise this won't work.
+function enemy_standard_path_stop_moving_func() {
+	if(inst.path_index == -1) { return; }
+	var next_position_in_pixels = (inst.path_position * path_get_length(inst.path_index)) + inst.path_speed;
+	var next_position_normalized = next_position_in_pixels / path_get_length(inst.path_index);
+	
+	//Need to add spawn position, because path_get_x/y assumes origin is (0, 0)
+	var next_x = path_get_x(inst.path_index, next_position_normalized) + path_data.spawn_x;
+	var next_y = path_get_y(inst.path_index, next_position_normalized) + path_data.spawn_y;
+	var entity_at_position = instance_position(next_x, next_y, base_unit);
+	
+	return (entity_at_position != noone && entity_at_position.entity_data.can_block)
 }

@@ -182,7 +182,7 @@ function MusicVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x_pos_le
 #region SoundEffectsVolumeSlider (Class)
 function SoundEffectsVolumeSlider(_x_pos_left, _x_pos_right, _y_pos) : Slider(_x_pos_left, _x_pos_right, _y_pos, "Sound Effects Volume") constructor {
 	
-	current_value = global.GAME_CONFIG_OPTIONS.music_volume; //Do this each time the slider is created so options are maintained between rooms
+	current_value = global.GAME_CONFIG_OPTIONS.sound_effects_volume; //Do this each time the slider is created so options are maintained between rooms
 	current_value_x_pos = map_value(current_value, min_value, max_value, x_pos, x_pos_right);
 	
 	static on_step_parent = on_step;
@@ -683,7 +683,7 @@ function StatUpgradeButton(_x_pos, _y_pos, _upgrade_idx) :
 			return false;
 		}
 		
-		var _stat_upgrades = _entity.entity_data.stat_upgrades;
+		var _stat_upgrades = _entity.stat_upgrades;
 		
 		draw_parent();
 		
@@ -723,7 +723,7 @@ function StatUpgradeButton(_x_pos, _y_pos, _upgrade_idx) :
 			return;
 		}
 		
-		var _stat_upgrades = _entity.entity_data.stat_upgrades;
+		var _stat_upgrades = _entity.stat_upgrades;
 		
 		return (_stat_upgrades[upgrade_idx] != undefined 
 			&& global.player_money >= _stat_upgrades[upgrade_idx].current_price 
@@ -743,7 +743,7 @@ function StatUpgradeButton(_x_pos, _y_pos, _upgrade_idx) :
 			return;
 		}
 		
-		var _stat_upgrades = _entity.entity_data.stat_upgrades;
+		var _stat_upgrades = _entity.stat_upgrades;
 		
 		if(_stat_upgrades[upgrade_idx] != undefined) {
 			global.player_money -= _stat_upgrades[upgrade_idx].current_price;
@@ -777,8 +777,8 @@ function UnitUpgradeButton(_x_pos, _y_pos, _upgrade_idx) :
 			return false;
 		}
 		
-		var _stat_upgrades = _entity.entity_data.stat_upgrades;
-		var _unit_upgrade = _entity.entity_data.unit_upgrades[upgrade_idx];
+		var _stat_upgrades = _entity.stat_upgrades;
+		var _unit_upgrade = _entity.unit_upgrades[upgrade_idx];
 		
 		return (_unit_upgrade != undefined && global.player_money >= _unit_upgrade.price &&
 			_stat_upgrades[0].current_level >= _unit_upgrade.level_req_1 &&
@@ -802,7 +802,7 @@ function UnitUpgradeButton(_x_pos, _y_pos, _upgrade_idx) :
 		
 		draw_parent(_button_highlight_enabled);
 		
-		var _unit_upgrade = _entity.entity_data.unit_upgrades[upgrade_idx];
+		var _unit_upgrade = _entity.unit_upgrades[upgrade_idx];
 		if(_unit_upgrade != undefined) {
 			var _upgrade_sprite = _unit_upgrade.new_animbank.get_animation("DEFAULT");
 			
@@ -824,9 +824,9 @@ function UnitUpgradeButton(_x_pos, _y_pos, _upgrade_idx) :
 			return false;
 		}
 		
-		if(_entity.entity_data.unit_upgrades[upgrade_idx] != undefined) {
-			global.player_money -= _entity.entity_data.unit_upgrades[upgrade_idx].price;
-			_entity.entity_data.unit_upgrades[upgrade_idx].on_upgrade();
+		if(_entity.unit_upgrades[upgrade_idx] != undefined) {
+			global.player_money -= _entity.unit_upgrades[upgrade_idx].price;
+			_entity.unit_upgrades[upgrade_idx].on_upgrade();
 		}
 	}
 }
@@ -860,11 +860,11 @@ function TargetingIndicator(_x_pos, _y_pos) : UIComponent(_x_pos, _y_pos) constr
 		
 		var _entity = selected_entity_manager.currently_selected_entity
 		
-		if(_entity == noone || array_length(_entity.entity_data.targeting_tracker.potential_targeting_types) == 0) {
+		if(_entity == noone || array_length(_entity.targeting_tracker.potential_targeting_types) == 0) {
 			return;
 		}
 
-		var _targeting_type = _entity.entity_data.targeting_tracker.get_current_targeting_type();
+		var _targeting_type = _entity.targeting_tracker.get_current_targeting_type();
 		
 		draw_rectangle_color(x_pos, y_pos, 
 			x_pos + TARGETING_INDICATOR_WIDTH, y_pos + TARGETING_INDICATOR_HEIGHT,
@@ -909,7 +909,7 @@ function SellButton(_x_pos, _y_pos) :
 		
 		draw_sprite(button_sprite_default, 0, x_pos, y_pos);
 		draw_set_alignments(fa_right, fa_center);
-		draw_text(x_pos + sprite_get_width(button_sprite_default) - 8, y_pos + sprite_get_height(button_sprite_default)/2, string(_entity.entity_data.sell_price));
+		draw_text(x_pos + sprite_get_width(button_sprite_default) - 8, y_pos + sprite_get_height(button_sprite_default)/2, string(_entity.sell_price));
 		draw_set_alignments();
 	}
 	
@@ -924,7 +924,7 @@ function SellButton(_x_pos, _y_pos) :
 			//Since the origin of units is centre-bottom, check one point above the origin for the tile. Otherwise, we accidentally mark the tile below as free for placement.
 			var _tile = instance_position(_entity.x, _entity.y - 1, placeable_tile);
 			_tile.placed_unit = noone;
-			global.player_money += _entity.entity_data.sell_price;
+			global.player_money += _entity.sell_price;
 			selected_entity_manager.deselect_entity(); //Need to clear this reference so it isn't pointing to something invalid
 			instance_destroy(_entity);
 		}

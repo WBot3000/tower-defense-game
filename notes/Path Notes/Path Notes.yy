@@ -1,7 +1,7 @@
 {
   "$GMNotes":"",
-  "%Name":"Script Assets Have Changed For v2.3.0",
-  "name":"Script Assets Have Changed For v2.3.0",
+  "%Name":"Path Notes",
+  "name":"Path Notes",
   "parent":{
     "name":"Notes",
     "path":"folders/Notes.yy",

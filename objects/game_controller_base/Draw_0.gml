@@ -1,6 +1,6 @@
 if(selected_entity_manager.currently_selected_entity != undefined) { //Draw range on the currently selected unit.
 	with(selected_entity_manager.currently_selected_entity) {
-		entity_data.range.draw_range();
+		entity_data.sight_range.draw_range();
 	}
 }
 

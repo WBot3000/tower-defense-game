@@ -1,3 +1,3 @@
 /// @description Initialize entity data
 
-entity_data = new Target(1000);
+entity_data = new TargetData(1000);
