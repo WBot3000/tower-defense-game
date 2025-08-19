@@ -1,7 +1,5 @@
 /// @description Initialize entity data
 
-event_inherited();
-
 //Entity stats
 entity_data = new GoldConstruct();
 
@@ -36,4 +34,5 @@ stat_upgrades = [undefined, undefined,
 unit_upgrades = [undefined, undefined, undefined];
 	
 //Set up animation bank
-animation_controller.set_animation_bank(global.ANIMBANK_GOLD);
+animation_bank = global.ANIMBANK_GOLD;
+event_inherited();

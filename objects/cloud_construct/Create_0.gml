@@ -1,7 +1,5 @@
 /// @description Initialize variables for the Cloud Construct
 
-event_inherited();
-
 //Entity stats
 entity_data = new CloudConstruct();
 
@@ -35,4 +33,5 @@ stat_upgrades = [undefined, undefined,
 unit_upgrades = [undefined, undefined, undefined];
 
 //Set up animation bank
-animation_controller.set_animation_bank(global.ANIMBANK_CLOUD);
+animation_bank = global.ANIMBANK_CLOUD;
+event_inherited();

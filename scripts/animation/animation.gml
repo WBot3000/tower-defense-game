@@ -85,8 +85,7 @@ function EnemyAnimationBank(_default_active_animation, _on_spawn_animation = _de
 	
 	TODO: Implement animation queue so different animations can be "queued" up and played sequentially
 	
-	TODO: When updating a unit, need a way to convert from the sprites of the unupgraded version to the sprites of the upgraded version.
-		- Basically need to "map" sprites to each other
+	TODO: Make entity passing implicit?
 */
 
 function AnimationController(_entity_obj, _animation_bank, _starting_animation_ref = "DEFAULT") constructor {

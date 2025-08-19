@@ -10,8 +10,21 @@ keyboard_set_map(vk_left, ord("A"));
 keyboard_set_map(vk_down, ord("S"));
 keyboard_set_map(vk_right, ord("D"));
 
+//Do stuff regarding command-line parameters
+command_line_parameters_on_game_start();
+
 //Particle Stuff!
 global.PARTICLE_SYSTEM = part_system_create_layer(PARTICLE_LAYER, true);
+
+global.PARTICLE_ENEMYDEATH = part_type_create();
+part_type_sprite(global.PARTICLE_ENEMYDEATH, spr_enemy_defeated, true, true, false);
+part_type_size(global.PARTICLE_ENEMYDEATH, 1, 1, 0, 0);
+part_type_alpha1(global.PARTICLE_ENEMYDEATH, 1);
+part_type_speed(global.PARTICLE_ENEMYDEATH, 0, 0, 0, 0);
+part_type_direction(global.PARTICLE_ENEMYDEATH, 0, 0, 0, 0);
+part_type_orientation(global.PARTICLE_ENEMYDEATH, 0, 0, 0, 0, true);
+part_type_blend(global.PARTICLE_ENEMYDEATH, 0);
+part_type_life(global.PARTICLE_ENEMYDEATH, 30, 30);
 
 global.PARTICLE_SPARKLE = part_type_create();
 part_type_sprite(global.PARTICLE_SPARKLE, spr_sparkle, true, true, false);

@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"action_system",
+  "%Name":"command_line_parameters",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"action_system",
+  "name":"command_line_parameters",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",

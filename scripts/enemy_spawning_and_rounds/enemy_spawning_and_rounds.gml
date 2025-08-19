@@ -103,7 +103,6 @@ function Round(_round_number, _spawn_list, _timer_count) constructor {
 			var _enemy_type = _current_spawn_data.enemy_types[i];
 			var _path_data = _current_spawn_data.enemy_path_data[i];
 		    spawn_enemy(_enemy_type, _path_data);
-			//show_debug_message("Enemy spawned");
 		}
 		
 		spawn_list_spawned_count++;

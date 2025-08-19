@@ -1053,15 +1053,14 @@ function UnitInfoCard() : UIComponent() constructor {
 			draw_sprite(_entity.sprite_index, 0, TILE_SIZE, y_pos + 5*TILE_SIZE/4);
 			
 			//Draw any necessary highlights. This is done after all of the other drawing so that they'll always be on top.
-			var _data = _entity.entity_data;
-			for(var i = 0; i < array_length(_data.stat_upgrades); ++i) {
+			for(var i = 0; i < array_length(_entity.stat_upgrades); ++i) {
 				var _mouse_x_gui = device_mouse_x_to_gui(0);
 				var _mouse_y_gui = device_mouse_y_to_gui(0);
 				var _region_highlighted = _mouse_x_gui >= stat_upgrade_buttons[i].x_pos && _mouse_x_gui <= stat_upgrade_buttons[i].x_pos + STAT_BUTTON_SIZE &&
 					_mouse_y_gui >= stat_upgrade_buttons[i].y_pos - STAT_BUTTON_SIZE && _mouse_y_gui <= stat_upgrade_buttons[i].y_pos + STAT_BUTTON_SIZE
 					
-				if(_data.stat_upgrades[i] != undefined && _region_highlighted) { //Need more than just standard highlight since this should include the icon along with the button
-					draw_highlight_info(_data.stat_upgrades[i].title, _data.stat_upgrades[i].description);
+				if(_entity.stat_upgrades[i] != undefined && _region_highlighted) { //Need more than just standard highlight since this should include the icon along with the button
+					draw_highlight_info(_entity.stat_upgrades[i].title, _entity.stat_upgrades[i].description);
 					break; //Only need to draw one highlight
 				}
 			}

@@ -1,6 +1,6 @@
 {
   "$GMSprite":"",
-  "%Name":"spr_worm_hole",
+  "%Name":"spr_wormhole",
   "bboxMode":0,
   "bbox_bottom":51,
   "bbox_left":4,
@@ -21,7 +21,7 @@
   "layers":[
     {"$GMImageLayer":"","%Name":"a4d115ad-0e97-45dd-a2ff-3d335516178b","blendMode":0,"displayName":"default","isLocked":false,"name":"a4d115ad-0e97-45dd-a2ff-3d335516178b","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
   ],
-  "name":"spr_worm_hole",
+  "name":"spr_wormhole",
   "nineSlice":{
     "$GMNineSliceData":"",
     "bottom":0,
@@ -52,7 +52,7 @@
   "resourceVersion":"2.0",
   "sequence":{
     "$GMSequence":"v1",
-    "%Name":"spr_worm_hole",
+    "%Name":"spr_wormhole",
     "autoRecord":true,
     "backdropHeight":768,
     "backdropImageOpacity":0.5,
@@ -76,7 +76,7 @@
       "resourceType":"KeyframeStore<MomentsEventKeyframe>",
       "resourceVersion":"2.0",
     },
-    "name":"spr_worm_hole",
+    "name":"spr_wormhole",
     "playback":1,
     "playbackSpeed":30.0,
     "playbackSpeedType":0,
@@ -90,7 +90,7 @@
     "tracks":[
       {"$GMSpriteFramesTrack":"","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"$KeyframeStore<SpriteFrameKeyframe>":"","Keyframes":[
             {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"e8621d12-28fd-4086-8da7-e435cfad8909","path":"sprites/spr_worm_hole/spr_worm_hole.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
+                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"e8621d12-28fd-4086-8da7-e435cfad8909","path":"sprites/spr_wormhole/spr_wormhole.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
               },"Disabled":false,"id":"e4c2915a-795a-4dcc-8107-710f11424509","IsCreationKey":false,"Key":0.0,"Length":1.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
           ],"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"2.0",},"modifiers":[],"name":"frames","resourceType":"GMSpriteFramesTrack","resourceVersion":"2.0","spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],

@@ -15,7 +15,7 @@ if(x >= 0 && x <= room_width && y >= 0 && y <= room_height) { //Only need to do 
 
 	for(var i = 0; i < ds_list_size(units_in_range); ++i) {
 		if(units_in_range[| i].health_state == HEALTH_STATE.ACTIVE) { //Don't want to shoot at knocked out units
-			deal_damage(units_in_range[| i], bullet_damage);
+			deal_damage(units_in_range[| i], projectile_data.damage);
 			_unit_was_hit = true;
 		}
 	}

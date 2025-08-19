@@ -395,8 +395,8 @@ function TargetingTracker(_potential_target_types) constructor {
 
 #region enemy_target_default (Function)
 //NOTE: With this function, the enemy selection is determined by the order of the input list, unlike all the other ones
-//NOTE 2: Currently, this doesn't do anything with _enemy, it just takes it as an argument because all of the other 
-function enemy_target_default(_enemy, _entity_list) {
+//NOTE 2: Currently, this doesn't do anything with _targeter, it just takes it as an argument because all of the other 
+function enemy_target_default(_targeter, _entity_list) {
 	for(var i = 0, len = ds_list_size(_entity_list); i < len; ++i) {
 		var _current_entity = _entity_list[| i];
 		if(can_be_attacked(_current_entity)) {

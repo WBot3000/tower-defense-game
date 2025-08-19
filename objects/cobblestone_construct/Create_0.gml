@@ -1,7 +1,5 @@
 /// @description Initialize entity data
 
-event_inherited();
-
 //Entity stats
 entity_data = new CobblestoneConstruct();
 
@@ -34,4 +32,5 @@ stat_upgrades = [undefined, undefined,
 unit_upgrades = [undefined, undefined, undefined];
 
 //Set up animation bank
-animation_controller.set_animation_bank(global.ANIMBANK_COBBLESTONE)
+animation_bank = global.ANIMBANK_COBBLESTONE;
+event_inherited();

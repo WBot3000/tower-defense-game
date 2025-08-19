@@ -54,22 +54,22 @@ function EnemyData(_path_data, _round_spawned_in) : CombatantData() constructor 
 
 
 /*
-	Whether an enemy should be moving or attacking
+	Whether an enemy should be moving or attacking, for enemies that aren't supposed ot both at the same time
 */
 enum ENEMY_ATTACKING_STATE {
 	NOT_ATTACKING,
 	IN_ATTACK
 }
 
-//TODO: Currently implemented in path travel action, might be able to get rid of this
+
 function get_enemy_path_direction(_enemy) {
-	var _enemy_current_x = _enemy.x;//path_get_x(_enemy.path_data.default_path, _enemy.path_position);
-	var _enemy_previous_x = path_get_x(_enemy.path_data.default_path, _enemy.path_positionprevious);
+	//var _enemy_current_x = _enemy.x;//path_get_x(_enemy.path_data.default_path, _enemy.path_position);
+	//var _enemy_previous_x = path_get_x(_enemy.path_data.default_path, _enemy.path_positionprevious);
 	
-	if(_enemy_current_x > _enemy_previous_x) {
+	if(_enemy.x > _enemy.xprevious) {
 		return DIRECTION_RIGHT;
 	}
-	if(_enemy_current_x < _enemy_previous_x) {
+	if(_enemy.x < _enemy.xprevious) {
 		return DIRECTION_LEFT;
 	}
 	if(variable_instance_exists(_enemy.id, "direction_facing")) {

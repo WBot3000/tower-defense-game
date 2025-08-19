@@ -28,14 +28,15 @@ function get_entity_using_targeting_tracker(_entity_list, _targeting_params, _ta
 //TODO: Take into account buffs/debuffs
 function deal_damage(_entity_to_damage, _damage_amount){
 	var _true_damage_amount = _damage_amount;
-	var _entity_data = _entity_to_damage.entity_data;
 	
-	if(variable_struct_exists(_entity_data, "defense_factor")) {
-		_true_damage_amount /= _entity_data.defense_factor
-	}
-	_entity_data.current_health = max(_entity_data.current_health - _true_damage_amount, 0);
-	if(_entity_data.current_health == 0) {
-		_entity_data.on_health_reached_zero();
+	with(_entity_to_damage) {
+		if(variable_struct_exists(entity_data, "defense_factor")) {
+			_true_damage_amount /= entity_data.defense_factor
+		}
+		current_health = max(current_health - _true_damage_amount, 0);
+		if(object_is_ancestor(object_index, base_target) && current_health <= 0) {
+			event_user(0); //"Lose the game" event
+		}
 	}
 	
 	return _true_damage_amount;
@@ -64,6 +65,20 @@ function shoot_projectile(_projectile, _target, _projectile_data, _shooter = oth
 #endregion
 
 
+#region Summoning Functions
+function create_tile_aligned_instance(_x_pos, _y_pos, _layer, _object, _data_passed) {
+	var tile_at_position = instance_position(_x_pos, _y_pos, base_tile);
+	if(tile_at_position != noone) {
+		//x-offset and y-offset used so this works no matter where the placed object's sprite origin is located
+		var _obj_sprite = object_get_sprite(_object)
+		instance_create_layer(tile_at_position.x + sprite_get_xoffset(_obj_sprite), tile_at_position.y + sprite_get_yoffset(_obj_sprite), _layer, _object, _data_passed)
+	}
+	else {
+		throw ("No tile present at location (" + string(_x_pos) + ", " + string(_y_pos) + ")!")
+	}
+}
+#endregion
+
 #region Miscellaneous Functions
 
 //Used to set the sprite direction of units and enemies
@@ -75,11 +90,23 @@ function set_facing_direction(_direction, _entity = other) {
 }
 
 
+//Standard stuff that happens when an enemy is defeated
+function standard_on_enemy_defeat_actions(_enemy = other) {
+	with(_enemy) {
+		health_state = HEALTH_STATE.KNOCKED_OUT;
+		part_particles_create(global.PARTICLE_SYSTEM, get_bbox_center_x(self), get_bbox_center_y(self),
+			global.PARTICLE_ENEMYDEATH, 1);
+		path_end();
+		instance_destroy(self, true);
+	}
+}
+
+
 //Standard KO stuff that should apply to most units that get knocked out
 function standard_on_ko_actions(_entity = other) {
 	with(_entity) {
-		animation_controller.set_animation("ON_KO"); //TODO: Write code for chaining animations together
-		health_state = UNIT_STATE.KNOCKED_OUT;
+		animation_controller.set_animation("ON_KO"); //TODO: Write better code for chaining animations together
+		health_state = HEALTH_STATE.KNOCKED_OUT;
 	}
 }
 

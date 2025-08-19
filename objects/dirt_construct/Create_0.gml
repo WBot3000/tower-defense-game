@@ -1,7 +1,5 @@
 /// @description Initialize entity data
 
-event_inherited();
-
 //Entity stats
 entity_data = new DirtConstruct();
 
@@ -36,4 +34,5 @@ stat_upgrades = [new DirtConstructDamageUpgrade(), new DirtConstructAttackSpeedU
 unit_upgrades = [new UpgradeDirtConstruct1(), undefined, undefined];
 
 //Set up animation bank
-animation_controller.set_animation_bank(global.ANIMBANK_DIRT)
+animation_bank = global.ANIMBANK_DIRT;
+event_inherited();

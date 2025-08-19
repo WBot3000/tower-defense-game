@@ -2,17 +2,18 @@
 
 animation_controller.on_step();
 
-switch (worm_hole_state) {
+switch (wormhole_state) {
+	/*
     case SLIDING_MENU_STATE.OPENING:
-        if(sprite_index == spr_worm_hole) {
-			worm_hole_state = SLIDING_MENU_STATE.OPEN;
+        if(sprite_index == spr_wormhole) {
+			wormhole_state = SLIDING_MENU_STATE.OPEN;
 		}
-        break;
+        break;*/
 	case SLIDING_MENU_STATE.OPEN:
 		if(existence_timer > existence_time_limit) {
 			//instance_destroy();
-			worm_hole_state = SLIDING_MENU_STATE.CLOSING;
-			animation_controller.set_animation(spr_worm_hole_closing, 1, spr_dummy);
+			wormhole_state = SLIDING_MENU_STATE.CLOSING;
+			animation_controller.set_animation("CLOSING", 1, spr_dummy);
 			exit;
 		}
 

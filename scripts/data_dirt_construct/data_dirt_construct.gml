@@ -59,7 +59,7 @@ function DirtConstructAttackSpeedUpgrade(_unit = other) :
 		"Decrease attack speed by 0.3 seconds with each upgrade.", spr_increase_attack_speed_icon, _unit) constructor {
 			
 	static upgrade_stats_fn = function() {
-		unit.entity_data.frames_between_shots -= seconds_to_roomspeed_frames(0.3)
+		unit.entity_data.frames_per_shot -= seconds_to_roomspeed_frames(0.3)
 	}
 	
 	static price_fn = function(upgrade_level) {
