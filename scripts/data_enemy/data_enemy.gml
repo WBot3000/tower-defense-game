@@ -27,38 +27,6 @@ function EnemyData(_path_data, _round_spawned_in) : CombatantData() constructor 
 	round_spawned_in = _round_spawned_in
 	monetary_value = 50;
 	
-	//Performs all actions a unit can do while active
-	static while_active = function() {
-		for(var i = 0; i < array_length(action_queue); ++i) {
-			action_queue[i].execute();
-			action_queue[i].update_params();
-		}
-	}
-	
-	
-	//Called in the "dealing_damage" function once the entity's health reaches zero
-	static on_health_reached_zero = function() {
-		health_state = HEALTH_STATE.KNOCKED_OUT;
-		for(var i = 0; i < array_length(action_queue); ++i) {
-			action_queue[i].on_health_reached_zero();
-		}
-		with(inst) {
-			path_end();
-		}
-		animation_controller.set_animation("ON_KO", 1, function(){ instance_destroy(inst, true) });
-	}
-	
-	
-	static while_knocked_out = function() {} //Can put anything here that should be done after the enemy has been defeated
-}
-
-
-/*
-	Whether an enemy should be moving or attacking, for enemies that aren't supposed ot both at the same time
-*/
-enum ENEMY_ATTACKING_STATE {
-	NOT_ATTACKING,
-	IN_ATTACK
 }
 
 

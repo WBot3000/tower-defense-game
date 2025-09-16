@@ -1,5 +1,7 @@
 /// @description Attack any units and targets in your path
 
+event_inherited();
+
 //Check to see if the enemy needs to be destroyed
 if(current_health <= 0) {
 	standard_on_enemy_defeat_actions();
@@ -10,7 +12,7 @@ if(current_health <= 0) {
 	*/
 }
 
-entity_data.sight_range.get_entities_in_range([base_unit, base_target], entities_in_range, true);
+entity_data.sight_range.get_entities_in_range([base_unit, base_target], entities_in_range);
 for(var i = 0; i < ds_list_size(entities_in_range); i++) {
 	var _entity = entities_in_range[| i];
 	if(can_be_attacked(_entity)) {

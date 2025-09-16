@@ -1,13 +1,12 @@
 /// @description Run events
 
-//TODO: Move this to the parent object so it doesn't have to be explicitly declared for every single unit
 event_inherited();
 
 switch (health_state) {
     case HEALTH_STATE.ACTIVE:
 		shot_timer++;
 		if(shot_timer >= entity_data.frames_per_shot) {
-			entity_data.sight_range.get_entities_in_range([base_enemy], enemies_in_range, true);
+			entity_data.sight_range.get_entities_in_range([base_enemy], enemies_in_range);
 
 			if(ds_list_size(enemies_in_range) > 0) {
 				//TODO: Check to see if targets are being picked correctly not sure if they are

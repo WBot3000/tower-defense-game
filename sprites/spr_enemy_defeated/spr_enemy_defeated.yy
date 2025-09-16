@@ -31,8 +31,8 @@
   "nineSlice":null,
   "origin":4,
   "parent":{
-    "name":"enemy_types",
-    "path":"folders/Sprites/enemy_types.yy",
+    "name":"effects",
+    "path":"folders/Sprites/effects.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

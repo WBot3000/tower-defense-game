@@ -21,9 +21,6 @@ new TargetingTracker([
 shot_timer = 0;
 enemies_in_range = ds_list_create();
 projectile_obj = dirt_ball;
-
-//Buff-debuff list
-buffs = []
 			
 //Buying + selling data
 sell_price = global.DATA_PURCHASE_DIRT.price * SELL_PRICE_REDUCTION;

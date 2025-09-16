@@ -11,7 +11,7 @@ if(!variable_instance_exists(self.id, "current_level_data")) {
 	Since these persist for the lifetime of the entire game, you need to make sure no funky side effects occur as a result.
 	Ideally, you want to use as few of these as possible, and put more stuff on the level-scoped managers down below.
 */
-global.player_money = 500;
+global.player_money = 9999;
 
 #endregion
 
@@ -47,6 +47,13 @@ camera_controller = new CameraController();
 #endregion
 
 
+#region Game Subscription Event Initalizations
+broadcast_hub = new BroadcastHub();
+broadcast_hub.register_event("unit_purchased");
+broadcast_hub.register_event("unit_removed");
+#endregion
+
+
 #region Camera Level-Start Movement Initialization
 //NOTE: Make sure all the targets are initialized BEFORE this controller, otherwise this won't work properly
 with(base_target) {
@@ -65,6 +72,7 @@ purchase_data = [
 	global.DATA_PURCHASE_GOLD,
 	
 	global.DATA_PURCHASE_CLOUD,
+	global.DATA_PURCHASE_FLAME,
 ]
 
 #endregion

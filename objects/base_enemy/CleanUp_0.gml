@@ -3,3 +3,8 @@ var _round_manager = get_round_manager();
 if(_round_manager != undefined) {
 	_round_manager.remove_enemy(self.id, round_spawned_in);
 }
+
+for(var i = 0, len = array_length(events_registered_for); i < len; ++i) {
+	var _event = events_registered_for[i];
+	_event.remove_subscriber(self);
+}

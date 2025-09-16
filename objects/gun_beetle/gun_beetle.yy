@@ -17,7 +17,7 @@
     "name":"base_enemy",
     "path":"objects/base_enemy/base_enemy.yy",
   },
-  "persistent":false,
+  "persistent":true,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,
   "physicsFriction":0.2,

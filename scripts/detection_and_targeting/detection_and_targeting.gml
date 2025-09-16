@@ -14,13 +14,14 @@
 #region Range (Class)
 /*
 	Base "range" from which all other ranges can derive from. Largely used as an interface.
-	entity: the id of the entity object that uses this range
+	owner: the id of the entity object that uses this range
 */
-function Range(_entity) constructor {
-	entity = _entity;
+function Range(_owner) constructor {
+	owner = _owner;
 	
 	static draw_range = function(){};
 	static get_entities_in_range = function(){};
+	static is_entity_in_range = function(){};
 	static move_range = function(){};
 }
 #endregion
@@ -29,18 +30,18 @@ function Range(_entity) constructor {
 #region CircularRange (Class)
 /*
 	For entities with a circular viewing range (think most towers from Bloons Tower Defense 6)
-	origin_x: x-coordinate of the circle's origin (relative to the unit's center)
-	origin_y: y-coordinate of the circle's origin (relative to the unit's center)
+	origin_x: x-coordinate of the circle's origin (relative to the owner's center)
+	origin_y: y-coordinate of the circle's origin (relative to the owner's center)
 	radius: How far the unit can "see"
 */
-function CircularRange(_entity, _origin_x, _origin_y, _radius) : Range(_entity) constructor {
+function CircularRange(_owner, _origin_x, _origin_y, _radius) : Range(_owner) constructor {
 	origin_x = _origin_x;
 	origin_y = _origin_y;
 	radius = _radius;
 	
 	static draw_range = function() {
 		draw_set_alpha(0.125)
-		draw_circle_color(origin_x + get_bbox_center_x(entity), origin_y + get_bbox_center_y(entity), radius, c_white, c_white, false);
+		draw_circle_color(origin_x + get_bbox_center_x(owner), origin_y + get_bbox_center_y(owner), radius, c_white, c_white, false);
 		draw_set_alpha(1)
 	}
 	
@@ -52,9 +53,18 @@ function CircularRange(_entity, _origin_x, _origin_y, _radius) : Range(_entity) 
 		While not targeting yourself (notme = true)
 	*/
 	static get_entities_in_range = function(_entity_types, _storage_list) {
-		for(var i = 0, len = array_length(_entity_types); i < len; ++i) {
-			collision_circle_list(origin_x + get_bbox_center_x(entity), origin_y + get_bbox_center_y(entity), radius, _entity_types[i], false, true, _storage_list, false);
+		with(owner) { //Wrapping is so the "notme" works properly
+			for(var i = 0, len = array_length(_entity_types); i < len; ++i) {
+				collision_circle_list(other.origin_x + get_bbox_center_x(self), other.origin_y + get_bbox_center_y(self), other.radius, _entity_types[i], false, true, _storage_list, false);
+			}
 		}
+	}
+	
+	/*
+		Determine whether a specific entity is within this range or not.
+	*/
+	static is_entity_in_range = function(_entity) {
+		return collision_circle(origin_x + get_bbox_center_x(owner), origin_y + get_bbox_center_y(owner), radius, _entity, false, true);
 	}
 	
 	/*
@@ -74,21 +84,21 @@ function CircularRange(_entity, _origin_x, _origin_y, _radius) : Range(_entity) 
 #region RectangularRange (Class)
 /*
 	For entities with a rectangular viewing range (mostly for specialty towers, not very common)
-	x1: x-coordinate of the rectangle's top-left (relative to entity)
-	y1: y-coordinate of the rectangle's top-left (relative to entity)
-	x2: x-coordinate of the rectangle's bottom-right (relative to entity)
-	y2: y-coordinate of the rectangle's bottom-right (relative to entity)
+	x1: x-coordinate of the rectangle's top-left (relative to owner)
+	y1: y-coordinate of the rectangle's top-left (relative to owner)
+	x2: x-coordinate of the rectangle's bottom-right (relative to owner)
+	y2: y-coordinate of the rectangle's bottom-right (relative to owner)
 */
-function RectangularRange(_entity, _x1, _y1, _x2, _y2) : Range(_entity) constructor {
+function RectangularRange(_owner, _x1, _y1, _x2, _y2) : Range(_owner) constructor {
 	x1 = _x1;
 	y1 = _y1;
 	x2 = _x2;
 	y2 = _y2;
 	
 	static draw_range = function() {
-		draw_set_alpha(0.125)
+		draw_set_alpha(0.125);
 		draw_rectangle_color(x1 + entity.x, y1 + entity.y - TILE_SIZE/2, x2 + entity.x, y2 + entity.y - TILE_SIZE/2, c_white, c_white, c_white, c_white, false);
-		draw_set_alpha(1)
+		draw_set_alpha(1);
 	}
 	
 	/*
@@ -99,12 +109,24 @@ function RectangularRange(_entity, _x1, _y1, _x2, _y2) : Range(_entity) construc
 		While not targeting yourself (notme = true)
 	*/
 	static get_entities_in_range = function(_entity_types, _storage_list) {
-		var _center_x = get_bbox_center_x(entity);
-		var _center_y = get_bbox_center_y(entity);
+		var _center_x = get_bbox_center_x(owner);
+		var _center_y = get_bbox_center_y(owner);
 		
-		for(var i = 0, len = array_length(_entity_types); i < len; ++i) {
-			collision_rectangle_list(x1 + _center_x, y1 + _center_y, x2 + _center_x, y2 + _center_y, _entity_types[i], false, true, _storage_list, false);
+		with(owner) { //Wrapping is so the "notme" works properly
+			for(var i = 0, len = array_length(_entity_types); i < len; ++i) {
+				collision_rectangle_list(other.x1 + _center_x, other.y1 + _center_y, other.x2 + _center_x, other.y2 + _center_y, _entity_types[i], false, true, _storage_list, false);
+			}
 		}
+	}
+	
+	/*
+		Determine whether a specific entity is within this range or not.
+	*/
+	static is_entity_in_range = function(_entity) {
+		var _center_x = get_bbox_center_x(owner);
+		var _center_y = get_bbox_center_y(owner);
+
+		return collision_rectangle(x1 + _center_x, y1 + _center_y, x2 + _center_x, y2 + _center_y, _entity, false, true);
 	}
 	
 	/*
@@ -137,10 +159,10 @@ function RectangularRange(_entity, _x1, _y1, _x2, _y2) : Range(_entity) construc
 	In order to accomodate for melee units having different bounding boxes, the radius is proportional to said bounding box
 	If you give all melee units the same range radius, then you have situations where the larger melee unit can't reach the smaller one.
 */
-function MeleeRange(_entity) : CircularRange(_entity) constructor {
+function MeleeRange(_owner) : CircularRange(_owner) constructor {
 	origin_x = 0;//get_bbox_center_x(_unit);
 	origin_y = 0;//get_bbox_center_y(_unit);
-	radius = max((_entity.bbox_right - _entity.bbox_left)/2, (_entity.bbox_bottom - _entity.bbox_top)/2) * 1.5; //So that melee units have just a bit more range.
+	radius = max((_owner.bbox_right - _owner.bbox_left)/2, (_owner.bbox_bottom - _owner.bbox_top)/2) * 1.5; //So that melee units have just a bit more range.
 }
 #endregion
 
@@ -150,7 +172,7 @@ function MeleeRange(_entity) : CircularRange(_entity) constructor {
 	A RectangularRange for enemies that can see the entire level at once.
 	Doesn't draw anything because creating a big white rectangle over the entire level sounds unpleasant.
 */
-function GlobalRange(_entity) : Range(_entity) constructor {	
+function GlobalRange(_owner) : Range(_owner) constructor {	
 	/*
 		Detect...
 		All of a certain type of entity (obj = _entity_types[x])

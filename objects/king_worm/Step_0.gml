@@ -1,5 +1,7 @@
 /// @description Move along the path and occasionally bite a unit
 
+event_inherited();
+
 //Check to see if the enemy needs to be destroyed
 if(current_health <= 0) {
 	standard_on_enemy_defeat_actions();
@@ -36,8 +38,8 @@ switch (health_state) {
 		if(attack_timer >= entity_data.frames_per_attack) { //Enemy can now attack again
 			//Prioritize units over targets (they'll be at the front of the list
 			//Temporary for now
-			entity_data.sight_range.get_entities_in_range(base_unit, units_in_range, true);
-			entity_data.sight_range.get_entities_in_range(base_target, targets_in_range, true);
+			entity_data.sight_range.get_entities_in_range(base_unit, units_in_range);
+			entity_data.sight_range.get_entities_in_range(base_target, targets_in_range);
 			for(var i = 0; i < ds_list_size(targets_in_range); ++i) {
 				ds_list_add(units_in_range, ds_list_find_value(targets_in_range, i));
 			}

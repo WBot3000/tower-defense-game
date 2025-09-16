@@ -10,7 +10,9 @@ switch (state) {
 			if(instance_exists(owner)) {
 				_targeting_type = owner.targeting_tracker.get_current_targeting_type();
 			}
-			target = _targeting_type.targeting_fn(self.id, global.ALL_ENEMIES_LIST, true);
+			
+			range.get_entities_in_range([base_enemy], enemies_in_range);
+			target = _targeting_type.targeting_fn(self.id, enemies_in_range, true);
 			if(target == noone) { //If no enemies can be found, just dissipate. TODO: Might change this behavior later
 				state = CLOUD_STATE.DISSIPATING
 				animation_controller.set_animation("DISSIPATING", 1, function(){ instance_destroy(self, true) });
@@ -37,8 +39,9 @@ switch (state) {
 			if(instance_exists(owner)) {
 				_targeting_type = owner.targeting_tracker.get_current_targeting_type();
 			}
-			range.get_entities_in_range(base_enemy, enemies_in_range, true);
-			target = _targeting_type.targeting_fn(self.id, enemies_in_range, true);
+			
+			range.get_entities_in_range([base_enemy], enemies_in_range);
+			target = _targeting_type.targeting_fn(self.id, enemies_in_range, global.DEFAULT_TARGETING_PARAMETERS);
 			if(target == noone) { //If no enemies can be found, just dissipate. TODO: Might change this behavior later
 				state = CLOUD_STATE.DISSIPATING;
 				animation_controller.set_animation("DISSIPATING", 1, function(){ instance_destroy(self, true) });
@@ -57,13 +60,13 @@ switch (state) {
 		part_emitter_region(global.PARTICLE_SYSTEM, rain_emitter, x - 8, x + 8, y + sprite_height, y + sprite_height, ps_shape_rectangle, ps_distr_linear);
 		
 		damage_timer++;
-		if(damage_timer >= data.seconds_to_damage) {
+		if(damage_timer >= data.frames_to_damage) {
 			deal_damage(target, data.damage);
 			part_emitter_stream(global.PARTICLE_SYSTEM, rain_emitter, global.PARTICLE_RAIN, 1);
 			damage_timer = 0;
 		}
 		linger_timer++;
-		if(linger_timer >= data.seconds_to_linger) {
+		if(linger_timer >= data.frames_to_linger) {
 			state = CLOUD_STATE.DISSIPATING;
 			animation_controller.set_animation("DISSIPATING", 1, function(){ instance_destroy(self, true) });
 		}

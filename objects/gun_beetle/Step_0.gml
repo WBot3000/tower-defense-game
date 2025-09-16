@@ -1,4 +1,7 @@
 /// @description Move along the path and occasionally bite a unit
+
+event_inherited();
+
 //Check to see if the enemy needs to be destroyed
 if(current_health <= 0) {
 	instance_destroy();
@@ -16,7 +19,7 @@ switch (attack_state) {
 	case ENEMY_ATTACKING_STATE.NOT_ATTACKING:
 		if(state_timer >= entity_data.frames_per_attack) { //Enemy can now attack again
 			//Prioritize units over targets (they'll be at the front of the list
-			entity_data.sight_range.get_entities_in_range([base_unit, base_target], entities_in_range, true);
+			entity_data.sight_range.get_entities_in_range([base_unit, base_target], entities_in_range);
 			focused_entity = enemy_target_default(self, entities_in_range);
 
 			if(focused_entity != noone) {
@@ -38,7 +41,7 @@ switch (attack_state) {
 			}
 			else { //Largely the same as the not-attacking code
 				//Prioritize units over targets (they'll be at the front of the list
-				range.get_entities_in_range([base_unit, base_target], entities_in_range, true);
+				entity_data.sight_range.get_entities_in_range([base_unit, base_target], entities_in_range);
 				focused_entity = enemy_target_default(self, entities_in_range);
 				
 				if(focused_entity != noone) {

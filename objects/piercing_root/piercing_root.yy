@@ -10,8 +10,8 @@
   "name":"piercing_root",
   "overriddenProperties":[],
   "parent":{
-    "name":"Upgrade 1",
-    "path":"folders/Objects/unit_types/Dirt/Upgrade 1.yy",
+    "name":"Dirt",
+    "path":"folders/Objects/unit_types/Dirt.yy",
   },
   "parentObjectId":null,
   "persistent":false,

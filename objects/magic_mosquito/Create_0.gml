@@ -16,13 +16,11 @@ frames_per_attack = seconds_to_roomspeed_frames(0.25);	//How many frames have to
 
 monetary_value = 25;
 
-enemy_buffs = [];
-
 //Variables to keep track of things
 state_timer = 0;
 
-//units_in_range = ds_list_create();
-//targets_in_range = ds_list_create();
 move_x = 0;
 move_y = 0;
 focused_entity = noone;
+
+event_inherited();

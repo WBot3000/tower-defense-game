@@ -11,6 +11,9 @@ health_state = HEALTH_STATE.ACTIVE;
 cached_round_manager = get_round_manager();
 money_generation_timer = 0;
 
+//Used for Gold Rush upgrade if purchased
+applying_buffs_to = [];
+
 //Used for Midas Missile upgrade if purchased
 targeting_tracker = 
 new TargetingTracker([
@@ -20,18 +23,16 @@ new TargetingTracker([
 				global.TARGETING_HEALTHY,
 				global.TARGETING_WEAK,
 ]);
-enemies_in_range = ds_list_create();
-
-//Buff-debuff list
-buffs = [];
+entities_in_range = ds_list_create();
 
 //Buying + selling data
 sell_price = global.DATA_PURCHASE_GOLD.price * SELL_PRICE_REDUCTION;
 
-stat_upgrades = [undefined, undefined, 
-	undefined, undefined];
+stat_upgrades = [new DirtConstructAttackSpeedUpgrade(), new DirtConstructAttackSpeedUpgrade(), 
+	new DirtConstructAttackSpeedUpgrade(), undefined];
 
-unit_upgrades = [undefined, undefined, undefined];
+unit_upgrades = [new UpgradeGoldConstruct1(), undefined, undefined];
+upgrade_purchased = 0; //Used to determine which unit upgrade was purchased after buying it.
 	
 //Set up animation bank
 animation_bank = global.ANIMBANK_GOLD;

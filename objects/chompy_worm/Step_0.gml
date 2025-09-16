@@ -1,5 +1,7 @@
 /// @description Move along the path and occasionally bite a unit
 
+event_inherited();
+
 switch (health_state) {
 	case HEALTH_STATE.ACTIVE:
 		//Check to see if the enemy needs to be destroyed
@@ -12,10 +14,12 @@ switch (health_state) {
 		*/
 		}
 		
+		blocked_check();
+		
 		attack_timer++;
 		if(attack_timer >= entity_data.frames_per_attack) { //Enemy can now attack again
 			
-			entity_data.sight_range.get_entities_in_range([base_unit, base_target], entities_in_range, true);
+			entity_data.sight_range.get_entities_in_range([base_unit, base_target], entities_in_range);
 			
 			if(ds_list_size(entities_in_range) > 0) {
 				var _entity_to_attack = enemy_target_default(self, entities_in_range);

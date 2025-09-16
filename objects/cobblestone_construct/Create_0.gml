@@ -20,8 +20,8 @@ new TargetingTracker([
 punch_timer = 0;
 enemies_in_range = ds_list_create();
 
-//Buff-debuff list
-buffs = []
+//Blocking functionality
+blocking_list = [];
 			
 //Buying + selling data
 sell_price = global.DATA_PURCHASE_COBBLESTONE.price * SELL_PRICE_REDUCTION;

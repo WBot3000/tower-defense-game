@@ -16,21 +16,18 @@ new TargetingTracker([
 				global.TARGETING_HEALTHY,
 				global.TARGETING_WEAK,
 ]);
-	
+
 cloud_timer = 0;
 enemies_in_range = global.ALL_ENEMIES_LIST;
 projectile_obj = cloud_attack;
-
-//Buff-debuff list
-buffs = []
 			
 //Buying + selling data
 sell_price = global.DATA_PURCHASE_CLOUD.price * SELL_PRICE_REDUCTION;
 
-stat_upgrades = [undefined, undefined, 
-	undefined, undefined];
+stat_upgrades = [new DirtConstructAttackSpeedUpgrade(), new DirtConstructAttackSpeedUpgrade(), 
+	new DirtConstructAttackSpeedUpgrade(), undefined]; //Just placeholders so unit upgrades work
 
-unit_upgrades = [undefined, undefined, undefined];
+unit_upgrades = [new UpgradeCloudConstruct1(), undefined, undefined];
 
 //Set up animation bank
 animation_bank = global.ANIMBANK_CLOUD;

@@ -5,7 +5,7 @@ var _mouse_left_released = mouse_check_button_released(mb_left);
 #endregion
 
 start_menu_ui.on_step();
-transition_effect.on_step();
+//transition_effect.on_step();
 
 if(_mouse_left_released) {
 	var _button_pressed = start_menu_ui.get_highlighted_child();

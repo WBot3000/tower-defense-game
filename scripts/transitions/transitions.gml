@@ -163,3 +163,26 @@ function SwipeTransition(_start_with_black = true, _post_transition_delay = TRAN
 		}
 	}
 }
+
+//Yay globals... (Should try and figure out another way to do this)
+global.UPCOMING_ROOM = undefined
+global.POST_TRANSITION_CALLBACK = function(){}
+function create_room_transition(_room_to_enter, _start_transition, _end_transition, _post_transition_callback = function(){} ) {
+	global.UPCOMING_ROOM = _room_to_enter;
+	global.POST_TRANSITION_CALLBACK = _post_transition_callback;
+	layer_sequence_create(TRANSITION_LAYER, 0, 0, _start_transition);
+	layer_set_target_room(global.UPCOMING_ROOM);
+	layer_sequence_create(TRANSITION_LAYER, 0, 0, _end_transition);
+	layer_reset_target_room();
+}
+
+function transition_room_transfer() {
+	room_goto(global.UPCOMING_ROOM)
+	global.UPCOMING_ROOM = undefined;
+}
+
+function post_transition_callback() {
+	var _callback = global.POST_TRANSITION_CALLBACK;
+	_callback();
+	global.POST_TRANSITION_CALLBACK = function(){};
+}

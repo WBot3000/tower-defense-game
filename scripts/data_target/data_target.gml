@@ -4,9 +4,4 @@ For now, I'm not defining specific classes for each target, as all of them will 
 */
 function TargetData(_max_health) : EntityData() constructor {
 	max_health = _max_health;
-	
-	static on_health_reached_zero = function() {
-		var _game_state_manager = get_game_state_manager();
-		_game_state_manager.lose_game();
-	}
 }

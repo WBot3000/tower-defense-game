@@ -58,8 +58,9 @@ if(_elem_highlighted == undefined && _mouse_left_released) {
 			with(_tile_at_mouse) {
 				var _purchase = other.purchase_manager.currently_selected_purchase;
 				if(can_purchase_unit(self.id, _purchase)) {
-					placed_unit = instance_create_layer(x + TILE_SIZE/2, y + TILE_SIZE, UNIT_LAYER, _purchase.unit);
-					global.player_money -= _purchase.price
+					_placed_unit = instance_create_layer(x + TILE_SIZE/2, y + TILE_SIZE, UNIT_LAYER, _purchase.unit);
+					global.player_money -= _purchase.price;
+					other.broadcast_hub.broadcast_event("unit_purchased", [_placed_unit]);
 				}
 			}
 		}

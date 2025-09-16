@@ -9,7 +9,7 @@ function can_be_attacked(_entity_to_be_attacked) {
 	if(_entity_to_be_attacked == noone || !instance_exists(_entity_to_be_attacked)) { //Can't attack an entity that no longer exists.
 		return false;
 	}
-	return _entity_to_be_attacked.entity_data.health_state == HEALTH_STATE.ACTIVE; //Don't attack knocked out units
+	return _entity_to_be_attacked.health_state == HEALTH_STATE.ACTIVE; //Don't attack knocked out units
 }
 
 
@@ -26,17 +26,14 @@ function get_entity_using_targeting_tracker(_entity_list, _targeting_params, _ta
 
 //Given an entity to damage, and a base damage value, calculate the amount of damage an attack should do. Returns the total amount of damage done.
 //TODO: Take into account buffs/debuffs
-function deal_damage(_entity_to_damage, _damage_amount){
+function deal_damage(_entity_to_damage, _damage_amount, _ignore_defense = false){
 	var _true_damage_amount = _damage_amount;
 	
 	with(_entity_to_damage) {
-		if(variable_struct_exists(entity_data, "defense_factor")) {
+		if(variable_struct_exists(entity_data, "defense_factor") && !_ignore_defense) {
 			_true_damage_amount /= entity_data.defense_factor
 		}
 		current_health = max(current_health - _true_damage_amount, 0);
-		if(object_is_ancestor(object_index, base_target) && current_health <= 0) {
-			event_user(0); //"Lose the game" event
-		}
 	}
 	
 	return _true_damage_amount;
@@ -62,6 +59,32 @@ function shoot_projectile(_projectile, _target, _projectile_data, _shooter = oth
 
 
 #region Movement Functions
+//Run on each step of an enemy that can be blocked. Will allow the entity to be stalled by entities that can block
+function blocked_check(_entity = other) {
+	with(_entity) {
+		if(!blocked) {
+			var _unit_at_position = instance_place(x, y, base_unit);
+			if(_unit_at_position != noone && _unit_at_position.entity_data.can_block && _unit_at_position.health_state == HEALTH_STATE.ACTIVE) {
+				path_speed = 0;
+				array_push(_unit_at_position.blocking_list, self);
+			}
+		}
+	}
+}
+
+//So we don't have to run the blocked_check function on every single frame, entities that contain instead contain a list that contains all of the entities that they are blocking
+//When this entity shouldn't block anymore (whether it has been knocked out or sold), run this function to allow those enemies to move again.
+
+//Currently, there's no function for periodically releasing defeated enemies from a blocking list. Might want to implement that so the lists don't get too huge.
+function release_enemies_from_block(_blocker = other) {
+	with(_blocker) {
+		for (var i = 0, len = array_length(blocking_list); i < len; ++i) {
+			var _entity_blocked = blocking_list[i];
+			//TODO: Replace this with a speed adjusted for buffs/debuffs
+			_entity_blocked.path_speed = _entity_blocked.entity_data.default_movement_speed;
+		}
+	}
+}
 #endregion
 
 

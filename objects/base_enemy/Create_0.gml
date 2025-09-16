@@ -1,7 +1,4 @@
-///@description Declare variables and initiate moving
-if(!variable_instance_exists(self, "enemy_data_type")) {
-	throw "Enemy data type not specified when attempting to spawn an enemy!"
-}
+///@description Initialize things all enemies use
 
 if(!variable_instance_exists(self, "path_data")) {
 	show_debug_message("Enemy " + string(self.id) + " created with no path data");
@@ -12,4 +9,10 @@ if(!variable_instance_exists(self, "round_spawned_in")) {
 	show_debug_message("Enemy " + string(self.id) + " created with no round spawn data");
 }
 
-entity_data = new enemy_data_type(path_data, round_spawned_in);
+animation_controller = new AnimationController(self, animation_bank);
+buffs = new BuffList();
+
+broadcast_hub = new BroadcastHub();
+broadcast_hub.register_event("enemy_defeated");
+
+events_registered_for = []; //List of events this entity is registered for

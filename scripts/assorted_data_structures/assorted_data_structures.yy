@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"assorted_data_structures",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"assorted_data_structures",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -27,14 +27,11 @@ function PurchaseData(_unit, _price, _button_sprite = object_get_sprite(_unit)) 
 #region Data Definitions
 
 #region Purchase Data
-global.DATA_PURCHASE_SAMPLE_GUNNER = new PurchaseData(sample_gunner, 100);
-global.DATA_PURCHASE_SAMPLE_BRAWLER = new PurchaseData(sample_brawler, 150);
-global.DATA_PURCHASE_SAMPLE_MORTAR = new PurchaseData(sample_mortar, 200);
-
 global.DATA_PURCHASE_DIRT = new PurchaseData(dirt_construct, 100);
 global.DATA_PURCHASE_COBBLESTONE = new PurchaseData(cobblestone_construct, 150);
 global.DATA_PURCHASE_GOLD = new PurchaseData(gold_construct, 300);
 global.DATA_PURCHASE_CLOUD = new PurchaseData(cloud_construct, 300);
+global.DATA_PURCHASE_FLAME = new PurchaseData(flame_construct, 300);
 #endregion
 
 #endregion

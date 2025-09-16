@@ -73,6 +73,15 @@ function instances_vector_to_get_components(source_inst, destination_inst, norma
 #endregion
 
 
+#region get_angle_from_vector_in_degrees (Function)
+//Get the angle a vector is facing in from 0 to 359 (0 = right, 90 = up, 180 = left, 270 = right)
+function get_angle_from_vector_in_degrees(_vector) {
+	//Need to make the y negative, since "going up" is represented with a negative value since the y value goes up as the physical location goes down
+	return darctan2(-1*_vector[VEC_Y], _vector[VEC_X]);
+}
+#endregion
+
+
 #region get_entity_facing_direction (Function)
 function get_entity_facing_direction(_entity, _x_coord) {
 	return (_entity.x < _x_coord ? DIRECTION_RIGHT : DIRECTION_LEFT);

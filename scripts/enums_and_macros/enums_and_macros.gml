@@ -14,6 +14,7 @@
 
 
 #region Room Layer Macros
+#macro TRANSITION_LAYER "Transition"
 #macro PARTICLE_LAYER "Particles"
 #macro TILE_LAYER "Placement_Tiles"
 #macro PROJECTILE_LAYER "Projectiles"
@@ -44,5 +45,5 @@ enum DIRECTION {
 enum CLOUD_STATE { //The state of the Cloud Construct's cloud summons
 	TRAVELING_TO_TARGET,
 	LINGERING,
-	DISSIPATING
+	DISSIPATING,
 }

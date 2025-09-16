@@ -17,7 +17,8 @@ function LevelSelectButton(_x_pos, _y_pos) :
 	Button(_x_pos, _y_pos, spr_play_game_button) constructor {
 		
 		static released_fn = function() {
-			//transition_effect = get_room_transition();
+			create_room_transition(LevelSelectScreen, screen_wipe_out, screen_wipe_in);
+			/*
 			_title_screen_controller = get_logic_controller();
 			if(_title_screen_controller != undefined) {
 				//Need to replace fading transition with swipe transition
@@ -26,7 +27,7 @@ function LevelSelectButton(_x_pos, _y_pos) :
 			}
 			else {
 				room_goto(LevelSelectScreen);
-			}
+			}*/
 		}
 }
 #endregion
