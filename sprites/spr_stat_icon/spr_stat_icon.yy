@@ -26,7 +26,7 @@
   "origin":0,
   "parent":{
     "name":"Upgrade Types",
-    "path":"folders/Sprites/ui_components/Unit Info Card/Upgrade Types.yy",
+    "path":"folders/Sprites/ui_components/SelectedEntityMenu/Upgrade Types.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",
@@ -63,6 +63,8 @@
     "playbackSpeedType":0,
     "resourceType":"GMSequence",
     "resourceVersion":"2.0",
+    "seqHeight":48.0,
+    "seqWidth":48.0,
     "showBackdrop":true,
     "showBackdropImage":false,
     "timeUnits":1,

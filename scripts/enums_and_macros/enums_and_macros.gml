@@ -14,7 +14,6 @@
 
 
 #region Room Layer Macros
-#macro TRANSITION_LAYER "Transition"
 #macro PARTICLE_LAYER "Particles"
 #macro TILE_LAYER "Placement_Tiles"
 #macro PROJECTILE_LAYER "Projectiles"
@@ -24,7 +23,8 @@
 #macro GROUND_INSTANCES_LAYER "Ground_Instances"
 #macro CONTROLLER_LAYER "Controllers"
 #endregion
-
+//For easy iteration
+global.INSTANCE_LAYERS = [TILE_LAYER, PROJECTILE_LAYER, TARGET_LAYER, UNIT_LAYER, ENEMY_LAYER, GROUND_INSTANCES_LAYER];
 
 /*
 	Macros for left and right directions.

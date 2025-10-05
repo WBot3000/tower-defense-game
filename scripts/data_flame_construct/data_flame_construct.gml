@@ -7,7 +7,7 @@ global.ANIMBANK_FLAME = new UnitAnimationBank(spr_flame_construct)
 
 #region FlameConstruct (Class)
 function FlameConstruct() : CombatantData() constructor {
-	name = "Flame Construct"
+	name = "Flame"
 	
 	//Stats
 	max_health = 100;

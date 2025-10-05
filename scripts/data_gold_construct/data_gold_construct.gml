@@ -9,7 +9,7 @@ global.ANIMBANK_GOLD_U1.add_animation("GENERATE", spr_gold_construct_u1_generate
 
 #region GoldConstruct (Class)
 function GoldConstruct() : CombatantData() constructor {
-	name = "Gold Construct"
+	name = "Gold"
 	
 	//Health variables
 	max_health = 100;

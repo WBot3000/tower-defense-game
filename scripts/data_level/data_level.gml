@@ -5,6 +5,9 @@
 	Each level controller inherits the base game controller, which declares all of the data needed to run all levels.
 	Then, each level initializes its unique properties after that code is run.
 */
+
+global.player_money = 0;
+
 #region Data Constructors
 
 #region PathData (Class)

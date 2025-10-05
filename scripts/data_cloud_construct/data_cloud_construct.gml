@@ -19,7 +19,7 @@ global.ANIMBANK_CLOUD_ATTACK_STORM.add_animation("LIGHTNING", spr_cloud_attack_s
 
 #region CloudConstruct (Class)
 function CloudConstruct() : CombatantData() constructor {
-	name = "Cloud Construct"
+	name = "Cloud"
 	
 	//Health variables
 	max_health = 60;

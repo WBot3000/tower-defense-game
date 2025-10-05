@@ -27,7 +27,7 @@
   "origin":0,
   "parent":{
     "name":"Upgrade Types",
-    "path":"folders/Sprites/ui_components/Unit Info Card/Upgrade Types.yy",
+    "path":"folders/Sprites/ui_components/SelectedEntityMenu/Upgrade Types.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

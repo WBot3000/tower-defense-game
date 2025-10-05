@@ -9,7 +9,7 @@ global.ANIMBANK_DIRT_U1.add_animation("SHOOT", spr_dirt_construct_u1_shooting);
 
 #region DirtConstruct (Class)
 function DirtConstruct() : CombatantData() constructor {
-	name = "Dirt Construct"
+	name = "Dirt"
 	
 	//Stats
 	max_health = 100;

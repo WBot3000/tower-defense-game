@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"in_game_ui_OLD",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"in_game_ui_OLD",
+  "parent":{
+    "name":"ui",
+    "path":"folders/Scripts/ui.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

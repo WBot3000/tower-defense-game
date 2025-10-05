@@ -15,7 +15,15 @@
     "resourceVersion":"2.0",
   },
   "eventStubScript":null,
-  "eventToFunction":{},
+  "eventToFunction":{
+    "0":"",
+    "1":"",
+    "2":"",
+    "3":"",
+    "4":"",
+    "5":"",
+    "6":"",
+  },
   "length":60.0,
   "lockOrigin":false,
   "moments":{

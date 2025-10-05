@@ -1,6 +1,6 @@
 {
   "$GMFont":"",
-  "%Name":"fnt_Test",
+  "%Name":"fnt_test",
   "AntiAlias":1,
   "applyKerning":0,
   "ascender":19,
@@ -117,7 +117,7 @@
   "last":0,
   "lineHeight":23,
   "maintainGms1Font":false,
-  "name":"fnt_Test",
+  "name":"fnt_test",
   "parent":{
     "name":"Fonts",
     "path":"folders/Fonts.yy",
@@ -134,7 +134,10 @@
   "sdfSpread":8,
   "size":12.0,
   "styleName":"Regular",
-  "textureGroupId":null,
+  "textureGroupId":{
+    "name":"Default",
+    "path":"texturegroups/Default",
+  },
   "TTFName":"",
   "usesSDF":false,
 }

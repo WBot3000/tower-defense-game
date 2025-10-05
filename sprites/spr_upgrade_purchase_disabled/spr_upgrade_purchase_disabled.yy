@@ -27,8 +27,8 @@
   "nineSlice":null,
   "origin":0,
   "parent":{
-    "name":"Unit Info Card",
-    "path":"folders/Sprites/ui_components/Unit Info Card.yy",
+    "name":"SelectedEntityMenu",
+    "path":"folders/Sprites/ui_components/SelectedEntityMenu.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

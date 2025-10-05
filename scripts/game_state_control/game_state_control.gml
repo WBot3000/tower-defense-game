@@ -39,10 +39,20 @@ function GameStateManager(_controller_obj, _initial_state = GAME_STATE.INTRO) co
 	static pause_game = function() {
 		if(state == GAME_STATE.RUNNING) { //Shouldn't be able to pause states that aren't RUNNING
 			state = GAME_STATE.PAUSED;
-			with(controller_obj) {
-				instance_deactivate_all(true); //Keep the manager object alive, otherwise the game will just stop working
-				if(game_ui != undefined) {
-					game_ui.set_gui_paused();
+			set_ui(undefined);
+			
+			if(global.PAUSE_SCREEN != -1) {
+				sprite_delete(global.PAUSE_SCREEN);
+				global.PAUSE_SCREEN = -1;
+			}
+			global.PAUSE_SCREEN = sprite_create_from_surface(application_surface, 
+				0, 0, camera_get_view_width(view_camera[0]), camera_get_view_height(view_camera[0]), 
+				false, false, 0, 0);
+			open_options_menu();
+
+			for(var i = 0, len = array_length(global.INSTANCE_LAYERS); i < len; ++i) {
+				if(layer_exists(global.INSTANCE_LAYERS[i])) { //All of these layers should exist in all rooms, but here's a safeguard just in case
+					instance_deactivate_layer(global.INSTANCE_LAYERS[i]);
 				}
 			}
 		}
@@ -50,12 +60,13 @@ function GameStateManager(_controller_obj, _initial_state = GAME_STATE.INTRO) co
 	
 	static resume_game = function() {
 		state = GAME_STATE.RUNNING;
-			with(controller_obj) {
-				instance_activate_all();
-				if(game_ui != undefined) {
-					game_ui.set_gui_running();
-				}
-			}
+		close_options_menu();
+		set_ui(GUI_IN_GAME);
+		if(global.PAUSE_SCREEN != -1) {
+			sprite_delete(global.PAUSE_SCREEN);
+			global.PAUSE_SCREEN = -1;
+		}
+		instance_activate_all();
 	}
 	
 	
@@ -73,9 +84,9 @@ function GameStateManager(_controller_obj, _initial_state = GAME_STATE.INTRO) co
 			state = GAME_STATE.VICTORY;
 			with(controller_obj) {
 				event_user(0);
-				if(game_ui != undefined) {
-					game_ui.set_gui_end_results(true);
-				}
+				//if(game_ui != undefined) {
+				//	game_ui.set_gui_end_results(true);
+				//}
 			}
 		}
 	}
@@ -85,9 +96,9 @@ function GameStateManager(_controller_obj, _initial_state = GAME_STATE.INTRO) co
 			state = GAME_STATE.DEFEAT;
 			with(controller_obj) {
 				event_user(1);
-				if(game_ui != undefined) {
-					game_ui.set_gui_end_results(false);
-				}
+				//if(game_ui != undefined) {
+				//	game_ui.set_gui_end_results(false);
+				//}
 			}
 		}
 	}

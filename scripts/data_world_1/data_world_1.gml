@@ -26,7 +26,7 @@ global.DATA_LEVEL_PATH_SAMPLELEVEL3_3 = new PathData(TILE_SIZE*-1, TILE_SIZE*20,
 global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 	{
 		level_room: SampleLevel1,
-		level_name: "Daniel's Potato Farm 1",
+		level_name: "Dan's Potato Farm 1",
 		level_portrait: spr_level_portrait_SampleLevel1,
 		card_color: WORLD_1_CARD_COLOR,
 	},
@@ -56,7 +56,7 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL1 = new LevelData(
 global.DATA_LEVEL_MAIN_SAMPLELEVEL2 = new LevelData(
 	{
 		level_room: SampleLevel2,
-		level_name: "Daniel's Potato Farm 2",
+		level_name: "Dan's Potato Farm 2",
 		level_portrait: spr_level_portrait_SampleLevel1,
 		card_color: WORLD_1_CARD_COLOR,
 	},
@@ -76,7 +76,7 @@ global.DATA_LEVEL_MAIN_SAMPLELEVEL2 = new LevelData(
 global.DATA_LEVEL_MAIN_SAMPLELEVEL3 = new LevelData(
 	{
 		level_room: SampleLevel3,
-		level_name: "Daniel's Potato Farm 3",
+		level_name: "Dan's Potato Farm 3",
 		level_portrait: spr_level_portrait_SampleLevel1,
 		card_color: WORLD_1_CARD_COLOR,
 	},

@@ -272,7 +272,7 @@
     {"name":"inst_4724839E","path":"rooms/SampleLevel2/SampleLevel2.yy",},
     {"name":"inst_733147DB_1","path":"rooms/SampleLevel2/SampleLevel2.yy",},
     {"name":"inst_4E1837CF","path":"rooms/SampleLevel2/SampleLevel2.yy",},
-    {"name":"inst_43249BB4_1","path":"rooms/SampleLevel2/SampleLevel2.yy",},
+    {"name":"inst_4F48099","path":"rooms/SampleLevel2/SampleLevel2.yy",},
   ],
   "isDnd":false,
   "layers":[
@@ -552,7 +552,9 @@
     {"$GMRInstanceLayer":"","%Name":"Enemies","depth":500,"effectEnabled":true,"effectType":null,"gridX":64,"gridY":64,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[],"layers":[],"name":"Enemies","properties":[],"resourceType":"GMRInstanceLayer","resourceVersion":"2.0","userdefinedDepth":false,"visible":true,},
     {"$GMRInstanceLayer":"","%Name":"Ground_Instances","depth":600,"effectEnabled":true,"effectType":null,"gridX":64,"gridY":64,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[],"layers":[],"name":"Ground_Instances","properties":[],"resourceType":"GMRInstanceLayer","resourceVersion":"2.0","userdefinedDepth":false,"visible":true,},
     {"$GMRInstanceLayer":"","%Name":"Controllers","depth":700,"effectEnabled":true,"effectType":null,"gridX":64,"gridY":64,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"instances":[
-        {"$GMRInstance":"v2","%Name":"inst_43249BB4_1","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_43249BB4_1","objectId":{"name":"game_controller_SampleLevel2","path":"objects/game_controller_SampleLevel2/game_controller_SampleLevel2.yy",},"properties":[],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":-64.0,"y":0.0,},
+        {"$GMRInstance":"v2","%Name":"inst_4F48099","colour":4294967295,"frozen":false,"hasCreationCode":false,"ignore":false,"imageIndex":0,"imageSpeed":1.0,"inheritCode":false,"inheritedItemId":null,"inheritItemSettings":false,"isDnd":false,"name":"inst_4F48099","objectId":{"name":"game_controller","path":"objects/game_controller/game_controller.yy",},"properties":[
+            {"$GMOverriddenProperty":"v1","%Name":"","name":"","objectId":{"name":"game_controller","path":"objects/game_controller/game_controller.yy",},"propertyId":{"name":"current_level_data","path":"objects/game_controller/game_controller.yy",},"resourceType":"GMOverriddenProperty","resourceVersion":"2.0","value":"global.DATA_LEVEL_MAIN_SAMPLELEVEL2",},
+          ],"resourceType":"GMRInstance","resourceVersion":"2.0","rotation":0.0,"scaleX":1.0,"scaleY":1.0,"x":-64.0,"y":0.0,},
       ],"layers":[],"name":"Controllers","properties":[],"resourceType":"GMRInstanceLayer","resourceVersion":"2.0","userdefinedDepth":false,"visible":true,},
     {"$GMRTileLayer":"","%Name":"Tile_Background","depth":800,"effectEnabled":true,"effectType":null,"gridX":64,"gridY":64,"hierarchyFrozen":false,"inheritLayerDepth":false,"inheritLayerSettings":false,"inheritSubLayers":true,"inheritVisibility":true,"layers":[],"name":"Tile_Background","properties":[],"resourceType":"GMRTileLayer","resourceVersion":"2.0","tiles":{"SerialiseHeight":12,"SerialiseWidth":22,"TileCompressedData":[
           1,15,-20,16,8,17,21,12,6,12,6,12,6,-9,12,1,6,-3,12,3,6,21,21,-7,12,-4,6,-4,12,11,33,18,19,20,33,21,21,

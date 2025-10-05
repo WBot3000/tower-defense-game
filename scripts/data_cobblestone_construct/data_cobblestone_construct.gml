@@ -6,7 +6,7 @@ global.ANIMBANK_COBBLESTONE.add_animation("ATTACK", spr_cobblestone_construct);
 
 #region CobblestoneConstruct (Class)
 function CobblestoneConstruct() : CombatantData() constructor {
-	name = "Cobblestone Construct"
+	name = "Cobblestone"
 	
 	//Health variables
 	max_health = 100;
