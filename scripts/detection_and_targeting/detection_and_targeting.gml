@@ -341,7 +341,7 @@ function target_value_weakest(_targeter, _targetee) {
 	targeting_name: The string value that the targeting type is referred to in the targeting menu
 	targeting_fn: The function used to select a target from a list of enemies.
 */
-function TargetingType(/*_identifier,*/ _targeting_name, _targeting_fn) constructor {
+function TargetingType(_targeting_name, _targeting_fn) constructor {
 	targeting_name = _targeting_name;
 	targeting_fn = _targeting_fn;
 }

@@ -18,10 +18,22 @@ function SelectedEntityManager() constructor {
 	
 	static set_selected_entity = function(_entity) {
 		currently_selected_entity = _entity;
+		//Update UI elements appropriately
+		selected_entity_picture.entity = _entity;
+		with(stat_upgrade) {
+			entity = _entity;
+		}
+		with(unit_upgrade_purchase_button) {
+			entity = _entity;
+		}
+		targeting_selector.entity = _entity;
+		targeting_selector_left_arrow.entity = _entity;
+		targeting_selector_right_arrow.entity = _entity;
+		sell_button.entity = _entity;
 	}
 	
 	static deselect_entity = function() {
-		currently_selected_entity = noone;
+		set_selected_entity(noone);
 	}
 	
 }
