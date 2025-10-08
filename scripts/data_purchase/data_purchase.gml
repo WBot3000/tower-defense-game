@@ -12,8 +12,6 @@
 	unit: The unit object that will be placed upon the making of a purchase
 	price: The amount the unit costs
 	button_sprite: The sprite that you can draw around 
-	
-	TODO: If I decide to create a "unit_data" struct, replace the entity object reference with the unit_data struct
 */
 function PurchaseData(_unit, _price, _button_sprite = object_get_sprite(_unit)) constructor {
 	unit = _unit;

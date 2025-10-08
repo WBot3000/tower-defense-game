@@ -32,15 +32,13 @@ global.INSTANCE_LAYERS = [TILE_LAYER, PROJECTILE_LAYER, TARGET_LAYER, UNIT_LAYER
 */
 #macro DIRECTION_LEFT 1
 #macro DIRECTION_RIGHT -1
-/*
-enum DIRECTION {
-	LEFT,
-	RIGHT,
-	UP, //Probably won't be used in the final game, kept for Sample Brawler
-	DOWN //Probably won't be used in the final game, kept for Sample Brawler
-}*/
 
 #macro SELL_PRICE_REDUCTION 0.8 //How much a unit sells for in comparison to how much it cost.
+
+enum ENEMY_ATTACKING_STATE { //State that certain enemies use to determine whether they are in the middle of attacking or not
+	NOT_ATTACKING,
+	IN_ATTACK
+}
 
 enum CLOUD_STATE { //The state of the Cloud Construct's cloud summons
 	TRAVELING_TO_TARGET,

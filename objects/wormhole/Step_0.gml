@@ -3,17 +3,11 @@
 animation_controller.on_step();
 
 switch (wormhole_state) {
-	/*
-    case SLIDING_MENU_STATE.OPENING:
-        if(sprite_index == spr_wormhole) {
-			wormhole_state = SLIDING_MENU_STATE.OPEN;
-		}
-        break;*/
 	case SLIDING_MENU_STATE.OPEN:
 		if(existence_timer > existence_time_limit) {
 			//instance_destroy();
 			wormhole_state = SLIDING_MENU_STATE.CLOSING;
-			animation_controller.set_animation("CLOSING", 1, spr_dummy);
+			animation_controller.set_animation("CLOSING", 1, function() { instance_destroy(self) } );
 			exit;
 		}
 
@@ -28,12 +22,6 @@ switch (wormhole_state) {
 
 		worm_spawn_timer++
 		existence_timer++;
-		break;
-	case SLIDING_MENU_STATE.CLOSING:
-		if(sprite_index == spr_dummy) {
-			instance_destroy();
-			exit;
-		}
 		break;
     default:
         break;

@@ -43,7 +43,7 @@ if(game_state_manager.state != GAME_STATE.RUNNING) { return; } //Don't need to h
 //NOTE: For some reason, the instance_position function wasn't working properly for this (which is why all this code is here). Probably some UI-layer stuff going on.
 var _mouse_gui_x = device_mouse_x_to_gui(0);
 var _mouse_gui_y = device_mouse_y_to_gui(0);
-currently_highlighted_ui_elem = undefined;
+currently_highlighted_ui_elem = noone;
 for(var i = 0, len = array_length(ui_elements); i < len; ++i) {
 	var _ui_elem = ui_elements[i];
 	if(_ui_elem.bbox_left <= _mouse_gui_x && _ui_elem.bbox_right >= _mouse_gui_x &&
@@ -55,7 +55,7 @@ for(var i = 0, len = array_length(ui_elements); i < len; ++i) {
 	
 
 //Not over a UI element, so you can take actions on the game field.
-if(currently_highlighted_ui_elem == undefined && _mouse_left_released) {
+if(currently_highlighted_ui_elem == noone && _mouse_left_released) {
 	//Attempt to click on an already placed unit
 	var _clicked_on_unit = instance_position(mouse_x, mouse_y, base_unit)
 	if(_clicked_on_unit != noone) {

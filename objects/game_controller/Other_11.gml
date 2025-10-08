@@ -2,3 +2,4 @@
 //game_state = GAME_STATE.DEFEAT;
 //game_state_manager.lose_game();
 global.BACKGROUND_MUSIC_MANAGER.fade_out_current_music(MUSIC_FADING_TIME, Music_Defeat);
+set_ui(GUI_DEFEAT_SCREEN); //TODO: Replace with defeat screen eventually

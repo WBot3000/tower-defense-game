@@ -24,7 +24,7 @@ if(selected) {
 		selected = false;
 		flash_timer = 0;
 	}
-	if(flash_timer > 60) {
+	if(flash_timer > 30) {
 		flash_timer = 0;
 	}
 }

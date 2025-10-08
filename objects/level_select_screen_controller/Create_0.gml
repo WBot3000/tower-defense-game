@@ -1,6 +1,6 @@
-/// @description Create LevelSelectUI
-//transition_effect = new SwipeTransition();
-//transition_effect.transition_in();
-//level_select_ui = new LevelSelectUI();
+/// @description Set UI
 set_ui(GUI_LEVEL_SELECT);
 room_intro_transition(screen_wipe_in);
+
+//Play title music
+global.BACKGROUND_MUSIC_MANAGER.set_music(Music_Title_Theme);

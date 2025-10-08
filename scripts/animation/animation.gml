@@ -107,9 +107,9 @@ function AnimationController(_entity_obj, _animation_bank, _starting_animation_r
 		
 		Returns true if the animation was set successfully, returns false otherwise
 	*/
-	static set_animation = function(_animation_ref, _num_times_played = 1, _post_animation_callback = function(){} ) {
+	static set_animation = function(_animation_ref, _num_times_played = 1, _post_animation_callback = undefined) {
 		var _sprite = animation_bank.get_animation(_animation_ref);
-		//TODO: Fallback on default animation?
+
 		if(_sprite == undefined) {
 			show_debug_message("Attempted to reference an animation that doesn't exist using reference: " + _animation_ref);
 			return false
@@ -134,7 +134,7 @@ function AnimationController(_entity_obj, _animation_bank, _starting_animation_r
 	//If you don't manually set "_replacement_animation_ref", make sure the old bank and new bank have the same references
 	static set_animation_bank = function(_new_animation_bank, _replacement_animation_ref = current_animation_ref) {
 		//Need to change the currently playing animation to the corresponding one in the animation bank
-		var _replacement_animation = _new_animation_bank.get_animation(current_animation_ref);
+		var _replacement_animation = _new_animation_bank.get_animation(_replacement_animation_ref);
 		
 		var _new_image_index = entity_obj.image_index;
 		if(entity_obj.image_number != sprite_get_number(_replacement_animation)) { //In the event the old and new animations have different image numbers
@@ -183,6 +183,7 @@ function AnimationController(_entity_obj, _animation_bank, _starting_animation_r
 		if(played_counter >= num_times_played) {
 			if(post_animation_callback != undefined) {
 				post_animation_callback();
+				post_animation_callback = undefined;
 			}
 			clear_animation();
 		}

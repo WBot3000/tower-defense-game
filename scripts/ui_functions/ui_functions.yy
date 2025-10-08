@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"ui_functions",
   "parent":{
-    "name":"ui",
-    "path":"folders/Scripts/ui.yy",
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

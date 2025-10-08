@@ -6,6 +6,8 @@ global.PAUSE_SCREEN = -1;
 
 #region GUI Layer Macros
 #macro GUI_TRANSITION "Transition"
+#macro GUI_VICTORY_SCREEN "VictoryScreen"
+#macro GUI_DEFEAT_SCREEN "DefeatScreen"
 #macro GUI_OPTIONS_MENU "OptionsMenuBase"
 #macro GUI_TITLE_SCREEN "StartMenu"
 #macro GUI_LEVEL_SELECT "LevelSelect"
@@ -14,33 +16,22 @@ global.PAUSE_SCREEN = -1;
 
 //Set the UI that should be used for the selected room
 function set_ui(_ui_macro) {
-	/*
-	if (GUI_IN_GAME == _ui_macro) { 
-		instance_activate_layer(GUI_IN_GAME)
+	//Mutually exclusive GUI layers
+	var _screen_types = [GUI_IN_GAME, GUI_TITLE_SCREEN, GUI_LEVEL_SELECT, GUI_VICTORY_SCREEN, GUI_DEFEAT_SCREEN]
+	for(var i = 0, len = array_length(_screen_types); i < len; ++i) {
+		layer_set_visible(_screen_types[i], _screen_types[i] == _ui_macro);
 	}
-	else {
-		instance_deactivate_layer(GUI_IN_GAME);
-	}*/
-	layer_set_visible(GUI_IN_GAME, GUI_IN_GAME == _ui_macro);
-	/*
-	if (GUI_TITLE_SCREEN == _ui_macro) { 
-		instance_activate_layer(GUI_TITLE_SCREEN)
-	}
-	else {
-		instance_deactivate_layer(GUI_TITLE_SCREEN);
-	}*/
-	layer_set_visible(GUI_TITLE_SCREEN, GUI_TITLE_SCREEN == _ui_macro);
-
-	/*
-	if (GUI_LEVEL_SELECT == _ui_macro) { 
-		instance_activate_layer(GUI_LEVEL_SELECT)
-	}
-	else {
-		instance_deactivate_layer(GUI_LEVEL_SELECT);
-	}*/
-	layer_set_visible(GUI_LEVEL_SELECT, GUI_LEVEL_SELECT == _ui_macro);
 }
 
+
+enum SLIDING_MENU_STATE {
+	CLOSED,
+	CLOSING,
+	OPENING,
+	OPEN
+}
+
+#macro SLIDING_MENU_MOVEMENT_SPEED 20
 
 #region Transitions
 //Yay globals... (Should try and figure out another way to do this)
@@ -82,6 +73,22 @@ function post_transition_callback() {
 #endregion
 
 
+function start_menu_start_button_click() {
+	//Create transition, then go to level select room
+	transition_to_new_room(screen_wipe_out, LevelSelectScreen);
+}
+
+function info_button_click() {
+	//Create transition, then go to info room
+	transition_to_new_room(screen_wipe_out, LevelSelectScreen) //TODO: Replace with level info room
+}
+
+function quit_game_button_click() {
+	//TODO: Maybe add confirmation popup?
+	game_end();
+}
+
+
 function change_purchase_menu_page(_new_page_num) {
 	//Don't go beyond defined pages
 	var _last_page_num = array_length(purchase_menu_base.purchase_list) - 1;
@@ -91,13 +98,19 @@ function change_purchase_menu_page(_new_page_num) {
 	purchase_menu_base.current_page = _new_page_num;
 	purchase_menu_previous_page_button.enabled = (_new_page_num > 0);
 	purchase_menu_next_page_button.enabled = (_new_page_num < _last_page_num);
+	
+	var _current_page_data = purchase_menu_base.purchase_list[purchase_menu_base.current_page];
+	with(unit_purchase_button) {
+		if(array_length(_current_page_data) <= button_number) {
+			current_purchase_data = undefined;
+			image_alpha = 0;
+		}
+		else {
+			current_purchase_data = _current_page_data[button_number];
+			image_alpha = 1;
+		}
+	}
 }
-
-
-#region Selected Entity Menu
-function initialize_selected_entity_picture() {
-}
-#endregion
 
 
 #region Options Menu

@@ -164,9 +164,9 @@ function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constru
 		var _round_completed = _round.remove_enemy_from_spawned_list(_enemy_id);
 		
 		if(_round_completed) {
-			var _gui = get_game_ui(controller_obj);
-			if(_gui != undefined) { //Player should know when they've completed a round
-				_gui.game_info_display.set_display_message("Round " + string(_round_number) + " completed!", true);
+			if(game_state_manager.state == GAME_STATE.RUNNING) {
+				display_message.message_string = "Round " + string(_round_number) + " completed!"
+				play_sound_effect(SFX_Round_Complete);
 			}
 			
 			var _round_index = array_get_index(rounds_currently_running, _round);
@@ -179,7 +179,7 @@ function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constru
 				controller_obj.game_state_manager.win_game();
 			}
 		}
-	}
+	};
 	
 	
 	static spawn_extra_enemy = function(_enemy_type, _path_data, _round_number) {
@@ -191,12 +191,12 @@ function RoundManager(_controller_obj, _max_round = 0, _spawn_data = []) constru
 		}
 		
 		return _round.spawn_enemy(_enemy_type, _path_data);
-	}
+	};
 	
 	
 	static is_spawning_enemies = function() {
 		return array_length(rounds_currently_running) != 0;
-	}
+	};
 	
 	
 	static on_step = function(_curr_game_state) {

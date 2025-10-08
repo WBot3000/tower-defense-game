@@ -18,7 +18,7 @@ if(selected_entity_manager.currently_selected_entity != undefined) { //Draw rang
 
 //If the mouse is over any UI elements, don't draw any placement graphics
 //NOTE: For some reason, the instance_position function wasn't working properly for this (which is why all this code is here). Probably some UI-layer stuff going on.
-if(currently_highlighted_ui_elem != undefined) {
+if(currently_highlighted_ui_elem != noone) {
 	return;
 }
 
