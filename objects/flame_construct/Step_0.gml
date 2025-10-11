@@ -20,7 +20,7 @@ switch (health_state) {
 			}
 		}
 		
-		if(flamethrower_target != noone && flamethrower_damage_timer >= entity_data.frames_per_damage) {
+		if(flamethrower_target != noone && flamethrower_damage_timer * stat_multipliers[STATS.ATTACK_SPEED] >= entity_data.frames_per_damage) {
 			set_facing_direction( get_entity_facing_direction(self, flamethrower_target.x) );
 			deal_damage(flamethrower_target, entity_data.damage);
 			flamethrower_damage_timer = 0;

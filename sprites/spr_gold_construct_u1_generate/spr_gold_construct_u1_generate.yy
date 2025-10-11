@@ -4,7 +4,7 @@
   "bboxMode":0,
   "bbox_bottom":48,
   "bbox_left":15,
-  "bbox_right":48,
+  "bbox_right":50,
   "bbox_top":5,
   "collisionKind":1,
   "collisionTolerance":0,
@@ -20,6 +20,7 @@
   "height":64,
   "HTile":false,
   "layers":[
+    {"$GMImageLayer":"","%Name":"6eeb4188-d499-4a22-a4ea-36c5d4be90f5","blendMode":0,"displayName":"Layer 1","isLocked":false,"name":"6eeb4188-d499-4a22-a4ea-36c5d4be90f5","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
     {"$GMImageLayer":"","%Name":"466cb1ef-0aac-41e4-956a-83e876fbf25a","blendMode":0,"displayName":"default","isLocked":false,"name":"466cb1ef-0aac-41e4-956a-83e876fbf25a","opacity":100.0,"resourceType":"GMImageLayer","resourceVersion":"2.0","visible":true,},
   ],
   "name":"spr_gold_construct_u1_generate",

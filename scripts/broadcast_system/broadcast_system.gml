@@ -42,26 +42,26 @@ function BroadcastEvent(_label = "No Label Given") constructor {
 		show_debug_message("Entity " + string(_entity.id) + " attempted to be removed from broadcast event " + label + ", despite not being registered.");
 	}
 	
-	static change_subscriber_function = function(_new_entity, _on_event_func) { //NOTE: This can be done within the "add_subscriber" function technically, but this provides a more explicit way to do it.
+	static change_subscriber_function = function(_entity, _on_event_func) { //NOTE: This can be done within the "add_subscriber" function technically, but this provides a more explicit way to do it.
 		for(var i = 0, len = array_length(subscribers); i < len; ++i) {
-			if(subscribers[i].entity == _new_entity) {
+			if(subscribers[i].entity == _entity) {
 				subscribers[i].on_event_func = _on_event_func;
 				return;
 			}
 		}
-		show_debug_message("Entity " + string(_new_entity.id) + " attempted to have function changed from broadcast event " + label + ", despite not being registered.");
+		show_debug_message("Entity " + string(_entity.id) + " attempted to have function changed from broadcast event " + label + ", despite not being registered.");
 	}
 }
 
 
-function BroadcastHub() constructor { //Contains all of the broadcast events a 
+function BroadcastHub() constructor { //Contains all of the broadcast events an entity has
 	broadcast_events = {};
 	
 	static register_event = function(_event_label) {
 		broadcast_events[$ _event_label] = new BroadcastEvent(_event_label);
 	}
 
-	static broadcast_event = function(_event_label, _args) {
+	static broadcast_event = function(_event_label, _args = []) {
 		var _event = broadcast_events[$ _event_label];
 		if(_event != undefined) {
 			_event.broadcast_event(_args);

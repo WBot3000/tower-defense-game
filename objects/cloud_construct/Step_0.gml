@@ -5,7 +5,7 @@ event_inherited();
 switch (health_state) {
     case HEALTH_STATE.ACTIVE:
 		cloud_timer++;
-		if(cloud_timer >= entity_data.frames_per_cloud) {
+		if(cloud_timer * stat_multipliers[STATS.ATTACK_SPEED] >= entity_data.frames_per_cloud) {
 			entity_data.sight_range.get_entities_in_range([base_enemy], enemies_in_range);
 			
 			if(ds_list_size(enemies_in_range) > 0) {

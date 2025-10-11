@@ -1,3 +1,28 @@
+enum STATS {
+	SIGHT_RANGE, //Determines how far an entity can see other entities
+	MOVEMENT_SPEED, //Movement speed of an entity (usually an enemy along a path)
+	ATTACK_POWER,
+	ATTACK_SPEED, //How quickly an entity attacks
+	DEFENSE, //Damage reduction (or increased damage taken if this value is less than 1)
+	HEALTH_REGEN_SPEED, //How quickly an entity (usually units) regenerate health
+	MONEY_GEN_SPEED, //How quickly an entity generates extra money
+	LENGTH //Doesn't correspond to an actual stat, just used to get the length of this
+}
+
+/*
+function StatMultipliers() constructor { //TODO: Should all entities have all of these stats, or should they only have the ones they require?
+	multipliers = array_create(STATS.LENGTH, 1)
+	
+	static get_stat_multiplier = function(_stat_type) {
+		return multipliers[_stat_type];
+	}
+	
+	//TODO: What about multiplication rounding errors (ex. 0.1 + 0.2 = 0.30000000000000004)
+	static apply_new_multiplier = function(_stat_type, _multiplier) {
+		multipliers[_stat_type] *= _multiplier;
+	}
+}*/
+
 /*
 This file contains the base EntityData struct, which contains data that all entities need. There are three kinds of entities:
 	1) Units (the entities the player uses to protect the Targets)

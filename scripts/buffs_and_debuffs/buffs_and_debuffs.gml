@@ -18,42 +18,48 @@ enum BUFF_IDS {
 	GOLD_RUSH
 }
 
-
-enum BUFF_CATEGORY {
-	NONE,
-	RANGE, //Alters size of range
-	MOVEMENT_SPEED, //Alters movement speed of unit/enemy
-	ATTACK_SPEED, //Alters shooting speed of unit/enemy
-	DEFENSE, //Alters unit/enemy defense
-	HEALTH_REGEN, //Alters unit/enemy health regen speed
-	MONEY_GENERATION
-}
+global.BUFF_IDS_TO_STRUCTS = {}
+global.BUFF_IDS_TO_STRUCTS[$ string(BUFF_IDS.ON_FIRE)] = OnFireBuff;
+global.BUFF_IDS_TO_STRUCTS[$ string(BUFF_IDS.GOLD_RUSH)] = GoldRushBuff;
 
 
-function Buff(_applied_to) constructor {
+function Buff(_applied_to, _additional_arguments) constructor {
 	static buff_id = BUFF_IDS.NONE;
 	static buff_name = "Placeholder Buff Name";
-	static buff_category = BUFF_CATEGORY.NONE;
+	//static stats_multiplied = [];//Stats affected by the buff's buff_multiplier
+	//static buff_multiplier = 1; //Used for buffs/debuffs that multiplicatively alter a stat. Can just ignore for ones that don't
 	applied_to = _applied_to;
 	
+	static on_initial_application = function() {};
 	static on_duplicate_application = function() {};
 	static on_step = function() {};
 	static on_removal = function() {};
 }
 
 
-function PresenceBasedBuff(_applied_to, _applier = self) : Buff(_applied_to) constructor {
+function PresenceBasedBuff(_applied_to, _additional_arguments) : Buff(_applied_to, _additional_arguments) constructor {
 	//Stores all of the units that are applying this buff. That way, if multiple units are applying the buff, and only one of them is gotten rid of, the buff will still be applied by the other one.
-	applied_by = [_applier];
+	applied_by = [_additional_arguments[0]];
+	
+	add_broadcast_subscriber(_additional_arguments[0], "entity_deleted", function(_args) {
+		remove_applier(_args[0]);
+	}, applied_to);
 	
 	//Add the unit to the current applied_by list
 	//Since this buff is initialized with the applier as the first argument in the list, we can take that first list object and append it to this buff's list.
-	static on_duplicate_application = function(_second_buff) { array_push(applied_by, _second_buff.applied_by[0]) };
+	static on_duplicate_application = function(_additional_arguments_2) {
+		var _applier = _additional_arguments_2[0];
+		array_push(applied_by, _applier);
+		add_broadcast_subscriber(_additional_arguments_2[0], "entity_deleted", function(_args) {
+			remove_applier(_args[0]);
+		}, applied_to);
+	};
 	
 	static remove_applier = function(_applier) {
 		for(var i = 0, len = array_length(applied_by); i < len; ++i) {
 			if(applied_by[i] == _applier) {
 				array_delete(applied_by, i, 1);
+				break;
 			}
 		}
 		if(array_length(applied_by) == 0) {
@@ -66,20 +72,21 @@ function PresenceBasedBuff(_applied_to, _applier = self) : Buff(_applied_to) con
 
 #macro ON_FIRE_TIME_LIMIT seconds_to_roomspeed_frames(10)
 #macro ON_FIRE_STEPS_PER_BURN seconds_to_roomspeed_frames(1)
-function OnFireBuff(_applied_to) : Buff(_applied_to) constructor {
+function OnFireBuff(_applied_to, _additional_arguments) : Buff(_applied_to, _additional_arguments) constructor {
 	static buff_id = BUFF_IDS.ON_FIRE;
 	static buff_name = "On Fire!";
 
 	burn_timer = 0;
+	seconds_to_burn = _additional_arguments[0];
 	
-	static on_duplicate_application = function() { burn_timer = 0 }; //Just reset the burn timer
+	static on_duplicate_application = function(_additional_arguments_2) { seconds_to_burn += _additional_arguments_2[0] }; //Just reset the burn timer
 	
 	static on_step = function() {
 		burn_timer++;
 		if(burn_timer % ON_FIRE_STEPS_PER_BURN == 0) {
 			deal_damage(applied_to, 2, true);
 		}
-		if(burn_timer > ON_FIRE_TIME_LIMIT) {
+		if(burn_timer > seconds_to_burn) {
 			applied_to.buffs.remove_buff(BUFF_IDS.ON_FIRE);
 		}
 	}
@@ -87,12 +94,27 @@ function OnFireBuff(_applied_to) : Buff(_applied_to) constructor {
 
 
 #macro GOLD_RUSH_ARROW_TIME seconds_to_roomspeed_frames(1)
-function GoldRushBuff(_applied_to, _applier = self) : PresenceBasedBuff(_applied_to, _applier) constructor {
+function GoldRushBuff(_applied_to, _additional_arguments) : PresenceBasedBuff(_applied_to, _additional_arguments) constructor {
 	static buff_id = BUFF_IDS.GOLD_RUSH;
 	static buff_name = "Gold Rush";
-	static buff_category = BUFF_CATEGORY.ATTACK_SPEED;
+	//static stats_multiplied = [STATS.ATTACK_SPEED];
+	//static buff_multiplier = 2;
 	
 	arrow_timer = 0;
+	
+	static on_initial_application = function() {
+		with(applied_to) {
+			stat_multipliers[STATS.ATTACK_SPEED] *= 2;
+			image_speed = 2;
+		}
+	}
+	
+	static on_removal = function() {
+		with(applied_to) {
+			stat_multipliers[STATS.ATTACK_SPEED] /= 2;
+			image_speed = 1;
+		}
+	}
 	
 	static on_step = function() {
 		arrow_timer++;
@@ -107,7 +129,8 @@ function GoldRushBuff(_applied_to, _applier = self) : PresenceBasedBuff(_applied
 
 //NOTE: Also stores debuffs
 //TODO: Allow multiples of a buff?
-function BuffList() constructor {
+function BuffList(_owner = other) constructor {
+	owner = _owner;
 	buff_list = [];
 	
 	static on_step = function() {
@@ -123,15 +146,21 @@ function BuffList() constructor {
 		}
 	}
 	
-	
-	static apply_buff = function(_buff) {
+	//Call this inside an enitty to apply a buff to them
+	//Returns the buff if it needs to be modified after it's been applied.
+	//TODO: Currently requires the creation of another instance. Maybe change this so it takes an ID and only creates an instance if needed
+	static apply_buff = function(_buff_id, _additional_arguments) {
 		for (var i = 0, len = array_length(buff_list); i < len; ++i) {
-		    if(buff_list[i].buff_id == _buff.buff_id) {
-				buff_list[i].on_duplicate_application(_buff);
-				return;
+		    if(buff_list[i].buff_id == _buff_id) {
+				buff_list[i].on_duplicate_application(_additional_arguments);
+				return buff_list[i];
 			}
 		}
-		array_push(buff_list, _buff);
+		var _buff_class = variable_struct_get(global.BUFF_IDS_TO_STRUCTS, string(_buff_id));
+		var _new_buff = new _buff_class(owner, _additional_arguments);
+		array_push(buff_list, _new_buff);
+		_new_buff.on_initial_application(_additional_arguments);
+		return _new_buff;
 	}
 	
 	
@@ -139,6 +168,7 @@ function BuffList() constructor {
 	static remove_buff = function(_buff_id) {
 		for (var i = 0, len = array_length(buff_list); i < len; ++i) {
 		    if(buff_list[i].buff_id == _buff_id) {
+				buff_list[i].on_removal();
 				array_delete(buff_list, i, 1);
 				return;
 			}
@@ -159,7 +189,7 @@ function BuffList() constructor {
 	static get_buffs_from_category = function(_category) {
 		var _filtered_buff_list = [];
 		for (var i = 0, len = array_length(buff_list); i < len; ++i) {
-		    if(buff_list[i].buff_category == _category) {
+		    if(array_contains(buff_list[i].buff_categories, _category)) {
 				array_push(_filtered_buff_list, buff_list[i]);
 			}
 		}

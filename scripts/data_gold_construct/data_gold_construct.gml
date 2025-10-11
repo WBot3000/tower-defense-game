@@ -44,7 +44,7 @@ function UpgradeGoldConstruct1(_unit = other) :
 				entity_data.sight_range.get_entities_in_range([base_unit], entities_in_range);
 				for(var i = 0, len = ds_list_size(entities_in_range); i < len; ++i) {
 					var _unit = entities_in_range[| i];
-					_unit.buffs.apply_buff(new GoldRushBuff(_unit));
+					_unit.buffs.apply_buff(/*new GoldRushBuff(_unit)*/BUFF_IDS.GOLD_RUSH, [self]);
 				}
 				show_debug_message("Should have buffed " + string(ds_list_size(entities_in_range)) + " units.");
 				ds_list_clear(entities_in_range);
@@ -52,9 +52,9 @@ function UpgradeGoldConstruct1(_unit = other) :
 				add_broadcast_subscriber(get_logic_controller(), "unit_purchased", function(args) {
 					var _unit = args[0]; //args[0] = unit purchased
 					if(entity_data.sight_range.is_entity_in_range(_unit)) {
-						_unit.buffs.apply_buff(new GoldRushBuff(_unit));
+						_unit.buffs.apply_buff(/*new GoldRushBuff(_unit)*/BUFF_IDS.GOLD_RUSH, [self]);
 					}
-				}/*, self*/);
+				});
 			}
 		}
 }

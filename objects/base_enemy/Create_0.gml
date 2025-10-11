@@ -12,7 +12,9 @@ if(!variable_instance_exists(self, "round_spawned_in")) {
 animation_controller = new AnimationController(self, animation_bank);
 buffs = new BuffList();
 
+stat_multipliers = array_create(STATS.LENGTH, 1)
+
 broadcast_hub = new BroadcastHub();
-broadcast_hub.register_event("enemy_defeated");
+broadcast_hub.register_event("enemy_deleted");
 
 events_registered_for = []; //List of events this entity is registered for
