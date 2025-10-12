@@ -15,3 +15,6 @@ broadcast_hub.register_event("entity_deleted");
 
 
 events_registered_for = []; //List of events this entity is registered for
+
+//Caching the selected entity manager for drawing checks
+selected_entity_manager = get_selected_entity_manager();

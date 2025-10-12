@@ -15,6 +15,6 @@ buffs = new BuffList();
 stat_multipliers = array_create(STATS.LENGTH, 1)
 
 broadcast_hub = new BroadcastHub();
-broadcast_hub.register_event("enemy_deleted");
+broadcast_hub.register_event("entity_deleted");
 
 events_registered_for = []; //List of events this entity is registered for

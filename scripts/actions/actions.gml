@@ -1,11 +1,13 @@
 /*
 This file contains functions that detail specific entity behaviors.
+
+NOTE: All actions should implicitly take the actor (the instance the function is called in) as the last parameter
 */
 
 #region Attacking Functions
 
 //Determines whether an entity is a valid target for attacking or not based on normal circumstances
-function can_be_attacked(_entity_to_be_attacked) {
+function can_be_attacked(_entity_to_be_attacked, _actor = other) {
 	if(_entity_to_be_attacked == noone || !instance_exists(_entity_to_be_attacked)) { //Can't attack an entity that no longer exists.
 		return false;
 	}
@@ -14,9 +16,9 @@ function can_be_attacked(_entity_to_be_attacked) {
 
 
 //Use this if you want an entity to pick out another entity based on their targeting tracker. Returns the enemy selected
-function get_entity_using_targeting_tracker(_entity_list, _targeting_params, _targeter = other) {
+function get_entity_using_targeting_tracker(_entity_list, _targeting_params, _actor = other) {
 	var _entity = noone;
-	with(_targeter) {
+	with(_actor) {
 		var _targeting_type = targeting_tracker.get_current_targeting_type();
 		_entity = _targeting_type.targeting_fn(self, _entity_list, _targeting_params);
 	}
@@ -26,12 +28,12 @@ function get_entity_using_targeting_tracker(_entity_list, _targeting_params, _ta
 
 //Given an entity to damage, and a base damage value, calculate the amount of damage an attack should do. Returns the total amount of damage done.
 //TODO: Take into account buffs/debuffs
-function deal_damage(_entity_to_damage, _damage_amount, _ignore_defense = false){
-	var _true_damage_amount = _damage_amount;
+function deal_damage(_entity_to_damage, _damage_amount, _ignore_defense = false, _actor = self){
+	var _true_damage_amount = _damage_amount * _actor.stat_multipliers[STATS.ATTACK_POWER];
 	
 	with(_entity_to_damage) {
 		if(variable_struct_exists(entity_data, "defense_factor") && !_ignore_defense) {
-			_true_damage_amount /= entity_data.defense_factor
+			_true_damage_amount /= (entity_data.defense_factor * stat_multipliers[STATS.DEFENSE]);
 		}
 		current_health = max(current_health - _true_damage_amount, 0);
 	}
@@ -42,15 +44,19 @@ function deal_damage(_entity_to_damage, _damage_amount, _ignore_defense = false)
 
 //Create a projectile at (x_start, y_start), directed at the target specified. Returns the id of the projectile created.
 //NOTE: The actual behavior of the projectile is determined within the projectile's code. This just does proper initialization.
-function shoot_projectile(_projectile, _target, _projectile_data, _shooter = other) {
-	var _vector = instances_vector_to_get_components(_shooter, _target, true);
+function shoot_projectile(_projectile, _target, _projectile_data, _actor = other) {
+	var _vector = instances_vector_to_get_components(_actor, _target, true);
+	var _projectile_stat_multipliers = [];
+	//Projectiles spawned when an entity has certain modifiers should keep those modifiers, even if the entity's modifiers end up changing (hence why this isn't just a shallow reference)
+	array_copy(_projectile_stat_multipliers, 0, _actor.stat_multipliers, 0, STATS.LENGTH);
 	
-	return instance_create_layer(get_bbox_center_x(_shooter), get_bbox_center_y(_shooter), PROJECTILE_LAYER, _projectile,
+	return instance_create_layer(get_bbox_center_x(_actor), get_bbox_center_y(_actor), PROJECTILE_LAYER, _projectile,
 				{
 					target: _target, //Needed for homing projectiles
 					x_speed: _vector[VEC_X] * _projectile_data.travel_speed,
 					y_speed: _vector[VEC_Y] * _projectile_data.travel_speed,
-					data: _projectile_data //NOTE: Also includes travel speed not broken up + normalized
+					data: _projectile_data, //NOTE: Also includes travel speed not broken up + normalized
+					stat_multipliers: _projectile_stat_multipliers
 				});
 	
 }
@@ -60,8 +66,8 @@ function shoot_projectile(_projectile, _target, _projectile_data, _shooter = oth
 
 #region Movement Functions
 //Run on each step of an enemy that can be blocked. Will allow the entity to be stalled by entities that can block
-function blocked_check(_entity = other) {
-	with(_entity) {
+function blocked_check(_actor = other) {
+	with(_actor) {
 		if(!blocked) {
 			var _unit_at_position = instance_place(x, y, base_unit);
 			if(_unit_at_position != noone && _unit_at_position.entity_data.can_block && _unit_at_position.health_state == HEALTH_STATE.ACTIVE) {
@@ -76,12 +82,12 @@ function blocked_check(_entity = other) {
 //When this entity shouldn't block anymore (whether it has been knocked out or sold), run this function to allow those enemies to move again.
 
 //Currently, there's no function for periodically releasing defeated enemies from a blocking list. Might want to implement that so the lists don't get too huge.
-function release_enemies_from_block(_blocker = other) {
-	with(_blocker) {
+function release_enemies_from_block(_actor = other) {
+	with(_actor) {
 		for (var i = 0, len = array_length(blocking_list); i < len; ++i) {
 			var _entity_blocked = blocking_list[i];
 			//TODO: Replace this with a speed adjusted for buffs/debuffs
-			_entity_blocked.path_speed = _entity_blocked.entity_data.default_movement_speed;
+			_entity_blocked.path_speed = _entity_blocked.entity_data.default_movement_speed * _entity_blocked.stat_multipliers[STATS.MOVEMENT_SPEED];
 		}
 	}
 }
@@ -126,23 +132,25 @@ function standard_on_enemy_defeat_actions(_enemy = other) {
 
 
 //Standard KO stuff that should apply to most units that get knocked out
-function standard_on_ko_actions(_entity = other) {
-	with(_entity) {
+function standard_on_ko_actions(_actor = other) {
+	with(_actor) {
 		animation_controller.set_animation("ON_KO"); //TODO: Write better code for chaining animations together
 		health_state = HEALTH_STATE.KNOCKED_OUT;
+		broadcast_hub.broadcast_event();
 	}
 }
 
 
 //Used for knocked-out units. Returns true if the entity has recovered and is back in it's normal state, returns false otherwise
-function standard_recover_from_ko_actions(_entity = other) {
+function standard_recover_from_ko_actions(_actor = other) {
 	var _recovered = false;
-	with(_entity) {
+	with(_actor) {
 		var _amount_to_recover = entity_data.recovery_rate / seconds_to_roomspeed_frames(1);
 		current_health = min(entity_data.max_health, current_health + _amount_to_recover);
 		if(current_health >= entity_data.max_health) {
 			animation_controller.set_animation("ON_RESTORE");
 			health_state = HEALTH_STATE.ACTIVE;
+			broadcast_hub.broadcast_event();
 			_recovered = true;
 		}
 	}

@@ -26,6 +26,7 @@ global.BUFF_IDS_TO_STRUCTS[$ string(BUFF_IDS.GOLD_RUSH)] = GoldRushBuff;
 function Buff(_applied_to, _additional_arguments) constructor {
 	static buff_id = BUFF_IDS.NONE;
 	static buff_name = "Placeholder Buff Name";
+	static buff_sprite = spr_default_buff_icon;
 	//static stats_multiplied = [];//Stats affected by the buff's buff_multiplier
 	//static buff_multiplier = 1; //Used for buffs/debuffs that multiplicatively alter a stat. Can just ignore for ones that don't
 	applied_to = _applied_to;
@@ -75,6 +76,7 @@ function PresenceBasedBuff(_applied_to, _additional_arguments) : Buff(_applied_t
 function OnFireBuff(_applied_to, _additional_arguments) : Buff(_applied_to, _additional_arguments) constructor {
 	static buff_id = BUFF_IDS.ON_FIRE;
 	static buff_name = "On Fire!";
+	static buff_sprite = spr_on_fire_icon;
 
 	burn_timer = 0;
 	seconds_to_burn = _additional_arguments[0];
@@ -97,8 +99,7 @@ function OnFireBuff(_applied_to, _additional_arguments) : Buff(_applied_to, _add
 function GoldRushBuff(_applied_to, _additional_arguments) : PresenceBasedBuff(_applied_to, _additional_arguments) constructor {
 	static buff_id = BUFF_IDS.GOLD_RUSH;
 	static buff_name = "Gold Rush";
-	//static stats_multiplied = [STATS.ATTACK_SPEED];
-	//static buff_multiplier = 2;
+	static buff_sprite = spr_gold_rush_icon;
 	
 	arrow_timer = 0;
 	
@@ -127,6 +128,7 @@ function GoldRushBuff(_applied_to, _additional_arguments) : PresenceBasedBuff(_a
 }
 
 
+#macro NUM_BUFFS_PER_ROW 4
 //NOTE: Also stores debuffs
 //TODO: Allow multiples of a buff?
 function BuffList(_owner = other) constructor {
@@ -194,5 +196,17 @@ function BuffList(_owner = other) constructor {
 			}
 		}
 		return _filtered_buff_list;
+	}
+	
+	
+	static draw_buff_icons = function() {
+		var _num_buffs = array_length(buff_list);
+		var _num_rows = floor(_num_buffs / NUM_BUFFS_PER_ROW) + 1;
+		for(var r = 0; r < _num_rows; ++r) {
+			for(var c = 0; c < NUM_BUFFS_PER_ROW && r*NUM_BUFFS_PER_ROW + c < _num_buffs; ++c) {
+				//TODO: Reformat this code so it doesn't make me wanna jump off a cliff.
+				draw_sprite(buff_list[r*NUM_BUFFS_PER_ROW + c].buff_sprite, 1, owner.x - (TILE_SIZE/2) + (TILE_SIZE/4 * c), owner.y - TILE_SIZE - (16 * (_num_rows - r)))
+			}
+		}
 	}
 }
