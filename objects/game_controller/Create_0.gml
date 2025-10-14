@@ -74,7 +74,7 @@ purchase_list = [
 	
 	global.DATA_PURCHASE_CLOUD,
 	global.DATA_PURCHASE_FLAME,
-	global.DATA_PURCHASE_DIRT,
+	global.DATA_PURCHASE_PLANT,
 	
 	global.DATA_PURCHASE_DIRT,
 	global.DATA_PURCHASE_DIRT,

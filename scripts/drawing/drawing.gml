@@ -14,6 +14,7 @@ function draw_set_alignments(_horizontal = fa_left, _vertical = fa_top) {
 
 
 #region draw_health_bar (Function)
+#macro HEALTH_BAR_WIDTH sprite_get_width(spr_health_bar)
 //Draw health bars for units and enemies
 //NOTE: Since health bar's origin is center-bottom, the x coordinate is where you want to draw the CENTER of the healthbar, while the y is where you want to draw the bottom
 function draw_health_bar(_x, _y, _current_health, _max_health, recovering_from_ko = false){
@@ -27,11 +28,10 @@ function draw_health_bar(_x, _y, _current_health, _max_health, recovering_from_k
 		//Enemy health casted to real so that division isn't integer division
 		var _percent_health_remaining = max(min(1, real(_current_health) / _max_health), 0);
 	
-		var _spr_health_bar_width = sprite_get_width(spr_health_bar)
 		//X-coordinate of the left bound of the health bar (+2 because the border is 2 pixels)
-		var _health_bar_left_bound = _x - (_spr_health_bar_width/2) + 2;
+		var _health_bar_left_bound = _x - (HEALTH_BAR_WIDTH/2) + 2;
 		//Right bound is same as left bound, but now you need to add the extra length and subtract the border (-3 because this draws at the end? of the pixel)
-		var _health_bar_right_bound = _x + (_spr_health_bar_width/2) - 3;
+		var _health_bar_right_bound = _x + (HEALTH_BAR_WIDTH/2) - 3;
 	
 		//Where to draw the green part of the health bar up to
 		var _health_bar_at = map_value(_percent_health_remaining, 0, 1, _health_bar_left_bound, _health_bar_right_bound);

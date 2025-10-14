@@ -212,15 +212,23 @@ global.ALL_UNITS_LIST = ds_list_create();
 function TargetingParams(_dont_target_knocked_out = true, _dont_target_attackable = false, _dont_target_buffs = [], _only_target_buffs = []) constructor {
 	dont_target_knocked_out = _dont_target_knocked_out;
 	dont_target_attackable = _dont_target_attackable;
-	dont_target_buffs = _dont_target_buffs;
-	only_target_buffs = _only_target_buffs;
+	dont_target_buffs = _dont_target_buffs; //NOTE: Should contain IDs
+	only_target_buffs = _only_target_buffs; //NOTE: Should contain IDs
 	
 	static is_entity_valid_target = function(_entity) {
 		//TODO: Add checking for buffs (before other checks)
+		if(array_length(dont_target_buffs) > 0 || array_length(only_target_buffs) > 0) {
+			for(var i = 0, len = array_length(_entity.buffs); i < len; ++i) {
+				var _buff_id = _entity.buffs[i].buff_id;
+				if(array_contains(dont_target_buffs, _buff_id) || !array_contains(only_target_buffs, _buff_id)) {
+					return false;
+				}
+			}
+		}
 		if(dont_target_attackable && can_be_attacked(_entity)) {
 			return false;
 		}
-		if(dont_target_knocked_out && _entity.entity_data.health_state == HEALTH_STATE.KNOCKED_OUT) {
+		if(dont_target_knocked_out && _entity.health_state == HEALTH_STATE.KNOCKED_OUT) {
 			return false;
 		}
 		return true;
@@ -281,7 +289,7 @@ function target_value_close(_targeter, _targetee) {
 
 #region target_first (Function)
 /*
-	Given an enemy list, selects the enemy closest to the wall.
+	Given an enemy list, selects the enemy closest to the target.
 	Currently only takes into account enemies that have paths.
 */
 function target_value_first(_targeter, _targetee) {
@@ -295,14 +303,14 @@ function target_value_first(_targeter, _targetee) {
 
 #region target_last (Function)
 /*
-	Given an enemy list, selects the enemy furthest from the wall.
+	Given an enemy list, selects the enemy furthest from the target.
 	Currently only takes into account enemies that have paths.
 */
 function target_value_last(_targeter, _targetee) {
 	if(_targetee.path_index != -1 && _targetee.path_index != pth_dummypath) {
 		return _targetee.path_position;
 	}
-	return -1;
+	return -1; //Same reasoning as above, but with a smaller number
 }
 #endregion
 
@@ -313,7 +321,7 @@ function target_value_last(_targeter, _targetee) {
 	NOTE: Currently doesn't take into account health buffs/debuffs
 */
 function target_value_healthiest(_targeter, _targetee) {
-	return _targetee.entity_data.current_health;
+	return _targetee.current_health;
 }
 #endregion
 
@@ -324,7 +332,7 @@ function target_value_healthiest(_targeter, _targetee) {
 	NOTE: Currently doesn't take into account health buffs/debuffs
 */
 function target_value_weakest(_targeter, _targetee) {
-	return _targetee.entity_data.current_health * -1;
+	return _targetee.current_health * -1;
 }
 #endregion
 

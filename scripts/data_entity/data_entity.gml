@@ -34,9 +34,7 @@ function EntityData() constructor {
 	name = "Unnamed";
 	
 	//Health variables
-	health_state = HEALTH_STATE.ACTIVE; //Not really needed for targets, but makes targeting code a bit simpler
 	max_health = 100;
-	current_health = 100;
 	
 	//Stat modifiers
 	defense_factor = 1; //All taken damage is divided by this value
@@ -47,7 +45,6 @@ function EntityData() constructor {
 	Units and Enemies share some additional data + functionality that Targets don't need, which is defined here.
 */
 function CombatantData() : EntityData() constructor {
-	
 	buffs = []; //NOTE: Also includes debuffs
 	direction_facing = DIRECTION_LEFT;
 	can_block = false; //Determines whether an entity can block opposing units/enemies

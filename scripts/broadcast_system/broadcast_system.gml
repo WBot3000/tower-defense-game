@@ -61,7 +61,7 @@ function BroadcastHub() constructor { //Contains all of the broadcast events an 
 		broadcast_events[$ _event_label] = new BroadcastEvent(_event_label);
 	}
 
-	static broadcast_event = function(_event_label, _args = []) {
+	static broadcast_event = function(_event_label = "NO_LABEL_GIVEN!", _args = []) {
 		var _event = broadcast_events[$ _event_label];
 		if(_event != undefined) {
 			_event.broadcast_event(_args);

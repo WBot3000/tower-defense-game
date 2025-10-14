@@ -1,10 +1,14 @@
 {
   "$GMObject":"",
   "%Name":"void_title",
-  "eventList":[],
+  "eventList":[
+    {"$GMEvent":"v1","%Name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,"name":"","resourceType":"GMEvent","resourceVersion":"2.0",},
+  ],
   "managed":true,
   "name":"void_title",
-  "overriddenProperties":[],
+  "overriddenProperties":[
+    {"$GMOverriddenProperty":"v1","%Name":"","name":"","objectId":{"name":"placeable_tile","path":"objects/placeable_tile/placeable_tile.yy",},"propertyId":{"name":"valid_units","path":"objects/placeable_tile/placeable_tile.yy",},"resourceType":"GMOverriddenProperty","resourceVersion":"2.0","value":"",},
+  ],
   "parent":{
     "name":"tile_types",
     "path":"folders/Objects/tile_types.yy",

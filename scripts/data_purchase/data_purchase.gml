@@ -30,6 +30,7 @@ global.DATA_PURCHASE_COBBLESTONE = new PurchaseData(cobblestone_construct, 150);
 global.DATA_PURCHASE_GOLD = new PurchaseData(gold_construct, 300);
 global.DATA_PURCHASE_CLOUD = new PurchaseData(cloud_construct, 300);
 global.DATA_PURCHASE_FLAME = new PurchaseData(flame_construct, 300);
+global.DATA_PURCHASE_PLANT = new PurchaseData(plant_construct, 500);
 #endregion
 
 #endregion

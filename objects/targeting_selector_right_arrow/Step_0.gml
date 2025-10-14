@@ -1,5 +1,6 @@
 /// @description Change targeting type
-if(!visible || !layer_get_visible(layer) || entity == noone) { return; }
+if(!visible || !layer_get_visible(layer) || entity == noone ||
+	!variable_instance_exists(entity, "targeting_tracker")) { return; }
 
 #region Gather Inputs
 var _mouse_clicked = mouse_check_button_released(mb_left);

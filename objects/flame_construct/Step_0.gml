@@ -23,7 +23,7 @@ switch (health_state) {
 		if(flamethrower_target != noone && flamethrower_damage_timer * stat_multipliers[STATS.ATTACK_SPEED] >= entity_data.frames_per_damage) {
 			var _light_on_fire = random(20); //Generates a number from 0-20. Should lead to a 5% chance to inflict burn
 			if(_light_on_fire <= 1) { //1/20 chance if I did the math right
-				flamethrower_target.buffs.apply_buff(BUFF_IDS.ON_FIRE, [5]); //Add 5 seconds of burn
+				flamethrower_target.buffs.apply_buff(BUFF_IDS.ON_FIRE, [seconds_to_roomspeed_frames(5)]); //Add 5 seconds of burn
 				show_debug_message("Hit");
 			}
 			set_facing_direction( get_entity_facing_direction(self, flamethrower_target.x) );

@@ -205,7 +205,7 @@ function BuffList(_owner = other) constructor {
 		for(var r = 0; r < _num_rows; ++r) {
 			for(var c = 0; c < NUM_BUFFS_PER_ROW && r*NUM_BUFFS_PER_ROW + c < _num_buffs; ++c) {
 				//TODO: Reformat this code so it doesn't make me wanna jump off a cliff.
-				draw_sprite(buff_list[r*NUM_BUFFS_PER_ROW + c].buff_sprite, 1, owner.x - (TILE_SIZE/2) + (TILE_SIZE/4 * c), owner.y - TILE_SIZE - (16 * (_num_rows - r)))
+				draw_sprite(buff_list[r*NUM_BUFFS_PER_ROW + c].buff_sprite, 1, owner.x - (TILE_SIZE/2) + (TILE_SIZE/NUM_BUFFS_PER_ROW * c), owner.bbox_top - (16 * (_num_rows - r + 1)))
 			}
 		}
 	}

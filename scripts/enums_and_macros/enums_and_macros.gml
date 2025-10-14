@@ -17,14 +17,14 @@
 #macro PARTICLE_LAYER "Particles"
 #macro TILE_LAYER "Placement_Tiles"
 #macro PROJECTILE_LAYER "Projectiles"
-#macro TARGET_LAYER "Targets"
-#macro UNIT_LAYER "Units"
 #macro ENEMY_LAYER "Enemies"
+#macro UNIT_LAYER "Units"
+#macro TARGET_LAYER "Targets"
 #macro GROUND_INSTANCES_LAYER "Ground_Instances"
 #macro CONTROLLER_LAYER "Controllers"
 #endregion
 //For easy iteration
-global.INSTANCE_LAYERS = [TILE_LAYER, PROJECTILE_LAYER, TARGET_LAYER, UNIT_LAYER, ENEMY_LAYER, GROUND_INSTANCES_LAYER];
+global.INSTANCE_LAYERS = [TILE_LAYER, PROJECTILE_LAYER, ENEMY_LAYER, UNIT_LAYER, TARGET_LAYER, GROUND_INSTANCES_LAYER];
 
 /*
 	Macros for left and right directions.

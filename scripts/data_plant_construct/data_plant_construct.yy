@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"data_plant_construct",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"data_plant_construct",
+  "parent":{
+    "name":"units",
+    "path":"folders/Scripts/data/units.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -29,11 +29,13 @@ function get_entity_using_targeting_tracker(_entity_list, _targeting_params, _ac
 //Given an entity to damage, and a base damage value, calculate the amount of damage an attack should do. Returns the total amount of damage done.
 //TODO: Take into account buffs/debuffs
 function deal_damage(_entity_to_damage, _damage_amount, _ignore_defense = false, _actor = self){
-	var _true_damage_amount = _damage_amount * _actor.stat_multipliers[STATS.ATTACK_POWER];
+	var _attack_multiplier = variable_instance_exists(_actor, "stat_multipliers") ? _actor.stat_multipliers[STATS.ATTACK_POWER] : 1;
+	var _true_damage_amount = _damage_amount * _attack_multiplier;
 	
 	with(_entity_to_damage) {
 		if(variable_struct_exists(entity_data, "defense_factor") && !_ignore_defense) {
-			_true_damage_amount /= (entity_data.defense_factor * stat_multipliers[STATS.DEFENSE]);
+			var _defense_multiplier = variable_instance_exists(_entity_to_damage, "stat_multipliers") ? _entity_to_damage.stat_multipliers[STATS.DEFENSE] : 1;
+			_true_damage_amount /= (entity_data.defense_factor * _defense_multiplier);
 		}
 		current_health = max(current_health - _true_damage_amount, 0);
 	}
@@ -108,13 +110,22 @@ function create_tile_aligned_instance(_x_pos, _y_pos, _layer, _object, _data_pas
 }
 #endregion
 
+
 #region Miscellaneous Functions
 
 //Used to set the sprite direction of units and enemies
-function set_facing_direction(_direction, _entity = other) {
-	with(_entity) {
+function set_facing_direction(_direction, _actor = other) {
+	with(_actor) {
 		direction_facing = _direction;
 		image_xscale = _direction;
+	}
+}
+
+
+//Used to heal an entity (prevents unintentional overheal)
+function heal_entity(_entity_to_heal, _amount_to_heal, _actor = other) {
+	with(_entity_to_heal) {
+		current_health = min(entity_data.max_health, current_health + _amount_to_heal)
 	}
 }
 
@@ -136,7 +147,7 @@ function standard_on_ko_actions(_actor = other) {
 	with(_actor) {
 		animation_controller.set_animation("ON_KO"); //TODO: Write better code for chaining animations together
 		health_state = HEALTH_STATE.KNOCKED_OUT;
-		broadcast_hub.broadcast_event();
+		broadcast_hub.broadcast_event("entity_knocked_out");
 	}
 }
 
@@ -150,7 +161,7 @@ function standard_recover_from_ko_actions(_actor = other) {
 		if(current_health >= entity_data.max_health) {
 			animation_controller.set_animation("ON_RESTORE");
 			health_state = HEALTH_STATE.ACTIVE;
-			broadcast_hub.broadcast_event();
+			broadcast_hub.broadcast_event("entity_revived");
 			_recovered = true;
 		}
 	}

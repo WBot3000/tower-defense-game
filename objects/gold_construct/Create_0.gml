@@ -11,9 +11,6 @@ health_state = HEALTH_STATE.ACTIVE;
 cached_round_manager = get_round_manager();
 money_generation_timer = 0;
 
-//Used for Gold Rush upgrade if purchased
-applying_buffs_to = [];
-
 //Used for Midas Missile upgrade if purchased
 targeting_tracker = 
 new TargetingTracker([
