@@ -39,9 +39,9 @@ function CircularRange(_owner, _origin_x, _origin_y, _radius) : Range(_owner) co
 	origin_y = _origin_y;
 	radius = _radius;
 	
-	static draw_range = function() {
+	static draw_range = function() { //NOTE: No longer using bbox because when a unit's dimensions change upon upgrade, the range shouldn't.
 		draw_set_alpha(0.125)
-		draw_circle_color(origin_x + get_bbox_center_x(owner), origin_y + get_bbox_center_y(owner), radius, c_white, c_white, false);
+		draw_circle_color(origin_x + owner.x, origin_y + (owner.y - (TILE_SIZE/2)), radius, c_white, c_white, false);
 		draw_set_alpha(1)
 	}
 	
@@ -55,7 +55,7 @@ function CircularRange(_owner, _origin_x, _origin_y, _radius) : Range(_owner) co
 	static get_entities_in_range = function(_entity_types, _storage_list) {
 		with(owner) { //Wrapping is so the "notme" works properly
 			for(var i = 0, len = array_length(_entity_types); i < len; ++i) {
-				collision_circle_list(other.origin_x + get_bbox_center_x(self), other.origin_y + get_bbox_center_y(self), other.radius, _entity_types[i], false, true, _storage_list, false);
+				collision_circle_list(other.origin_x + x, other.origin_y + (y - (TILE_SIZE/2)), other.radius, _entity_types[i], false, true, _storage_list, false);
 			}
 		}
 	}
@@ -64,7 +64,7 @@ function CircularRange(_owner, _origin_x, _origin_y, _radius) : Range(_owner) co
 		Determine whether a specific entity is within this range or not.
 	*/
 	static is_entity_in_range = function(_entity) {
-		return collision_circle(origin_x + get_bbox_center_x(owner), origin_y + get_bbox_center_y(owner), radius, _entity, false, true);
+		return collision_circle(origin_x + owner.x, origin_y + (owner.y - (TILE_SIZE/2)), radius, _entity, false, true);
 	}
 	
 	/*
@@ -97,7 +97,7 @@ function RectangularRange(_owner, _x1, _y1, _x2, _y2) : Range(_owner) constructo
 	
 	static draw_range = function() {
 		draw_set_alpha(0.125);
-		draw_rectangle_color(x1 + entity.x, y1 + entity.y - TILE_SIZE/2, x2 + entity.x, y2 + entity.y - TILE_SIZE/2, c_white, c_white, c_white, c_white, false);
+		draw_rectangle_color(x1 + owner.x, y1 + owner.y - TILE_SIZE/2, x2 + owner.x, y2 + owner.y - TILE_SIZE/2, c_white, c_white, c_white, c_white, false);
 		draw_set_alpha(1);
 	}
 	
@@ -109,12 +109,9 @@ function RectangularRange(_owner, _x1, _y1, _x2, _y2) : Range(_owner) constructo
 		While not targeting yourself (notme = true)
 	*/
 	static get_entities_in_range = function(_entity_types, _storage_list) {
-		var _center_x = get_bbox_center_x(owner);
-		var _center_y = get_bbox_center_y(owner);
-		
 		with(owner) { //Wrapping is so the "notme" works properly
 			for(var i = 0, len = array_length(_entity_types); i < len; ++i) {
-				collision_rectangle_list(other.x1 + _center_x, other.y1 + _center_y, other.x2 + _center_x, other.y2 + _center_y, _entity_types[i], false, true, _storage_list, false);
+				collision_rectangle_list(other.x1 + x, other.y1 + y - (TILE_SIZE/2), other.x2 + x, other.y2 + y - (TILE_SIZE/2), _entity_types[i], false, true, _storage_list, false);
 			}
 		}
 	}
@@ -123,10 +120,7 @@ function RectangularRange(_owner, _x1, _y1, _x2, _y2) : Range(_owner) constructo
 		Determine whether a specific entity is within this range or not.
 	*/
 	static is_entity_in_range = function(_entity) {
-		var _center_x = get_bbox_center_x(owner);
-		var _center_y = get_bbox_center_y(owner);
-
-		return collision_rectangle(x1 + _center_x, y1 + _center_y, x2 + _center_x, y2 + _center_y, _entity, false, true);
+		return collision_rectangle(x1 + owner.x, y1 + owner.y - (TILE_SIZE/2), x2 + owner.x, y2 + owner.y - (TILE_SIZE/2), _entity, false, true);
 	}
 	
 	/*
@@ -247,11 +241,11 @@ global.DEFAULT_TARGETING_PARAMETERS = new TargetingParams(); //So this doesn't n
 	If you want to pick the target with the smallest value instead, just multiply the result by -1 in the _entity_to_value_fn
 	
 	NOTE: Not all targeting functions need to use this. For example, the default enemy targeter just chooses the first entity in the list
-*/
+*//*
 function targeting_fn_builder(_entity_to_value_fn) {
 	var _fn = function(_unit, _entity_list, _targeting_params) {
 		var _selected_entity = noone;
-		var _selected_entity_value = -1;
+		var _selected_entity_value = -2;
 		for(var i = 0, len = ds_list_size(_entity_list); i < len; ++i) {
 			if(!_targeting_params.is_entity_valid_target(_entity_list[| i])) { //Filter out inelligible entities
 				continue;
@@ -270,6 +264,40 @@ function targeting_fn_builder(_entity_to_value_fn) {
 			}
 		}
 		return _selected_entity;
+	}
+	
+	//Need the method function to pass the outer value to the inner function, as seen here: https://forum.gamemaker.io/index.php?threads/inherit-struct-with-variable-parameter-as-parameter.91799/
+	return method({entity_to_value_fn: _entity_to_value_fn}, _fn);
+}*/
+function targeting_fn_builder(_entity_to_value_fn) {
+	var _fn = function(_unit, _entity_list, _targeting_params, _num_entities_returned = 1) {
+		//var _selected_entity = noone;
+		var _entities_returned = array_create(_num_entities_returned, noone);
+		//var _selected_entity_value = -2;
+		var _selected_entity_values = array_create(_num_entities_returned, -2); //Is -2 because sometimes a function might return -1 as a special "do not prioritize" value, but you still want to be able to target those entities (as in target_last)
+		for(var i = 0, len = ds_list_size(_entity_list); i < len; ++i) {
+			var _picked_entity = _entity_list[| i];
+			if(!_targeting_params.is_entity_valid_target(_picked_entity)) { //Filter out inelligible entities
+				continue;
+			}
+			
+			var _new_value = entity_to_value_fn(_unit, _picked_entity);
+			for(var j = 0; j < _num_entities_returned; ++j) {
+				if(_new_value > _selected_entity_values[j]) { //Array should be in descending order
+					array_insert(_entities_returned, j, _picked_entity);
+					array_insert(_selected_entity_values, j, _new_value);
+					//Now there are _num_entities_returned + 1 entities in the array, need to get rid of the one with the lowest value (which will always be at the end of the array)
+					array_pop(_entities_returned);
+					array_pop(_selected_entity_values);
+					break; //Don't want to force out all the values
+				}
+			}
+		}
+		
+		if(_num_entities_returned == 1) {
+			return _entities_returned[0]; //TODO: Currently doing this so all the old code doesn't break. Bad practice, don't do this normally. Will change eventually.
+		}
+		return _entities_returned;
 	}
 	
 	//Need the method function to pass the outer value to the inner function, as seen here: https://forum.gamemaker.io/index.php?threads/inherit-struct-with-variable-parameter-as-parameter.91799/

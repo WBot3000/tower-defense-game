@@ -26,7 +26,7 @@ function draw_health_bar(_x, _y, _current_health, _max_health, recovering_from_k
 		//Don't want the health bar to overflow in the event the entity's current health exceeds it's normal max health
 		//Also don't want it to underflow if the entity (somehow) gets negative health
 		//Enemy health casted to real so that division isn't integer division
-		var _percent_health_remaining = max(min(1, real(_current_health) / _max_health), 0);
+		var _percent_health_remaining = clamp(real(_current_health) / _max_health, 0, 1);
 	
 		//X-coordinate of the left bound of the health bar (+2 because the border is 2 pixels)
 		var _health_bar_left_bound = _x - (HEALTH_BAR_WIDTH/2) + 2;
@@ -60,7 +60,7 @@ function draw_health_bar_target(x, y, _current_health, _max_health){
 		//Don't want the health bar to overflow in the event the entity's current health exceeds it's normal max health
 		//Also don't want it to underflow if the entity (somehow) gets negative health
 		//Enemy health casted to real so that division isn't integer division
-		var _percent_health_remaining = max(min(1, real(_current_health) / _max_health), 0);
+		var _percent_health_remaining = clamp(real(_current_health) / _max_health, 0, 1);
 	
 		var _spr_health_bar_width = sprite_get_width(spr_health_bar_target)
 		//X-coordinate of the left bound of the health bar (+4 because the border is 4 pixels)

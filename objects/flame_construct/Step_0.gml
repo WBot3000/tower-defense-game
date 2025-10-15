@@ -10,7 +10,7 @@ switch (health_state) {
 			entity_data.sight_range.get_entities_in_range([base_enemy], enemies_in_range, true);
 			if(ds_list_size(enemies_in_range) > 0) {
 				//TODO: Check to see if targets are being picked correctly not sure if they are
-				flamethrower_target = get_entity_using_targeting_tracker(enemies_in_range, global.DEFAULT_TARGETING_PARAMETERS);
+				flamethrower_target = get_entities_using_targeting_tracker(enemies_in_range, global.DEFAULT_TARGETING_PARAMETERS);
 				flamethrower_effect.end_instance = flamethrower_target;
 				ds_list_clear(enemies_in_range);
 			}
@@ -24,7 +24,6 @@ switch (health_state) {
 			var _light_on_fire = random(20); //Generates a number from 0-20. Should lead to a 5% chance to inflict burn
 			if(_light_on_fire <= 1) { //1/20 chance if I did the math right
 				flamethrower_target.buffs.apply_buff(BUFF_IDS.ON_FIRE, [seconds_to_roomspeed_frames(5)]); //Add 5 seconds of burn
-				show_debug_message("Hit");
 			}
 			set_facing_direction( get_entity_facing_direction(self, flamethrower_target.x) );
 			deal_damage(flamethrower_target, entity_data.damage);

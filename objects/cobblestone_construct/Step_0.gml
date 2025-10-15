@@ -9,7 +9,7 @@ switch (health_state) {
 			entity_data.sight_range.get_entities_in_range([base_enemy], enemies_in_range);
 
 			if(ds_list_size(enemies_in_range) > 0) {
-				var _enemy_to_target = get_entity_using_targeting_tracker(enemies_in_range, global.DEFAULT_TARGETING_PARAMETERS);
+				var _enemy_to_target = get_entities_using_targeting_tracker(enemies_in_range, global.DEFAULT_TARGETING_PARAMETERS);
 				
 				set_facing_direction( get_entity_facing_direction(self, _enemy_to_target.x) );
 				deal_damage(_enemy_to_target, entity_data.punch_damage);

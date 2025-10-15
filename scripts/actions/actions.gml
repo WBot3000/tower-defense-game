@@ -15,14 +15,15 @@ function can_be_attacked(_entity_to_be_attacked, _actor = other) {
 }
 
 
-//Use this if you want an entity to pick out another entity based on their targeting tracker. Returns the enemy selected
-function get_entity_using_targeting_tracker(_entity_list, _targeting_params, _actor = other) {
-	var _entity = noone;
+//Use this if you want an entity to pick out another entity(ies) based on their targeting tracker. Returns the entities selected
+//NOTE: If there are less entities than specified by _num_entities_returned, the rest of the array will NOT be culled. It's the responsibility of the calling code to handle this however it sees fit.
+function get_entities_using_targeting_tracker(_entity_list, _targeting_params, _num_entities_returned = 1, _actor = other) {
+	var _entities = undefined;
 	with(_actor) {
 		var _targeting_type = targeting_tracker.get_current_targeting_type();
-		_entity = _targeting_type.targeting_fn(self, _entity_list, _targeting_params);
+		_entities = _targeting_type.targeting_fn(self, _entity_list, _targeting_params, _num_entities_returned);
 	}
-	return _entity;
+	return _entities;
 }
 
 
@@ -105,7 +106,7 @@ function create_tile_aligned_instance(_x_pos, _y_pos, _layer, _object, _data_pas
 		instance_create_layer(tile_at_position.x + sprite_get_xoffset(_obj_sprite), tile_at_position.y + sprite_get_yoffset(_obj_sprite), _layer, _object, _data_passed)
 	}
 	else {
-		throw ("No tile present at location (" + string(_x_pos) + ", " + string(_y_pos) + ")!")
+		/*throw*/ show_debug_message("No tile present at location (" + string(_x_pos) + ", " + string(_y_pos) + ")!")
 	}
 }
 #endregion

@@ -11,13 +11,6 @@ health_state = HEALTH_STATE.ACTIVE;
 cached_round_manager = get_round_manager();
 health_restoration_timer = 0;
 
-/*
-//Used for something maybe idk yet
-targeting_tracker = 
-new TargetingTracker([
-				global.TARGETING_HEALTHY,
-				global.TARGETING_WEAK,
-]);*/
 entities_in_range = ds_list_create();
 
 //Buying + selling data
@@ -26,7 +19,7 @@ sell_price = global.DATA_PURCHASE_PLANT.price * SELL_PRICE_REDUCTION;
 stat_upgrades = [new DirtConstructAttackSpeedUpgrade(), new DirtConstructAttackSpeedUpgrade(), 
 	new DirtConstructAttackSpeedUpgrade(), undefined];
 
-unit_upgrades = [undefined, undefined, undefined];
+unit_upgrades = [new UpgradePlantConstruct1(), undefined, undefined];
 upgrade_purchased = 0; //Used to determine which unit upgrade was purchased after buying it.
 	
 //Set up animation bank

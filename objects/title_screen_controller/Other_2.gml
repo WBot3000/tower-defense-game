@@ -43,6 +43,19 @@ part_type_orientation(global.PARTICLE_RAIN, 90, 90, 0, 0, true);
 part_type_blend(global.PARTICLE_RAIN, 0);
 part_type_life(global.PARTICLE_RAIN, 15, 15);
 
+//TODO: When range becomes adjustable, each individual instance will need its own particle (like how the flamethrower particles work now). Just keep that in mind.
+var _initial_aura_percentage = 16/sprite_get_width(spr_healing_aura)//Aura should start at 16 pixels, then grow to max size
+var _aura_time = seconds_to_roomspeed_frames(0.5);
+var _aura_growth_per_frame = 0.0306;
+
+global.PARTICLE_HEALING_AURA = part_type_create();
+part_type_sprite(global.PARTICLE_HEALING_AURA, spr_healing_aura, true, true, false);
+part_type_size(global.PARTICLE_HEALING_AURA, _initial_aura_percentage, _initial_aura_percentage, _aura_growth_per_frame, 0);
+part_type_alpha3(global.PARTICLE_HEALING_AURA, 1, 1, 0);
+part_type_blend(global.PARTICLE_HEALING_AURA, 0);
+part_type_life(global.PARTICLE_HEALING_AURA, _aura_time, _aura_time);
+
+
 global.PARTICLE_DIGIT_0 = part_type_create();
 global.PARTICLE_DIGIT_1 = part_type_create();
 global.PARTICLE_DIGIT_2 = part_type_create();

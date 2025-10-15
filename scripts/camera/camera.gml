@@ -34,6 +34,7 @@ function CameraSequenceData(_dest_x, _dest_y, _seconds_to_hang = CAM_NUM_SECONDS
 }
 
 /*
+	Information about where the camera should move while the camera isn't being controlled by the player.
 */
 function CameraSequence(_initial_seconds_to_hang = CAM_NUM_SECONDS_HANGING_DEFAULT,
 	_after_sequence_callback = function(){}) constructor {
@@ -52,8 +53,8 @@ function CameraSequence(_initial_seconds_to_hang = CAM_NUM_SECONDS_HANGING_DEFAU
 		//Need to make sure they don't go beyond the level itself (hence the max and min checks)
 		//Right and down checks subtract the width/height of the view since coordinates are based on the top-left corner of the camera
 		//NOTE: I'm not caching these since they're only used once, and passing them through the camera manager would be ugly
-		var _fixed_dest_x = max(0, min(_dest_x, room_width - camera_get_view_width(view_camera[0])));
-		var _fixed_dest_y = max(0, min(_dest_y, room_height - camera_get_view_height(view_camera[0])));
+		var _fixed_dest_x = clamp(_dest_x, 0, room_width - camera_get_view_width(view_camera[0]));
+		var _fixed_dest_y = clamp(_dest_y, 0, room_height - camera_get_view_height(view_camera[0]));
 		
 		array_push(sequence_queue, new CameraSequenceData(_fixed_dest_x, _fixed_dest_y, _seconds_to_hang));
 	}

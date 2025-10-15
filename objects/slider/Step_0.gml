@@ -18,6 +18,6 @@ if(_mouse_pressed && highlighted) {
 }
 
 if(_mouse_held && held) {
-	nob_x = max(left_bound, min(right_bound, device_mouse_x_to_gui(0))); //Don't go beyond boundaries of the slider
+	nob_x = clamp(device_mouse_x_to_gui(0), left_bound, right_bound) //Don't go beyond boundaries of the slider
 	on_value_changed_func(map_value(nob_x, left_bound, right_bound, 0, 100));
 }

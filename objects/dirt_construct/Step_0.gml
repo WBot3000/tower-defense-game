@@ -10,7 +10,7 @@ switch (health_state) {
 
 			if(ds_list_size(enemies_in_range) > 0) {
 				//TODO: Check to see if targets are being picked correctly not sure if they are
-				var _enemy_to_target = get_entity_using_targeting_tracker(enemies_in_range, global.DEFAULT_TARGETING_PARAMETERS);
+				var _enemy_to_target = get_entities_using_targeting_tracker(enemies_in_range, global.DEFAULT_TARGETING_PARAMETERS);
 				
 				set_facing_direction( get_entity_facing_direction(self, _enemy_to_target.x) );
 				shoot_projectile(projectile_obj, _enemy_to_target, entity_data.projectile_data);

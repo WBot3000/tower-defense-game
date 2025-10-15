@@ -3,7 +3,7 @@ This file contains data about the Plant Construct and its upgrades
 */
 global.ANIMBANK_PLANT = new UnitAnimationBank(spr_plant_construct)
 
-//global.ANIMBANK_PLANT_U1 = new UnitAnimationBank(spr_plant_construct_u1);
+global.ANIMBANK_PLANT_U1 = new UnitAnimationBank(spr_plant_construct_u1);
 
 
 #region PlantConstruct (Class)
@@ -18,6 +18,13 @@ function PlantConstruct() : CombatantData() constructor {
 	healing_amount = 10;
 	
 	sight_range = new CircularRange(inst, 0, 0, tilesize_to_pixels(2));
+	global_range = new GlobalRange(inst);
+	
+	projectile_data = {
+				healing_amount: 10, 
+				travel_speed: 5
+			};
+	num_projectiles = 2;
 }
 #endregion
 
@@ -27,4 +34,21 @@ function PlantConstruct() : CombatantData() constructor {
 
 
 #region Plant Construct Unit Upgrades
+function UpgradePlantConstruct1(_unit = other) :
+	UnitUpgrade("Flower Power", 100, 0, 0, 0) constructor {
+		new_animbank = global.ANIMBANK_PLANT_U1;
+		//new_stat_upgrade = new DirtConstructU1PierceUpgrade(_unit);
+		
+		static upgrade_fn = function() {
+			with(unit_to_upgrade) {
+				//Used to signify which upgrade was purchased. Maybe make this nicer.
+				upgrade_purchased = 1;
+				targeting_tracker = 
+					new TargetingTracker([
+									global.TARGETING_HEALTHY,
+									global.TARGETING_WEAK,
+					]);
+			}
+		}
+}
 #endregion
