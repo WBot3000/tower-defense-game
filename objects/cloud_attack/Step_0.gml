@@ -12,7 +12,7 @@ switch (state) {
 			}
 			
 			range.get_entities_in_range([base_enemy], enemies_in_range);
-			target = _targeting_type.targeting_fn(self.id, enemies_in_range, true);
+			target = _targeting_type.targeting_fn(self, enemies_in_range, target_filter_fn_default);
 			if(target == noone) { //If no enemies can be found, just dissipate. TODO: Might change this behavior later
 				state = CLOUD_STATE.DISSIPATING
 				animation_controller.set_animation("DISSIPATING", 1, function(){ instance_destroy(self, true) });
@@ -41,7 +41,7 @@ switch (state) {
 			}
 			
 			range.get_entities_in_range([base_enemy], enemies_in_range);
-			target = _targeting_type.targeting_fn(self.id, enemies_in_range, global.DEFAULT_TARGETING_PARAMETERS);
+			target = _targeting_type.targeting_fn(self, enemies_in_range, target_filter_fn_default);
 			if(target == noone) { //If no enemies can be found, just dissipate. TODO: Might change this behavior later
 				state = CLOUD_STATE.DISSIPATING;
 				animation_controller.set_animation("DISSIPATING", 1, function(){ instance_destroy(self, true) });

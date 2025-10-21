@@ -106,13 +106,12 @@ global.BACKGROUND_MUSIC_MANAGER.fade_out_current_music(seconds_to_roomspeed_fram
 
 
 #region GUI Data
-set_ui(GUI_IN_GAME); //TODO: Might make an active and inactive one
+set_ui(GUI_IN_GAME);
 ui_elements = array_map(layer_get_all_elements(GUI_IN_GAME), 
 							function(_elem, _idx) { return layer_instance_get_instance(_elem) }) //Needed to prevent placement on a UI element 
 array_shift(ui_elements); //For some reason, ui_elements starts with a noone instance, not sure why
 currently_highlighted_ui_elem = noone; //Used so that the highlighted element only needs to be gotten once (instead of once in the Step event and again in the Draw event)
 
-//game_ui = new GameUI(self.id, purchase_list);
 /*
 	Different game states use different sets of GUI elements 
 	(ex. when the game is paused, the pause menu needs to be drawn)
@@ -128,8 +127,6 @@ room_intro_transition(screen_wipe_in, function() { //Callback after transition
 			global.BACKGROUND_MUSIC_MANAGER.set_music(Music_PreRound);
 			var _game_state_manager = get_game_state_manager();
 			_game_state_manager.resume_game();
-			//var _game_ui = get_game_ui();
-			//_game_ui.set_gui_intro();
 		});
 })
 #endregion

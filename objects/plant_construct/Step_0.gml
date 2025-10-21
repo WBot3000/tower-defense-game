@@ -20,7 +20,7 @@ switch (health_state) {
 				
 				if(upgrade_purchased == 1) {// Shoot projectiles for upgrade 1
 					entity_data.global_range.get_entities_in_range([base_unit], entities_in_range);
-					var _entities_for_healing_projectiles = get_entities_using_targeting_tracker(entities_in_range, global.DEFAULT_TARGETING_PARAMETERS, entity_data.num_projectiles);
+					var _entities_for_healing_projectiles = get_entities_using_targeting_tracker(entities_in_range, target_filter_fn_healer, entity_data.num_projectiles);
 					show_debug_message(_entities_for_healing_projectiles);
 					if(_entities_for_healing_projectiles[0] != noone) {
 						var _projectiles_created = 0;

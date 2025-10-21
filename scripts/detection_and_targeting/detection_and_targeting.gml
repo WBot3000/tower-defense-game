@@ -163,7 +163,7 @@ function MeleeRange(_owner) : CircularRange(_owner) constructor {
 
 #region GlobalRange (Class)
 /*
-	A RectangularRange for enemies that can see the entire level at once.
+	A range for enemies that can see the entire level at once.
 	Doesn't draw anything because creating a big white rectangle over the entire level sounds unpleasant.
 */
 function GlobalRange(_owner) : Range(_owner) constructor {	
@@ -175,10 +175,20 @@ function GlobalRange(_owner) : Range(_owner) constructor {
 		While not targeting yourself (notme = true)
 	*/
 	static get_entities_in_range = function(_entity_types, _storage_list) {
-		for (var i = 0, len = array_length(_entity_types); i < len; ++i) {
-			collision_rectangle_list(0, 0, room_width, room_height, _entity_types[i], false, true, _storage_list, false);
+		with(owner) { //NOTE: with(owner) necessary for the notme flag to work properly
+			for (var i = 0, len = array_length(_entity_types); i < len; ++i) {
+				collision_rectangle_list(0, 0, room_width, room_height, _entity_types[i], false, true, _storage_list, false);
+			}
 		}
 	}
+	
+	/*
+		Determine whether a specific entity is within this range or not.
+	*/
+	static is_entity_in_range = function(_entity) {
+		return collision_rectangle(0, 0, room_width, room_height, _entity, false, true);
+	}
+
 }
 
 /*
@@ -194,108 +204,59 @@ global.ALL_UNITS_LIST = ds_list_create();
 #endregion
 
 
-#region Unit Targeting
+#region Targeting
 
-#region TargetingParams (Class)
-/*
-	A struct that specifies what kinds of entities should be included or excluded from targeting.
-	By default, all entities picked up by a range will be considered valid targets for an action.
-	The functions determine the method for picking out an entity, while this acts as a "filter".
-	NOTE: This doesn't filter out entities based on their type, as you can just specify what kind of entities should be detected when using the ranges.
-*/
-function TargetingParams(_dont_target_knocked_out = true, _dont_target_attackable = false, _dont_target_buffs = [], _only_target_buffs = []) constructor {
-	dont_target_knocked_out = _dont_target_knocked_out;
-	dont_target_attackable = _dont_target_attackable;
-	dont_target_buffs = _dont_target_buffs; //NOTE: Should contain IDs
-	only_target_buffs = _only_target_buffs; //NOTE: Should contain IDs
-	
-	static is_entity_valid_target = function(_entity) {
-		//TODO: Add checking for buffs (before other checks)
-		if(array_length(dont_target_buffs) > 0 || array_length(only_target_buffs) > 0) {
-			for(var i = 0, len = array_length(_entity.buffs); i < len; ++i) {
-				var _buff_id = _entity.buffs[i].buff_id;
-				if(array_contains(dont_target_buffs, _buff_id) || !array_contains(only_target_buffs, _buff_id)) {
-					return false;
-				}
-			}
-		}
-		if(dont_target_attackable && can_be_attacked(_entity)) {
-			return false;
-		}
-		if(dont_target_knocked_out && _entity.health_state == HEALTH_STATE.KNOCKED_OUT) {
-			return false;
-		}
-		return true;
-	}
+
+#region Targeting Functions (Functions)
+//Don't target entities that are knocked out, all other entities are valid targets
+//Right now just a wrapper around can_be_attacked. This might be changed, it might not be.
+function target_filter_fn_default(_entity_to_target) {
+		return can_be_attacked(_entity_to_target);
 }
 
-
-global.DEFAULT_TARGETING_PARAMETERS = new TargetingParams(); //So this doesn't need to be created for every single unit/enemy that doesn't use specialized targeting parameters
+function target_filter_fn_healer(_entity_to_target) {
+	return _entity_to_target.current_health < _entity_to_target.entity_data.max_health;
+}
 #endregion
 
 
 #region targeting_function_builder (Function)
-/*
-	Create new kinds of targeting using this function. Prevents inconsistencies from arising between the different targeting functions.
-	The _entity_to_value_fn should return a numerical value. The targeting function will pick the entity that satisfies the targeting parameters and generates the largest value.
-	If you want to pick the target with the smallest value instead, just multiply the result by -1 in the _entity_to_value_fn
-	
-	NOTE: Not all targeting functions need to use this. For example, the default enemy targeter just chooses the first entity in the list
-*//*
 function targeting_fn_builder(_entity_to_value_fn) {
-	var _fn = function(_unit, _entity_list, _targeting_params) {
-		var _selected_entity = noone;
-		var _selected_entity_value = -2;
-		for(var i = 0, len = ds_list_size(_entity_list); i < len; ++i) {
-			if(!_targeting_params.is_entity_valid_target(_entity_list[| i])) { //Filter out inelligible entities
-				continue;
-			}
-			
-			if(_selected_entity == noone) {
-				_selected_entity = _entity_list[| i];
-				_selected_entity_value = entity_to_value_fn(_unit, _selected_entity);
-			}
-			else {
-				var _new_value = entity_to_value_fn(_unit, _entity_list[| i]);
-				if(_new_value > _selected_entity_value) {
-					_selected_entity = _entity_list[| i];
-					_selected_entity_value = _new_value;
-				}
-			}
+	var _fn = function(_unit, _entity_list, _target_filter_fn, _num_entities_returned = 1) {
+		var _entities_returned = [noone];
+		var _selected_entity_values = [undefined];
+		if(_num_entities_returned != RETURN_ALL_ENTITIES) {
+			_entities_returned = array_create(_num_entities_returned, noone);
+			_selected_entity_values = array_create(_num_entities_returned, undefined);
 		}
-		return _selected_entity;
-	}
-	
-	//Need the method function to pass the outer value to the inner function, as seen here: https://forum.gamemaker.io/index.php?threads/inherit-struct-with-variable-parameter-as-parameter.91799/
-	return method({entity_to_value_fn: _entity_to_value_fn}, _fn);
-}*/
-function targeting_fn_builder(_entity_to_value_fn) {
-	var _fn = function(_unit, _entity_list, _targeting_params, _num_entities_returned = 1) {
-		//var _selected_entity = noone;
-		var _entities_returned = array_create(_num_entities_returned, noone);
-		//var _selected_entity_value = -2;
-		var _selected_entity_values = array_create(_num_entities_returned, -2); //Is -2 because sometimes a function might return -1 as a special "do not prioritize" value, but you still want to be able to target those entities (as in target_last)
+
 		for(var i = 0, len = ds_list_size(_entity_list); i < len; ++i) {
 			var _picked_entity = _entity_list[| i];
-			if(!_targeting_params.is_entity_valid_target(_picked_entity)) { //Filter out inelligible entities
+			if(!_target_filter_fn(_picked_entity)) { //Filter out inelligible entities
 				continue;
 			}
 			
 			var _new_value = entity_to_value_fn(_unit, _picked_entity);
-			for(var j = 0; j < _num_entities_returned; ++j) {
-				if(_new_value > _selected_entity_values[j]) { //Array should be in descending order
+			for(var j = 0, len2 = array_length(_selected_entity_values); j < len2; ++j) {
+				if(_selected_entity_values[j] == undefined || _new_value > _selected_entity_values[j]) { //Array should be in descending order
 					array_insert(_entities_returned, j, _picked_entity);
 					array_insert(_selected_entity_values, j, _new_value);
-					//Now there are _num_entities_returned + 1 entities in the array, need to get rid of the one with the lowest value (which will always be at the end of the array)
-					array_pop(_entities_returned);
-					array_pop(_selected_entity_values);
+					if(_num_entities_returned != RETURN_ALL_ENTITIES) {
+						//Now there are _num_entities_returned + 1 entities in the array, need to get rid of the one with the lowest value (which will always be at the end of the array)
+						array_pop(_entities_returned);
+						array_pop(_selected_entity_values);
+					}
 					break; //Don't want to force out all the values
 				}
 			}
 		}
-		
+
 		if(_num_entities_returned == 1) {
 			return _entities_returned[0]; //TODO: Currently doing this so all the old code doesn't break. Bad practice, don't do this normally. Will change eventually.
+		}
+		
+		if(_num_entities_returned == RETURN_ALL_ENTITIES) {
+			array_pop(_entities_returned); //Because we never pop off the array if we're returning all the entities in the loop, we'll have an extra "noone" at the end
 		}
 		return _entities_returned;
 	}

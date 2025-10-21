@@ -17,11 +17,13 @@ function can_be_attacked(_entity_to_be_attacked, _actor = other) {
 
 //Use this if you want an entity to pick out another entity(ies) based on their targeting tracker. Returns the entities selected
 //NOTE: If there are less entities than specified by _num_entities_returned, the rest of the array will NOT be culled. It's the responsibility of the calling code to handle this however it sees fit.
-function get_entities_using_targeting_tracker(_entity_list, _targeting_params, _num_entities_returned = 1, _actor = other) {
+
+#macro RETURN_ALL_ENTITIES -1 //Used for when you need all the valid entities picked up. This basically turns the function into a filtered sorter.
+function get_entities_using_targeting_tracker(_entity_list, _target_filter_fn, _num_entities_returned = 1, _actor = other) {
 	var _entities = undefined;
 	with(_actor) {
 		var _targeting_type = targeting_tracker.get_current_targeting_type();
-		_entities = _targeting_type.targeting_fn(self, _entity_list, _targeting_params, _num_entities_returned);
+		_entities = _targeting_type.targeting_fn(self, _entity_list, _target_filter_fn, _num_entities_returned);
 	}
 	return _entities;
 }
@@ -49,6 +51,7 @@ function deal_damage(_entity_to_damage, _damage_amount, _ignore_defense = false,
 //NOTE: The actual behavior of the projectile is determined within the projectile's code. This just does proper initialization.
 function shoot_projectile(_projectile, _target, _projectile_data, _actor = other) {
 	var _vector = instances_vector_to_get_components(_actor, _target, true);
+	//show_debug_message(_vector);
 	var _projectile_stat_multipliers = [];
 	//Projectiles spawned when an entity has certain modifiers should keep those modifiers, even if the entity's modifiers end up changing (hence why this isn't just a shallow reference)
 	array_copy(_projectile_stat_multipliers, 0, _actor.stat_multipliers, 0, STATS.LENGTH);

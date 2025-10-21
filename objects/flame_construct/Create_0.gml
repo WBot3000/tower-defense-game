@@ -17,19 +17,19 @@ new TargetingTracker([
 				global.TARGETING_HEALTHY,
 				global.TARGETING_WEAK,
 ]);
-flamethrower_damage_timer = entity_data.frames_per_damage - 2;
-enemies_in_range = ds_list_create();
-flamethrower_target = noone;
 
-//Flamethrower particles
-flamethrower_effect = new ParticleBeam(spr_flame, self, noone, 1, BEAM_SPEED_DEFAULT, tilesize_to_pixels(0.5));
+flamethrowers = [new FlameConstructFlamethrower(self)];
+enemies_in_range = ds_list_create();
+current_targets = [];
+
 			
 //Buying + selling data
 sell_price = global.DATA_PURCHASE_FLAME.price * SELL_PRICE_REDUCTION;
 
-stat_upgrades = [undefined, undefined, undefined, undefined];
+stat_upgrades = [new DirtConstructAttackSpeedUpgrade(), new DirtConstructAttackSpeedUpgrade(), 
+	new DirtConstructAttackSpeedUpgrade(), undefined]; //Just placeholders so unit upgrades work
 
-unit_upgrades = [undefined, undefined, undefined];
+unit_upgrades = [new UpgradeFlameConstruct1(), undefined, undefined];
 
 //Set up animation bank
 animation_bank = global.ANIMBANK_FLAME;
