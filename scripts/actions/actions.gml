@@ -71,6 +71,7 @@ function shoot_projectile(_projectile, _target, _projectile_data, _actor = other
 
 
 #region Movement Functions
+//TODO: Blocking functions will have to change because of potential for enemies to move backwards along their paths
 //Run on each step of an enemy that can be blocked. Will allow the entity to be stalled by entities that can block
 function blocked_check(_actor = other) {
 	with(_actor) {
@@ -92,9 +93,19 @@ function release_enemies_from_block(_actor = other) {
 	with(_actor) {
 		for (var i = 0, len = array_length(blocking_list); i < len; ++i) {
 			var _entity_blocked = blocking_list[i];
-			//TODO: Replace this with a speed adjusted for buffs/debuffs
 			_entity_blocked.path_speed = _entity_blocked.entity_data.default_movement_speed * _entity_blocked.stat_multipliers[STATS.MOVEMENT_SPEED];
 		}
+	}
+}
+
+
+//End knockback state, return to normal moving state (for path-based enemies)
+function end_path_knockback(_actor = other) {
+	with(_actor) {
+		knockback_timer = 0;
+		frames_to_knockback = 0;
+		movement_state = MOVEMENT_STATE.UNIMPEDED;
+		path_speed = entity_data.default_movement_speed * stat_multipliers[STATS.MOVEMENT_SPEED]
 	}
 }
 #endregion

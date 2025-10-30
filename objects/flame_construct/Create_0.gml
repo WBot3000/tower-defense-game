@@ -19,7 +19,6 @@ new TargetingTracker([
 ]);
 
 flamethrowers = [new FlameConstructFlamethrower(self)];
-enemies_in_range = ds_list_create();
 current_targets = [];
 
 			

@@ -26,3 +26,4 @@ for(var i = 0; i < ds_list_size(entities_in_range); i++) {
 ds_list_clear(entities_in_range);
 
 entity_attack_cooldown_queue.tick();
+movement_controller.on_step();

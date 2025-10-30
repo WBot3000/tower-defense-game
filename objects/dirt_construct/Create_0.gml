@@ -19,7 +19,6 @@ new TargetingTracker([
 ]);
 	
 shot_timer = 0;
-enemies_in_range = ds_list_create();
 projectile_obj = dirt_ball;
 			
 //Buying + selling data

@@ -11,14 +11,14 @@ switch (state) {
 				_targeting_type = owner.targeting_tracker.get_current_targeting_type();
 			}
 			
-			range.get_entities_in_range([base_enemy], enemies_in_range);
-			target = _targeting_type.targeting_fn(self, enemies_in_range, target_filter_fn_default);
+			range.get_entities_in_range([base_enemy], entities_in_range);
+			target = _targeting_type.targeting_fn(self, entities_in_range, target_filter_fn_default);
 			if(target == noone) { //If no enemies can be found, just dissipate. TODO: Might change this behavior later
 				state = CLOUD_STATE.DISSIPATING
 				animation_controller.set_animation("DISSIPATING", 1, function(){ instance_destroy(self, true) });
 				break;
 			}
-			ds_list_clear(enemies_in_range);
+			ds_list_clear(entities_in_range);
 		}
 		var _vector = vector_to_get_components(x, y, target.x, target.y - TILE_SIZE, true);
 		x += _vector[VEC_X] * data.travel_speed;
@@ -40,8 +40,8 @@ switch (state) {
 				_targeting_type = owner.targeting_tracker.get_current_targeting_type();
 			}
 			
-			range.get_entities_in_range([base_enemy], enemies_in_range);
-			target = _targeting_type.targeting_fn(self, enemies_in_range, target_filter_fn_default);
+			range.get_entities_in_range([base_enemy], entities_in_range);
+			target = _targeting_type.targeting_fn(self, entities_in_range, target_filter_fn_default);
 			if(target == noone) { //If no enemies can be found, just dissipate. TODO: Might change this behavior later
 				state = CLOUD_STATE.DISSIPATING;
 				animation_controller.set_animation("DISSIPATING", 1, function(){ instance_destroy(self, true) });
@@ -51,7 +51,7 @@ switch (state) {
 				state = CLOUD_STATE.TRAVELING_TO_TARGET;
 			}
 			part_emitter_stream(global.PARTICLE_SYSTEM, rain_emitter, global.PARTICLE_RAIN, 0);
-			ds_list_clear(enemies_in_range);
+			ds_list_clear(entities_in_range);
 			break;
 		}
 		

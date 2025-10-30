@@ -38,19 +38,19 @@ switch (health_state) {
 		if(attack_timer >= entity_data.frames_per_attack) { //Enemy can now attack again
 			//Prioritize units over targets (they'll be at the front of the list
 			//Temporary for now
-			entity_data.sight_range.get_entities_in_range(base_unit, units_in_range);
+			entity_data.sight_range.get_entities_in_range(base_unit, entities_in_range);
 			entity_data.sight_range.get_entities_in_range(base_target, targets_in_range);
 			for(var i = 0; i < ds_list_size(targets_in_range); ++i) {
-				ds_list_add(units_in_range, ds_list_find_value(targets_in_range, i));
+				ds_list_add(entities_in_range, ds_list_find_value(targets_in_range, i));
 			}
-			var _entity_to_attack = enemy_target_default(self, units_in_range);
+			var _entity_to_attack = enemy_target_default(self, entities_in_range);
 			if(_entity_to_attack != noone) {
 				deal_damage(_entity_to_attack, entity_data.attack_damage);
 				draw_damage_effect(_entity_to_attack, spr_bite);
 				
 				attack_timer = 0;
 			}
-			ds_list_clear(units_in_range);
+			ds_list_clear(entities_in_range);
 			ds_list_clear(targets_in_range);
 		}
 		break;
@@ -59,3 +59,5 @@ switch (health_state) {
 	default:
 		break;
 }
+
+movement_controller.on_step();

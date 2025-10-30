@@ -12,7 +12,7 @@ damage_timer = data.frames_to_damage/2; //Start the first hit of damage sooner, 
 lightning_timer = 0;
 
 range = new GlobalRange(self.id)
-enemies_in_range = global.ALL_ENEMIES_LIST; //Remember, don't destroy this! It's used globally.
+entities_in_range = ds_list_create();
 
 shock_area = new RectangularRange(self, x - 8, x + 8, y + 32, y + 64);
 enemies_in_shock_area = ds_list_create();

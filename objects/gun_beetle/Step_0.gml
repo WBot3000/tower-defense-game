@@ -59,3 +59,5 @@ switch (attack_state) {
 	default:
 		break;
 }
+
+movement_controller.on_step();

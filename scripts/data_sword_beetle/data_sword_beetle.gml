@@ -12,6 +12,7 @@ function SwordBeetle() :
 	max_health = 60;
 	
 	//Stat modifiers
+	movement_controller_type = EnemyPathMovementController;
 	default_movement_speed = 1;
 	defense_factor = 2; //All taken damage is divided by this value
 	attack_damage = 10;

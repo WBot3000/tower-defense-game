@@ -18,7 +18,6 @@ new TargetingTracker([
 ]);
 
 cloud_timer = 0;
-enemies_in_range = global.ALL_ENEMIES_LIST;
 projectile_obj = cloud_attack;
 			
 //Buying + selling data

@@ -12,6 +12,7 @@ function GunBeetle() :
 	max_health = 45;
 	
 	//Stat modifiers
+	movement_controller_type = EnemyPathMovementController;
 	default_movement_speed = 1.5;
 	defense_factor = 1; //All taken damage is divided by this value
 	frames_per_attack = seconds_to_roomspeed_frames(2);

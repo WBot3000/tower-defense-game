@@ -49,8 +49,7 @@ camera_controller = new CameraController();
 
 #region Game Subscription Event Initalizations
 broadcast_hub = new BroadcastHub();
-broadcast_hub.register_event("unit_purchased");
-broadcast_hub.register_event("unit_removed");
+broadcast_hub.register_event(EVENT_UNIT_PURCHASED);
 #endregion
 
 

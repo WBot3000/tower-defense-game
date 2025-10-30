@@ -20,9 +20,9 @@ switch (health_state) {
 				
 				
 				if(_potential_targets == undefined) { //Only need to fetch this once
-					entity_data.sight_range.get_entities_in_range([base_enemy], enemies_in_range, true);
+					entity_data.sight_range.get_entities_in_range([base_enemy], entities_in_range, true);
 					//Need to return all entities, as we'll need to make sure the enemy isn't currently being targeted by another flamethrower at the moment
-					_potential_targets = get_entities_using_targeting_tracker(enemies_in_range, target_filter_fn_default, RETURN_ALL_ENTITIES);
+					_potential_targets = get_entities_using_targeting_tracker(entities_in_range, target_filter_fn_default, RETURN_ALL_ENTITIES);
 					_potential_targets_len = array_length(_potential_targets);
 				}
 				
@@ -39,9 +39,9 @@ switch (health_state) {
 						}
 					}
 					//TODO: Check to see if targets are being picked correctly not sure if they are
-					//flamethrower_target = get_entities_using_targeting_tracker(enemies_in_range, target_filter_fn_default);
+					//flamethrower_target = get_entities_using_targeting_tracker(entities_in_range, target_filter_fn_default);
 					//flamethrower_effect.end_instance = flamethrower_target;
-					//ds_list_clear(enemies_in_range);
+					//ds_list_clear(entities_in_range);
 				}
 			}
 			
@@ -61,7 +61,7 @@ switch (health_state) {
 			
 		}
 		
-		ds_list_clear(enemies_in_range);
+		ds_list_clear(entities_in_range);
 		
 		if(array_length(current_targets) > 0) { //TODO: Find a way that doesn't run this every step
 			set_facing_direction( get_entity_facing_direction(self, current_targets[0].x) );
@@ -70,12 +70,12 @@ switch (health_state) {
 	/*
 		//Get new target if needed
 		if(!instance_exists(flamethrower_target) || !entity_data.sight_range.is_entity_in_range(flamethrower_target)) {
-			entity_data.sight_range.get_entities_in_range([base_enemy], enemies_in_range, true);
-			if(ds_list_size(enemies_in_range) > 0) {
+			entity_data.sight_range.get_entities_in_range([base_enemy], entities_in_range, true);
+			if(ds_list_size(entities_in_range) > 0) {
 				//TODO: Check to see if targets are being picked correctly not sure if they are
-				flamethrower_target = get_entities_using_targeting_tracker(enemies_in_range, target_filter_fn_default);
+				flamethrower_target = get_entities_using_targeting_tracker(entities_in_range, target_filter_fn_default);
 				flamethrower_effect.end_instance = flamethrower_target;
-				ds_list_clear(enemies_in_range);
+				ds_list_clear(entities_in_range);
 			}
 			else {
 				flamethrower_target = noone;

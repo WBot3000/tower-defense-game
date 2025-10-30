@@ -10,10 +10,11 @@ set_facing_direction(DIRECTION_RIGHT);
 attack_timer = 0;
 wormhole_timer = seconds_to_roomspeed_frames(20); //Spawn the first worm hole soon after losing the health
 
-units_in_range = ds_list_create();
 targets_in_range = ds_list_create();
 
 animation_bank = global.ANIMBANK_KINGWORM;
+
 event_inherited();
 
-path_start(path_data.default_path, entity_data.default_movement_speed, path_action_stop, false);
+//movement_controller = new EnemyPathMovementController(self);
+movement_controller.start_movement();

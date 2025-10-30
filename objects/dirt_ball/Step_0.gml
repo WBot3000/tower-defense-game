@@ -11,11 +11,11 @@ if(x >= 0 && x <= room_width && y >= 0 && y <= room_height) { //Only need to do 
 	var _end_x = clamp(x + x_speed, 0, room_width);
 	var _end_y = clamp(y + y_speed, 0, room_height);
 	//Using collision_line_list here instead of collision_line, as this should always hit the closest instance (instead of any arbitrary one on the line)
-	collision_line_list(x, y, _end_x, _end_y, base_enemy, false, true, enemies_in_range, true);
+	collision_line_list(x, y, _end_x, _end_y, base_enemy, false, true, entities_in_range, true);
 
-	if(ds_list_size(enemies_in_range) > 0) {
+	if(ds_list_size(entities_in_range) > 0) {
 		//Damage an enemy that should get hit by the projectile
-		deal_damage(enemies_in_range[| 0], data.damage);
+		deal_damage(entities_in_range[| 0], data.damage);
 		
 		//Destroy the bullet
 		instance_destroy()

@@ -42,18 +42,18 @@ function PresenceBasedBuff(_applied_to, _additional_arguments) : Buff(_applied_t
 	//Stores all of the units that are applying this buff. That way, if multiple units are applying the buff, and only one of them is gotten rid of, the buff will still be applied by the other one.
 	applied_by = [_additional_arguments[0]];
 	
-	add_broadcast_subscriber(_additional_arguments[0], "entity_deleted", function(_args) {
+	add_broadcast_subscriber(_additional_arguments[0], EVENT_ENTITY_DELETED, function(_args) {
 		remove_applier(_args[0]);
-	}, applied_to);
+	}, false, applied_to);
 	
 	//Add the unit to the current applied_by list
 	//Since this buff is initialized with the applier as the first argument in the list, we can take that first list object and append it to this buff's list.
 	static on_duplicate_application = function(_additional_arguments_2) {
 		var _applier = _additional_arguments_2[0];
 		array_push(applied_by, _applier);
-		add_broadcast_subscriber(_additional_arguments_2[0], "entity_deleted", function(_args) {
+		add_broadcast_subscriber(_additional_arguments_2[0], EVENT_ENTITY_DELETED, function(_args) {
 			remove_applier(_args[0]);
-		}, applied_to);
+		}, false, applied_to);
 	};
 	
 	static remove_applier = function(_applier) {

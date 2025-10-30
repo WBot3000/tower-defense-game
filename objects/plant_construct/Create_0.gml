@@ -11,8 +11,6 @@ health_state = HEALTH_STATE.ACTIVE;
 cached_round_manager = get_round_manager();
 health_restoration_timer = 0;
 
-entities_in_range = ds_list_create();
-
 //Buying + selling data
 sell_price = global.DATA_PURCHASE_PLANT.price * SELL_PRICE_REDUCTION;
 

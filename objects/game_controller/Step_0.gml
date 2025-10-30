@@ -77,7 +77,7 @@ if(currently_highlighted_ui_elem == noone && _mouse_left_released) {
 				if(can_purchase_unit(self.id, _purchase)) {
 					placed_unit = instance_create_layer(x + TILE_SIZE/2, y + TILE_SIZE, UNIT_LAYER, _purchase.unit);
 					global.player_money -= _purchase.price;
-					other.broadcast_hub.broadcast_event("unit_purchased", [placed_unit]);
+					other.broadcast_hub.broadcast_event(EVENT_UNIT_PURCHASED, [placed_unit]);
 				}
 			}
 		}

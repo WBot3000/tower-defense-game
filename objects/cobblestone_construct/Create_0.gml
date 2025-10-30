@@ -18,10 +18,9 @@ new TargetingTracker([
 ]);
 	
 punch_timer = 0;
-enemies_in_range = ds_list_create();
 
 //Blocking functionality
-blocking_list = [];
+//blocking_list = [];
 			
 //Buying + selling data
 sell_price = global.DATA_PURCHASE_COBBLESTONE.price * SELL_PRICE_REDUCTION;
@@ -34,3 +33,7 @@ unit_upgrades = [undefined, undefined, undefined];
 //Set up animation bank
 animation_bank = global.ANIMBANK_COBBLESTONE;
 event_inherited();
+
+//Blocking functionality
+//TODO: Wrap all the stuff required for setting up blocking in a function of some sort maybe
+broadcast_hub.register_event(EVENT_END_BLOCK);

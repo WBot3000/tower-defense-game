@@ -12,6 +12,7 @@ function ChompyWorm() :
 	max_health = 30;
 	
 	//Stat modifiers
+	movement_controller_type = EnemyPathMovementController;
 	default_movement_speed = 1.5; //In pixels per game step/frame
 	defense_factor = 1; //All taken damage is divided by this value
 	attack_damage = 10;

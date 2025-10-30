@@ -14,10 +14,12 @@ function Butterflybarian() :
 	health_state = HEALTH_STATE.ACTIVE
 	
 	//Stat modifiers
+	movement_controller_type = EnemyPathMovementController;
 	default_movement_speed = 4;
 	defense_factor = 1; //All taken damage is divided by this value
 	attack_damage = 20;
 	frames_per_attack = seconds_to_roomspeed_frames(1);
+	immune_to_block = true;
 	
 	//Monetary value
 	monetary_value = 100;

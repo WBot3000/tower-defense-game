@@ -20,7 +20,6 @@ new TargetingTracker([
 				global.TARGETING_HEALTHY,
 				global.TARGETING_WEAK,
 ]);
-entities_in_range = ds_list_create();
 
 //Buying + selling data
 sell_price = global.DATA_PURCHASE_GOLD.price * SELL_PRICE_REDUCTION;

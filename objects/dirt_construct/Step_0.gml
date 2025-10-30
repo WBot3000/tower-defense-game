@@ -6,18 +6,18 @@ switch (health_state) {
     case HEALTH_STATE.ACTIVE:
 		shot_timer++;
 		if(shot_timer * stat_multipliers[STATS.ATTACK_SPEED] >= entity_data.frames_per_shot) {
-			entity_data.sight_range.get_entities_in_range([base_enemy], enemies_in_range);
+			entity_data.sight_range.get_entities_in_range([base_enemy], entities_in_range);
 
-			if(ds_list_size(enemies_in_range) > 0) {
+			if(ds_list_size(entities_in_range) > 0) {
 				//TODO: Check to see if targets are being picked correctly not sure if they are
-				var _enemy_to_target = get_entities_using_targeting_tracker(enemies_in_range, target_filter_fn_default);
+				var _enemy_to_target = get_entities_using_targeting_tracker(entities_in_range, target_filter_fn_default);
 				
 				set_facing_direction( get_entity_facing_direction(self, _enemy_to_target.x) );
 				shoot_projectile(projectile_obj, _enemy_to_target, entity_data.projectile_data);
 				animation_controller.set_animation("SHOOT");
 				
 				shot_timer = 0;
-				ds_list_clear(enemies_in_range);
+				ds_list_clear(entities_in_range);
 			}
 		}
 		

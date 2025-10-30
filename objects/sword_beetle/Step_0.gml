@@ -14,8 +14,6 @@ switch (health_state) {
 		*/
 		}
 		
-		blocked_check();
-		
 		attack_timer++;
 		if(attack_timer >= entity_data.frames_per_attack) { //Enemy can now attack again
 			
@@ -38,3 +36,5 @@ switch (health_state) {
 	default:
 		break;
 }
+
+movement_controller.on_step();

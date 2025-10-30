@@ -8,11 +8,12 @@ blocked = false;
 
 //Variables to keep track of biting
 attack_timer = 0;
-entities_in_range = ds_list_create();
 
 set_facing_direction(DIRECTION_RIGHT);
 
 animation_bank = global.ANIMBANK_SWORDBEETLE;
+
 event_inherited();
 
-path_start(path_data.default_path, entity_data.default_movement_speed, path_action_stop, false);
+//movement_controller = new EnemyPathMovementController(self);
+movement_controller.start_movement();

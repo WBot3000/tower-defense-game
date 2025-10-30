@@ -16,9 +16,11 @@ function KingWorm() :
 	max_health = 1000;
 	
 	//Stat modifiers
+	movement_controller_type = EnemyPathMovementController;
 	default_movement_speed = 0.5;
 	defense_factor = 1; //All taken damage is divided by this value
 	attack_damage = 10;
+	immune_to_block = true;
 	frames_per_attack = seconds_to_roomspeed_frames(1);
 	frames_per_wormhole_summon = seconds_to_roomspeed_frames(20);
 	
