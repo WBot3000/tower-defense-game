@@ -3,6 +3,8 @@
 //Buff-debuff list
 buffs = new BuffList();
 
+upgrade_purchased = 0;
+
 //Stat multipliers (based on buffs/debuffs and other stats)
 stat_multipliers = array_create(STATS.LENGTH, 1);
 

@@ -15,7 +15,7 @@ enum MOVEMENT_STATE {
 }
 
 //In pixels/second
-#macro KNOCKBACK_SPEED -2
+#macro KNOCKBACK_SPEED -3
 
 //Used to control how enemies should be moving at any given instance
 //Currently assumes a path is being used, but this should be changed
@@ -64,6 +64,12 @@ function EnemyMovementController(_owner = other) constructor {
 					break;
 				case MOVEMENT_STATE.IN_KNOCKBACK:
 					//Decrement knockback timer, and if the timer reaches zero, then go back into the unimpeded state
+					if(path_position == 0) {
+						path_speed = 0;
+					}
+					else {
+						path_speed = KNOCKBACK_SPEED;
+					}
 					other.knockback_timer--;
 					if(other.knockback_timer <= 0) { //In case of any shenanigans
 						other.knockback_timer = 0;
@@ -132,7 +138,9 @@ function EnemyPathMovementController(_owner = other) : EnemyMovementController(_
 	
 	
 	static initiate_knockback = function() {
-		path_speed = KNOCKBACK_SPEED //Tinker with this value a bit to see what works best
+		with(owner) {
+			path_speed = KNOCKBACK_SPEED //Tinker with this value a bit to see what works best
+		}
 	}
 	
 }

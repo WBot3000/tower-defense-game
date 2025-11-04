@@ -38,10 +38,6 @@ switch (health_state) {
 							break; //Found a new target, don't need to do any more looping
 						}
 					}
-					//TODO: Check to see if targets are being picked correctly not sure if they are
-					//flamethrower_target = get_entities_using_targeting_tracker(entities_in_range, target_filter_fn_default);
-					//flamethrower_effect.end_instance = flamethrower_target;
-					//ds_list_clear(entities_in_range);
 				}
 			}
 			

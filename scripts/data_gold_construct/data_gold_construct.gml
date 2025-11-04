@@ -52,7 +52,7 @@ function UpgradeGoldConstruct1(_unit = other) :
 				add_broadcast_subscriber(get_logic_controller(), EVENT_UNIT_PURCHASED, function(args) {
 					var _unit = args[0]; //args[0] = unit purchased
 					if(entity_data.sight_range.is_entity_in_range(_unit)) {
-						_unit.buffs.apply_buff(/*new GoldRushBuff(_unit)*/BUFF_IDS.GOLD_RUSH, [self]);
+						_unit.buffs.apply_buff(BUFF_IDS.GOLD_RUSH, [self]);
 					}
 				});
 			}

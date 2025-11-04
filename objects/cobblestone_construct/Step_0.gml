@@ -18,6 +18,19 @@ switch (health_state) {
 				draw_damage_effect(_enemy_to_target, spr_punch);
 				
 				punch_timer = 0;
+				punch_counter++;
+				if(punch_counter >= 5) {
+					if(upgrade_purchased == 1) {
+						for(var i = 0, len = ds_list_size(entities_in_range); i < len; ++i) {
+							var _enemy = entities_in_range[| i];
+							with(_enemy) {
+								movement_controller.add_knockback(seconds_to_roomspeed_frames(1));
+							}
+						}
+						part_particles_create(global.PARTICLE_SYSTEM, x, y - TILE_SIZE/2, global.PARTICLE_QUAKE, 1);
+					}
+					punch_counter = 0;
+				}
 				ds_list_clear(entities_in_range);
 			}
 		}

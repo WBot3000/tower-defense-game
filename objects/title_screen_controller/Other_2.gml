@@ -55,6 +55,14 @@ part_type_alpha3(global.PARTICLE_HEALING_AURA, 1, 1, 0);
 part_type_blend(global.PARTICLE_HEALING_AURA, 0);
 part_type_life(global.PARTICLE_HEALING_AURA, _aura_time, _aura_time);
 
+global.PARTICLE_QUAKE = part_type_create();
+part_type_sprite(global.PARTICLE_QUAKE, spr_quake, true, true, false);
+part_type_size(global.PARTICLE_QUAKE, 1, 1, 0, 0);
+part_type_alpha3(global.PARTICLE_QUAKE, 1, 1, 0);
+part_type_direction(global.PARTICLE_QUAKE, 90, 90, 0, 0);
+part_type_blend(global.PARTICLE_QUAKE, 0);
+part_type_life(global.PARTICLE_QUAKE, 50, 50);
+
 
 global.PARTICLE_DIGIT_0 = part_type_create();
 global.PARTICLE_DIGIT_1 = part_type_create();

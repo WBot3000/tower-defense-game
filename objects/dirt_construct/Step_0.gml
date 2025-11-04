@@ -21,6 +21,21 @@ switch (health_state) {
 			}
 		}
 		
+		if(upgrade_purchased == 3 && round_manager.is_spawning_enemies()) {
+			splotch_creation_timer++;
+			if(splotch_creation_timer > entity_data.frames_per_splotch) {
+				entity_data.sight_range.get_entities_in_range([path_tile], entities_in_range);
+				var len = ds_list_size(entities_in_range);
+				if(len > 0) {
+					var _tile_index = irandom(len - 1);
+					var _tile = entities_in_range[| _tile_index]; 
+					create_tile_aligned_instance(_tile.x, _tile.y, GROUND_INSTANCES_LAYER, mud_splotch, {});
+					ds_list_clear(entities_in_range);
+				}
+				splotch_creation_timer = 0;
+			}
+		}
+		
 		if(current_health <= 0) {
 			standard_on_ko_actions();
 			shot_timer = 0;

@@ -1,5 +1,5 @@
 {
-  "$GMNotes":"",
+  "$GMNotes":"v1",
   "%Name":"Level Instance Order Notes",
   "name":"Level Instance Order Notes",
   "parent":{

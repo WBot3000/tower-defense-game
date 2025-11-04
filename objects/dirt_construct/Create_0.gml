@@ -20,6 +20,10 @@ new TargetingTracker([
 	
 shot_timer = 0;
 projectile_obj = dirt_ball;
+
+//Mud functionality for upgrade 3
+splotch_creation_timer = 0;
+round_manager = get_round_manager();
 			
 //Buying + selling data
 sell_price = global.DATA_PURCHASE_DIRT.price * SELL_PRICE_REDUCTION;
@@ -27,7 +31,7 @@ sell_price = global.DATA_PURCHASE_DIRT.price * SELL_PRICE_REDUCTION;
 stat_upgrades = [new DirtConstructDamageUpgrade(), new DirtConstructAttackSpeedUpgrade(), 
 	new DirtConstructRestorationUpgrade(), undefined];
 
-unit_upgrades = [new UpgradeDirtConstruct1(), undefined, undefined];
+unit_upgrades = [new UpgradeDirtConstruct1(), undefined, new UpgradeDirtConstruct3()];
 
 //Set up animation bank
 animation_bank = global.ANIMBANK_DIRT;

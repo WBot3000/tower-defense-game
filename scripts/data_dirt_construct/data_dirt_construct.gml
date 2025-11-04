@@ -7,6 +7,13 @@ global.ANIMBANK_DIRT.add_animation("SHOOT", spr_dirt_construct_shooting);
 global.ANIMBANK_DIRT_U1 = new UnitAnimationBank(spr_dirt_construct_u1);
 global.ANIMBANK_DIRT_U1.add_animation("SHOOT", spr_dirt_construct_u1_shooting);
 
+global.ANIMBANK_DIRT_U3 = new UnitAnimationBank(spr_dirt_construct_u3);
+global.ANIMBANK_DIRT_U3.add_animation("SHOOT", spr_dirt_construct_u3_shooting);
+
+global.ANIMBANK_MUD_SPLOTCH = new AnimationBank(spr_mud_splotch);
+global.ANIMBANK_MUD_SPLOTCH.add_animation("GROWING", spr_mud_splotch_growing);
+global.ANIMBANK_MUD_SPLOTCH.add_animation("SHRINKING", spr_mud_splotch_shrinking);
+
 #region DirtConstruct (Class)
 function DirtConstruct() : CombatantData() constructor {
 	name = "Dirt"
@@ -16,6 +23,8 @@ function DirtConstruct() : CombatantData() constructor {
 	defense_factor = 1; //All taken damage is divided by this value
 	recovery_rate = 10; //Health points per second
 	frames_per_shot = seconds_to_roomspeed_frames(2);
+	
+	frames_per_splotch = seconds_to_roomspeed_frames(10);
 	
 	sight_range = new CircularRange(inst, 0, 0, tilesize_to_pixels(3));
 
@@ -126,8 +135,22 @@ function UpgradeDirtConstruct1(_unit = other) :
 		
 		static upgrade_fn = function() {
 			
-			unit_to_upgrade.projectile_obj = piercing_root;
-			unit_to_upgrade.entity_data.projectile_data.pierce = 3;
+			unit_to_upgrade.upgrade_purchased = 1
+		}
+}
+
+
+/*
+	Upgrade from Dirt Construct to Mudbath
+*/
+function UpgradeDirtConstruct3(_unit = other) :
+	UnitUpgrade("Mudbath", 100, 0, 0, 3) constructor {
+		new_animbank = global.ANIMBANK_DIRT_U3;
+		//new_stat_upgrade = new DirtConstructU1PierceUpgrade(_unit);
+		
+		static upgrade_fn = function() {
+			
+			unit_to_upgrade.upgrade_purchased = 3
 		}
 }
 #endregion

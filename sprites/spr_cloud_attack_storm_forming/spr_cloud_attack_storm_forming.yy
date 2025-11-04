@@ -1,5 +1,5 @@
 {
-  "$GMSprite":"",
+  "$GMSprite":"v2",
   "%Name":"spr_cloud_attack_storm_forming",
   "bboxMode":0,
   "bbox_bottom":14,
@@ -12,9 +12,9 @@
   "edgeFiltering":false,
   "For3D":false,
   "frames":[
-    {"$GMSpriteFrame":"","%Name":"2bf7a42c-7946-4ebe-9b7b-f76beb545cd3","name":"2bf7a42c-7946-4ebe-9b7b-f76beb545cd3","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
-    {"$GMSpriteFrame":"","%Name":"a8ef9fab-7241-48ee-a0c3-9ec3ae375cab","name":"a8ef9fab-7241-48ee-a0c3-9ec3ae375cab","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
-    {"$GMSpriteFrame":"","%Name":"9fbebc79-f841-4dcc-bc63-52d8c8c4a5fb","name":"9fbebc79-f841-4dcc-bc63-52d8c8c4a5fb","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"2bf7a42c-7946-4ebe-9b7b-f76beb545cd3","name":"2bf7a42c-7946-4ebe-9b7b-f76beb545cd3","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"a8ef9fab-7241-48ee-a0c3-9ec3ae375cab","name":"a8ef9fab-7241-48ee-a0c3-9ec3ae375cab","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
+    {"$GMSpriteFrame":"v1","%Name":"9fbebc79-f841-4dcc-bc63-52d8c8c4a5fb","name":"9fbebc79-f841-4dcc-bc63-52d8c8c4a5fb","resourceType":"GMSpriteFrame","resourceVersion":"2.0",},
   ],
   "gridX":0,
   "gridY":0,
@@ -72,15 +72,9 @@
     "timeUnits":1,
     "tracks":[
       {"$GMSpriteFramesTrack":"","builtinName":0,"events":[],"inheritsTrackColour":true,"interpolation":1,"isCreationTrack":false,"keyframes":{"$KeyframeStore<SpriteFrameKeyframe>":"","Keyframes":[
-            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"2bf7a42c-7946-4ebe-9b7b-f76beb545cd3","path":"sprites/spr_cloud_attack_storm_forming/spr_cloud_attack_storm_forming.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"990a92d1-5903-40f2-b072-7665f98a38df","IsCreationKey":false,"Key":0.0,"Length":3.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
-            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"a8ef9fab-7241-48ee-a0c3-9ec3ae375cab","path":"sprites/spr_cloud_attack_storm_forming/spr_cloud_attack_storm_forming.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"e48c5039-236b-47a3-a915-5c983066a7be","IsCreationKey":false,"Key":3.0,"Length":3.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
-            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{
-                "0":{"$SpriteFrameKeyframe":"","Id":{"name":"9fbebc79-f841-4dcc-bc63-52d8c8c4a5fb","path":"sprites/spr_cloud_attack_storm_forming/spr_cloud_attack_storm_forming.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},
-              },"Disabled":false,"id":"7f6936be-2db3-4a90-b15b-b7401c381f24","IsCreationKey":false,"Key":6.0,"Length":3.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{"0":{"$SpriteFrameKeyframe":"","Id":{"name":"2bf7a42c-7946-4ebe-9b7b-f76beb545cd3","path":"sprites/spr_cloud_attack_storm_forming/spr_cloud_attack_storm_forming.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},},"Disabled":false,"id":"990a92d1-5903-40f2-b072-7665f98a38df","IsCreationKey":false,"Key":0.0,"Length":3.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{"0":{"$SpriteFrameKeyframe":"","Id":{"name":"a8ef9fab-7241-48ee-a0c3-9ec3ae375cab","path":"sprites/spr_cloud_attack_storm_forming/spr_cloud_attack_storm_forming.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},},"Disabled":false,"id":"e48c5039-236b-47a3-a915-5c983066a7be","IsCreationKey":false,"Key":3.0,"Length":3.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
+            {"$Keyframe<SpriteFrameKeyframe>":"","Channels":{"0":{"$SpriteFrameKeyframe":"","Id":{"name":"9fbebc79-f841-4dcc-bc63-52d8c8c4a5fb","path":"sprites/spr_cloud_attack_storm_forming/spr_cloud_attack_storm_forming.yy",},"resourceType":"SpriteFrameKeyframe","resourceVersion":"2.0",},},"Disabled":false,"id":"7f6936be-2db3-4a90-b15b-b7401c381f24","IsCreationKey":false,"Key":6.0,"Length":3.0,"resourceType":"Keyframe<SpriteFrameKeyframe>","resourceVersion":"2.0","Stretch":false,},
           ],"resourceType":"KeyframeStore<SpriteFrameKeyframe>","resourceVersion":"2.0",},"modifiers":[],"name":"frames","resourceType":"GMSpriteFramesTrack","resourceVersion":"2.0","spriteId":null,"trackColour":0,"tracks":[],"traits":0,},
     ],
     "visibleRange":null,

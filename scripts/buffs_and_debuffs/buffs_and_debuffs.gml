@@ -15,11 +15,13 @@
 enum BUFF_IDS {
 	NONE,
 	ON_FIRE,
-	GOLD_RUSH
+	MUDDY,
+	GOLD_RUSH,
 }
 
 global.BUFF_IDS_TO_STRUCTS = {}
 global.BUFF_IDS_TO_STRUCTS[$ string(BUFF_IDS.ON_FIRE)] = OnFireBuff;
+global.BUFF_IDS_TO_STRUCTS[$ string(BUFF_IDS.MUDDY)] = MuddyBuff;
 global.BUFF_IDS_TO_STRUCTS[$ string(BUFF_IDS.GOLD_RUSH)] = GoldRushBuff;
 
 
@@ -95,6 +97,44 @@ function OnFireBuff(_applied_to, _additional_arguments) : Buff(_applied_to, _add
 }
 
 
+#macro MUDDY_TIME_LIMIT seconds_to_roomspeed_frames(5)
+function MuddyBuff(_applied_to, _additional_arguments) : Buff(_applied_to, _additional_arguments) constructor {
+	static buff_id = BUFF_IDS.MUDDY;
+	static buff_name = "Muddy";
+	static buff_sprite = spr_muddy_icon;
+	
+	muddy_timer = 0;
+
+	static on_initial_application = function() {
+		with(applied_to) {
+			stat_multipliers[STATS.MOVEMENT_SPEED] *= 0.5;
+			movement_controller.retrigger_speed_calculation();
+		}
+	}
+	
+	
+	static on_removal = function() {
+		with(applied_to) {
+			stat_multipliers[STATS.MOVEMENT_SPEED] *= 2;
+			movement_controller.retrigger_speed_calculation();
+		}
+	}
+	
+	
+	static on_duplicate_application = function() {
+		muddy_timer = 0;
+	}
+	
+	
+	static on_step = function() {
+		muddy_timer++;
+		if(muddy_timer > MUDDY_TIME_LIMIT) {
+			applied_to.buffs.remove_buff(BUFF_IDS.MUDDY);
+		}
+	}
+}
+
+
 #macro GOLD_RUSH_ARROW_TIME seconds_to_roomspeed_frames(1)
 function GoldRushBuff(_applied_to, _additional_arguments) : PresenceBasedBuff(_applied_to, _additional_arguments) constructor {
 	static buff_id = BUFF_IDS.GOLD_RUSH;
@@ -106,14 +146,14 @@ function GoldRushBuff(_applied_to, _additional_arguments) : PresenceBasedBuff(_a
 	static on_initial_application = function() {
 		with(applied_to) {
 			stat_multipliers[STATS.ATTACK_SPEED] *= 2;
-			image_speed = 2;
+			image_speed = stat_multipliers[STATS.ATTACK_SPEED];
 		}
 	}
 	
 	static on_removal = function() {
 		with(applied_to) {
 			stat_multipliers[STATS.ATTACK_SPEED] /= 2;
-			image_speed = 1;
+			image_speed = stat_multipliers[STATS.ATTACK_SPEED];
 		}
 	}
 	

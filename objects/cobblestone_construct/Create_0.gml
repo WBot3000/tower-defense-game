@@ -18,17 +18,17 @@ new TargetingTracker([
 ]);
 	
 punch_timer = 0;
+punch_counter = 0; //Amount of punches needed for earthquake event for first upgraded
 
-//Blocking functionality
-//blocking_list = [];
 			
 //Buying + selling data
 sell_price = global.DATA_PURCHASE_COBBLESTONE.price * SELL_PRICE_REDUCTION;
 
-stat_upgrades = [undefined, undefined, 
-	undefined, undefined];
+stat_upgrades = [new DirtConstructAttackSpeedUpgrade(), new DirtConstructAttackSpeedUpgrade(), 
+	new DirtConstructAttackSpeedUpgrade(), undefined];
 
-unit_upgrades = [undefined, undefined, undefined];
+unit_upgrades = [new UpgradeCobblestoneConstruct1(), undefined, undefined];
+upgrade_purchased = 0;
 
 //Set up animation bank
 animation_bank = global.ANIMBANK_COBBLESTONE;
